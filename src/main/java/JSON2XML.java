@@ -102,7 +102,7 @@ public class JSON2XML {
 
     public static String start() {
         try {
-            String jsonStr = FileUtils.readFileToString(new File("src/main/resources/test2.json"), "UTF-8");
+            String jsonStr = FileUtils.readFileToString(new File("src/main/resources/books.json"), "UTF-8");
             JSONObject jsonObject = JSON.parseObject(jsonStr);
 
             StringBuffer buffer = new StringBuffer();
