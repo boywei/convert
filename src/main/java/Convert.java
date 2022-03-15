@@ -1,14 +1,22 @@
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import entity.Car;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
 
 public class Convert {
 
-    private int countOfCar;
-
+    // 这里对应json的各个部分
+    private Car[] cars;
+    private String map;
+    private String source;
+    private int timeStep;
+    private String weather;
 
     // （一）对应XML声明头
     private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
@@ -19,8 +27,9 @@ public class Convert {
         buffer.append("<nta>\n");
 
         addDeclaration(buffer);
-        // 可能有多个template需要添加
-        addTemplate(buffer);
+        for(int i=0; i<cars.length; i++) {
+            addTemplate(buffer, i);
+        }
         addSystem(buffer);
         addQueries(buffer);
 
@@ -29,7 +38,7 @@ public class Convert {
 
     // 1 对应declaration部分，即代码编写处
     private void addDeclaration(StringBuffer buffer) {
-        buffer.append("\t<declaration>");
+        buffer.append("\t<declaration>\n");
 
         // 已定义部分，与JSON文本内容无关
         addDefined(buffer);
@@ -50,53 +59,101 @@ public class Convert {
     }
 
     // 2 对应template部分，即每辆车的行为树
-    private void addTemplate(StringBuffer buffer) {
+    private void addTemplate(StringBuffer buffer, int index) {
         buffer.append("\t<template>\n");
 
-        addName(buffer);
-        addLocalDeclaration(buffer);
-        addLocations(buffer);
-        addBranchpoints(buffer);
-        addInit(buffer);
-        addTransitions(buffer);
+        addName(buffer, index);
+        addLocalDeclaration(buffer, index);
+        addLocations(buffer, index);
+        addBranchPoints(buffer, index);
+        addInit(buffer, index);
+        addTransitions(buffer, index);
 
         buffer.append("\t</template>\n");
     }
 
     // 2.1 template名称，即车辆名称
-    private void addName(StringBuffer buffer) {
+    private void addName(StringBuffer buffer, int index) {
+        // <name>Template</name>
+        buffer.append("\t\t<name>");
 
+        // 车辆名称
+
+        buffer.append("</name>\n");
     }
 
     // 2.2 局部变量的声明
-    private void addLocalDeclaration(StringBuffer buffer) {
+    private void addLocalDeclaration(StringBuffer buffer, int index) {
+        buffer.append("\t\t<declaration>\n");
 
+        // 局部变量，也可以不写
+
+        buffer.append("\t\t</declaration>");
     }
 
     // 2.3 自动机的每个location，每个状态
-    private void addLocations(StringBuffer buffer) {
+    private void addLocations(StringBuffer buffer, int index) {
+        int countOfLocation = 5;
+        for(int i=0; i<countOfLocation; i++) {
+            String id = "id" + i, name = "name";
+            int x = 119, y=-119;
+            int nameX = x-10, nameY = y-34;
+
+            buffer.append("\t\t<location id=\"" + id + "\" x=\"" + x + "\" y=\"" + y + "\">");
+
+            buffer.append("\t\t\t<name x=\"" + nameX + "\" y=\"" + nameY + "\">");
+            buffer.append(name);
+            buffer.append("</name>\n");
+
+            buffer.append("\t\t</location>\n");
+        }
+
 
     }
 
     // 2.4 转换点branch point
-    private void addBranchpoints(StringBuffer buffer) {
-
+    private void addBranchPoints(StringBuffer buffer, int index) {
+        int countOfBranchPoint = 5;
+        for(int i=0; i<countOfBranchPoint; i++) {
+            String id = "id";
+            int x=229, y=-25;
+            buffer.append("\t\t<branchpoint id=\"" + id + "\" x=\"" + x + "\" y=\"" + y + "\">\n");
+            buffer.append("\t\t</branchpoint>\n");
+        }
     }
 
     // 2.5 初始节点
-    private void addInit(StringBuffer buffer) {
-
+    private void addInit(StringBuffer buffer, int index) {
+        // <init ref="id0"/>
+        String id = "id0";
+        buffer.append("\t\t<init ref=\"" + id + "/>\n");
     }
 
     // 2.6 连线
-    private void addTransitions(StringBuffer buffer) {
-
+    private void addTransitions(StringBuffer buffer, int index) {
+        //      <transition>
+        //			<source ref="id3"/>
+        //			<target ref="id0"/>
+        //		</transition>
+        String from = "id0", to = "id1";
+        buffer.append("\t\t<transition>\n");
+        buffer.append("\t\t\t<source ref=\"" + from + ">\n");
+        buffer.append("\t\t\t<target ref=\"" + to + ">\n");
+        buffer.append("\t\t</transition>\n");
     }
 
 
     // 3 对应system部分，即系统模版声明处
     private void addSystem(StringBuffer buffer) {
+        buffer.append("\t<system>\n");
 
+        buffer.append("system ");
+        for(int i=1; i<cars.length; i++) {
+            buffer.append(", " + cars[i].getName());
+        }
+        buffer.append(";\n");
+
+        buffer.append("\t</system>\n");
     }
 
     // 4 对应queries部分，即性质规约？
@@ -124,11 +181,43 @@ public class Convert {
         buffer.append("\t\t</query>");
     }
 
+    // 提取所有的信息，转化为Java中的类
+    private void init(JSONObject jsonObject) {
+        Set<Map.Entry<String, Object>> set = jsonObject.entrySet();
+
+        for(Map.Entry<String, Object> entry : set) {
+            if(entry.getKey().equals("cars")) {
+                JSONArray ja = jsonObject.getJSONArray(entry.getKey());
+                int countOfCar = ja.size();
+                cars = new Car[countOfCar];
+                for(int i = 0; i < countOfCar; i++) {
+                    Car car = (Car) ja.get(i);
+                    cars[i] = car;
+                }
+            }
+            else if(entry.getKey().equals("map")){
+                map = entry.getValue().toString();
+            }
+            else if(entry.getKey().equals("source")) {
+                source = entry.getValue().toString();
+            }
+            else if(entry.getKey().equals("timeStep")) {
+                timeStep = (Integer) entry.getValue();
+            }
+            else if(entry.getKey().equals("weather")) {
+                weather = entry.getValue().toString();
+            }
+
+        }
+    }
+
     // 从这里开始
     public String start() {
         try {
-            String jsonStr = FileUtils.readFileToString(new File("src/main/resources/test2.json"), "UTF-8");
+            String jsonStr = FileUtils.readFileToString(new File("src/main/resources/test.json"), "UTF-8");
             JSONObject jsonObject = JSON.parseObject(jsonStr);
+
+            init(jsonObject);
 
             StringBuffer buffer = new StringBuffer();
             buffer.append(XML_HEAD);
