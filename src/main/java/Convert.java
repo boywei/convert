@@ -1,9 +1,7 @@
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import entity.Behavior;
-import entity.BranchPoint;
-import entity.Car;
+import entity.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -89,7 +87,7 @@ public class Convert {
 
         // 局部变量，也可以不写
 
-        buffer.append("\t\t</declaration>");
+        buffer.append("\t\t</declaration>\n");
     }
 
     // 2.3 自动机的每个location，每个状态
@@ -127,7 +125,7 @@ public class Convert {
     private void addInit(StringBuffer buffer, int index) {
         // <init ref="id0"/>
         String id = "id0";
-        buffer.append("\t\t<init ref=\"" + id + "/>\n");
+        buffer.append("\t\t<init ref=" + id + "/>\n");
     }
 
     // 2.6 连线
@@ -136,11 +134,17 @@ public class Convert {
         //			<source ref="id3"/>
         //			<target ref="id0"/>
         //		</transition>
-        String from = "id0", to = "id1";
-        buffer.append("\t\t<transition>\n");
-        buffer.append("\t\t\t<source ref=\"" + from + ">\n");
-        buffer.append("\t\t\t<target ref=\"" + to + ">\n");
-        buffer.append("\t\t</transition>\n");
+        CommonTransition[] commonTransitions = cars[index].getmTree().getCommonTransitions();
+        ProbabilityTransition[] probabilityTransitions = cars[index].getmTree().getProbabilityTransitions();
+
+        for(CommonTransition commonTransition : commonTransitions) {
+            String from = "id" + commonTransition.getId(), to = "id" + commonTransition.getId();
+            buffer.append("\t\t<transition>\n");
+            buffer.append("\t\t\t<source ref=\"" + from + "\">\n");
+            buffer.append("\t\t\t<target ref=\"" + to + "\">\n");
+            buffer.append("\t\t</transition>\n");
+        }
+
     }
 
 
@@ -149,6 +153,7 @@ public class Convert {
         buffer.append("\t<system>\n");
 
         buffer.append("system ");
+        buffer.append(cars[0].getName());
         for(int i=1; i<cars.length; i++) {
             buffer.append(", " + cars[i].getName());
         }
@@ -159,12 +164,12 @@ public class Convert {
 
     // 4 对应queries部分，即性质规约？
     private void addQueries(StringBuffer buffer) {
-        buffer.append("\t<queries>");
+        buffer.append("\t<queries>\n");
 
         // 可能有多个query
         addQuery(buffer);
 
-        buffer.append("\t</queries>");
+        buffer.append("\t</queries>\n");
     }
 
     // 4.1
@@ -179,7 +184,7 @@ public class Convert {
         // 这里是comment的内容
         buffer.append("</comment>\n" );
 
-        buffer.append("\t\t</query>");
+        buffer.append("\t\t</query>\n");
     }
 
     // 提取所有的信息，转化为Java中的类
