@@ -5,7 +5,9 @@ import entity.*;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Map;
 import java.util.Set;
 
@@ -125,7 +127,7 @@ public class Convert {
     private void addInit(StringBuffer buffer, int index) {
         // <init ref="id0"/>
         String id = "id0";
-        buffer.append("\t\t<init ref=" + id + "/>\n");
+        buffer.append("\t\t<init ref=\"" + id + "\"/>\n");
     }
 
     // 2.6 连线
@@ -138,10 +140,18 @@ public class Convert {
         ProbabilityTransition[] probabilityTransitions = cars[index].getmTree().getProbabilityTransitions();
 
         for(CommonTransition commonTransition : commonTransitions) {
-            String from = "id" + commonTransition.getId(), to = "id" + commonTransition.getId();
+            String from = "id" + commonTransition.getSourceId(), to = "id" + commonTransition.getTargetId();
             buffer.append("\t\t<transition>\n");
-            buffer.append("\t\t\t<source ref=\"" + from + "\">\n");
-            buffer.append("\t\t\t<target ref=\"" + to + "\">\n");
+            buffer.append("\t\t\t<source ref=\"" + from + "\"/>\n");
+            buffer.append("\t\t\t<target ref=\"" + to + "\"/>\n");
+            buffer.append("\t\t</transition>\n");
+        }
+
+        for(ProbabilityTransition probabilityTransition : probabilityTransitions) {
+            String from = "id" + probabilityTransition.getSourceId(), to = "id" + probabilityTransition.getTargetId();
+            buffer.append("\t\t<transition>\n");
+            buffer.append("\t\t\t<source ref=\"" + from + "\"/>\n");
+            buffer.append("\t\t\t<target ref=\"" + to + "\"/>\n");
             buffer.append("\t\t</transition>\n");
         }
 
@@ -220,7 +230,10 @@ public class Convert {
     // 从这里开始
     public String start() {
         try {
+            // 1. 读取
             String jsonStr = FileUtils.readFileToString(new File("src/main/resources/test.json"), "UTF-8");
+
+            // 2. 解析
             JSONObject jsonObject = JSON.parseObject(jsonStr);
 
             init(jsonObject);
@@ -229,8 +242,19 @@ public class Convert {
             buffer.append(XML_HEAD);
             buffer.append(UPPAAL_HEAD);
             addNta(buffer);
+            String result = buffer.toString();
 
-            return buffer.toString();
+            // 3. 写入
+            File f = new File("src/main/resources/test.xml");
+            FileOutputStream fop = new FileOutputStream(f);
+            OutputStreamWriter writer = new OutputStreamWriter(fop, "UTF-8");
+
+            writer.append(result);
+
+            writer.close();
+            fop.close();
+
+            return result;
         } catch (IOException e) {
             e.printStackTrace();
         }
