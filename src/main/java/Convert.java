@@ -52,11 +52,22 @@ public class Convert {
 
     // 1.1 添加已经定义好的地图数据结构、车辆数据结构、一些信息部分和函数部分
     private void addDefined(StringBuffer buffer) {
-
+        try {
+            String definedContent = FileUtils.readFileToString(new File("src/main/resources/defined.txt"), "UTF-8");
+            buffer.append(definedContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // 1.2 根据JSON中提取到的信息，创建声明变量的语句
     private void create(StringBuffer buffer) {
+
+        // 解析OpenDrive地图，道路声明
+        buffer.append(MapConvert.convertOpenDrive(map));
+
+        // 根据提取出的信息，车辆等变量声明
+
 
     }
 

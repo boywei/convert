@@ -244,7 +244,7 @@
 		"roadId": 1,
 		"treePath": "test2.tree"
 	}],
-	"map": "",
+	"map": "src/main/java/resources/testMap.xml",
 	"source": "",
 	"timeStep": 1,
 	"weather": "clear"

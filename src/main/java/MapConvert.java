@@ -1,7 +1,8 @@
 public class MapConvert {
 
-    public void getOpenDrive() {
+    public static String convertOpenDrive(String map) {
 
+        return null;
     }
 
 }
