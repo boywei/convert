@@ -1,6 +1,8 @@
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import entity.Behavior;
+import entity.BranchPoint;
 import entity.Car;
 import org.apache.commons.io.FileUtils;
 
@@ -19,7 +21,7 @@ public class Convert {
     private String weather;
 
     // （一）对应XML声明头
-    private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+    private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
     private static final String UPPAAL_HEAD = "<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>\n";
 
     // （二）对应nta一个整体部分，XML头下面就是这一大块，涵盖1234部分
@@ -27,13 +29,13 @@ public class Convert {
         buffer.append("<nta>\n");
 
         addDeclaration(buffer);
-        for(int i=0; i<cars.length; i++) {
+        for(int i = 0; i < cars.length; i++) {
             addTemplate(buffer, i);
         }
         addSystem(buffer);
         addQueries(buffer);
 
-        buffer.append("</nta>");
+        buffer.append("</nta>\n");
     }
 
     // 1 对应declaration部分，即代码编写处
@@ -45,7 +47,7 @@ public class Convert {
         // 新创建的变量声明等，与JSON内容相关
         create(buffer);
 
-        buffer.append("\t</declaration>");
+        buffer.append("\t</declaration>\n");
     }
 
     // 1.1 添加已经定义好的地图数据结构、车辆数据结构、一些信息部分和函数部分
@@ -74,11 +76,10 @@ public class Convert {
 
     // 2.1 template名称，即车辆名称
     private void addName(StringBuffer buffer, int index) {
-        // <name>Template</name>
+        String name = cars[index].getName();
+
         buffer.append("\t\t<name>");
-
-        // 车辆名称
-
+        buffer.append(name);
         buffer.append("</name>\n");
     }
 
@@ -93,13 +94,14 @@ public class Convert {
 
     // 2.3 自动机的每个location，每个状态
     private void addLocations(StringBuffer buffer, int index) {
-        int countOfLocation = 5;
-        for(int i=0; i<countOfLocation; i++) {
-            String id = "id" + i, name = "name";
-            int x = 119, y=-119;
-            int nameX = x-10, nameY = y-34;
+        Behavior[] behaviors = cars[index].getmTree().getBehaviors();
+        int countOfLocation = behaviors.length;
+        for(int i = 0; i < countOfLocation; i++) {
+            String id = "id" + behaviors[i].getId(), name = behaviors[i].getName();
+            double x = behaviors[i].getPosition().getX(), y = behaviors[i].getPosition().getY();
+            double nameX = x-10, nameY = y-34;
 
-            buffer.append("\t\t<location id=\"" + id + "\" x=\"" + x + "\" y=\"" + y + "\">");
+            buffer.append("\t\t<location id=\"" + id + "\" x=\"" + x + "\" y=\"" + y + "\">\n");
 
             buffer.append("\t\t\t<name x=\"" + nameX + "\" y=\"" + nameY + "\">");
             buffer.append(name);
@@ -108,15 +110,14 @@ public class Convert {
             buffer.append("\t\t</location>\n");
         }
 
-
     }
 
     // 2.4 转换点branch point
     private void addBranchPoints(StringBuffer buffer, int index) {
-        int countOfBranchPoint = 5;
-        for(int i=0; i<countOfBranchPoint; i++) {
-            String id = "id";
-            int x=229, y=-25;
+        BranchPoint[] branchPoints = cars[index].getmTree().getBranchPoints();
+        for (BranchPoint branchPoint : branchPoints) {
+            String id = "id" + branchPoint.getId();
+            double x = branchPoint.getPosition().getX(), y = branchPoint.getPosition().getY();
             buffer.append("\t\t<branchpoint id=\"" + id + "\" x=\"" + x + "\" y=\"" + y + "\">\n");
             buffer.append("\t\t</branchpoint>\n");
         }
@@ -191,7 +192,7 @@ public class Convert {
                 int countOfCar = ja.size();
                 cars = new Car[countOfCar];
                 for(int i = 0; i < countOfCar; i++) {
-                    Car car = (Car) ja.get(i);
+                    Car car = JSONObject.parseObject(ja.get(i).toString(), Car.class);
                     cars[i] = car;
                 }
             }
