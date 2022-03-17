@@ -64,7 +64,7 @@ public class Convert {
     private void create(StringBuffer buffer) {
 
         // 解析OpenDrive地图，道路声明
-        buffer.append(MapConvert.convertOpenDrive(map));
+        buffer.append(new MapConvert().convertMap(map));
 
         // 根据提取出的信息，车辆等变量声明
 
