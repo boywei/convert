@@ -8,6 +8,10 @@ public class ProbabilityTransition {
     private Position treeTextPosition;
     private String weight;
 
+    private int level;
+    private int group;
+    private int number;
+
     public ProbabilityTransition(int id, Position[] linkPoints, int sourceId, int targetId, Position treeTextPosition, String weight) {
         this.id = id;
         this.linkPoints = linkPoints;
@@ -64,4 +68,29 @@ public class ProbabilityTransition {
     public void setWeight(String weight) {
         this.weight = weight;
     }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getGroup() {
+        return group;
+    }
+
+    public void setGroup(int group) {
+        this.group = group;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
 }

@@ -8,6 +8,10 @@ public class CommonTransition {
     private int targetId;
     private Position treeTextPosition;
 
+    private int level;
+    private int group;
+    private int number;
+
     public CommonTransition(String[] guards, int id, Position[] linkPoints, int sourceId, int targetId, Position treeTextPosition) {
         this.guards = guards;
         this.id = id;
@@ -63,5 +67,29 @@ public class CommonTransition {
 
     public void setTreeTextPosition(Position treeTextPosition) {
         this.treeTextPosition = treeTextPosition;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getGroup() {
+        return group;
+    }
+
+    public void setGroup(int group) {
+        this.group = group;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 }

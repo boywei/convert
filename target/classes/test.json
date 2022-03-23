@@ -239,12 +239,13 @@
 		"maxSpeed": 10.0,
 		"model": "vehicle.audi.a2",
 		"name": "car1",
-		"offset": 0.0,
+		"minLaneOffset": 0.0,
+		"maxLaneOffset": 20.0,
 		"roadDeviation": -20.0,
 		"roadId": 1,
 		"treePath": "test2.tree"
 	}],
-	"map": "",
+	"map": "src/main/java/resources/testMap.xml",
 	"source": "",
 	"timeStep": 1,
 	"weather": "clear"

@@ -8,8 +8,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 public class Convert {
 
@@ -38,19 +40,24 @@ public class Convert {
         buffer.append("</nta>\n");
     }
 
-    // 1 对应declaration部分，即代码编写处
+    // 1 对应declaration部分，即代码编写处（需注意Uppaal中函数在后变量在前）
     private void addDeclaration(StringBuffer buffer) {
         buffer.append("\t<declaration>\n");
 
-        // 已定义部分，与JSON文本内容无关
+        // 1）已定义的数据结构和变量信息
         addDefined(buffer);
-        // 新创建的变量声明等，与JSON内容相关
-        create(buffer);
+        buffer.append("const double TIME_STEP = " + timeStep + ";\n");
+        // 2) 声明路网，初始化
+        addMap(buffer);
+        // 3) 声明车辆，初始化
+        addCar(buffer);
+        // 4）已定义好的函数部分
+        addFunction(buffer);
 
-        buffer.append("\t</declaration>\n");
+        buffer.append("\n\t</declaration>\n");
     }
 
-    // 1.1 添加已经定义好的地图数据结构、车辆数据结构、一些信息部分和函数部分
+    // 1.1 添加已经定义好的地图数据结构（包括一些变量信息）
     private void addDefined(StringBuffer buffer) {
         try {
             String definedContent = FileUtils.readFileToString(new File("src/main/resources/defined.txt"), "UTF-8");
@@ -61,14 +68,63 @@ public class Convert {
     }
 
     // 1.2 根据JSON中提取到的信息，创建声明变量的语句
-    private void create(StringBuffer buffer) {
+    private void addMap(StringBuffer buffer) {
 
         // 解析OpenDrive地图，道路声明
-        buffer.append(new MapConvert().convertMap(map));
+//        buffer.append(new MapConvert().convertMap(map));
 
-        // 根据提取出的信息，车辆等变量声明
+    }
 
+    // 1.3 添加车辆声明
+    private void addCar(StringBuffer buffer) {
+        int countOfCar = cars.length;
+        buffer.append("Car car[" + countOfCar + "] = {");
+        for(int i = 0; i < countOfCar; i++) {
+            buffer.append("{");
+            buffer.append(i + ", ");
+            buffer.append(i + ", ");
+            buffer.append(i + ", ");
 
+            buffer.append(cars[i].isHeading() + ", ");
+            buffer.append(i + ", ");
+            buffer.append(i + ", ");
+
+            buffer.append(cars[i].getRoadId() + ", ");
+            buffer.append(cars[i].getLaneId() + ", ");
+            buffer.append(cars[i].getLaneSectionId() + ", ");
+            buffer.append(i + ", ");
+            buffer.append(i + ", ");
+            buffer.append(i + ", ");
+            buffer.append(i + ", ");
+            buffer.append(i);
+            buffer.append("}");
+
+            if(i != countOfCar-1) {
+                buffer.append(",");
+            }
+
+//            buffer.append("bool car" + (i+1) + "_heading = " + cars[i].isHeading() + ";\n");
+//            buffer.append("double car" + (i+1) + "_speed = " + cars[i].getInitSpeed() + ";\n");
+//            buffer.append("double car" + (i+1) + "_acceleration = " + 0 + ";\n");
+//            buffer.append("double car" + (i+1) + "_width = " + 1.0 + ";\n");
+//            buffer.append("double car" + (i+1) + "_length = " + 2.0 + ";\n");
+//            buffer.append("int car" + (i+1) + "_laneId = " + cars[i].getLaneId() + ";\n");
+//            buffer.append("int car" + (i+1) + "_roadId = " + cars[i].getRoadId() + ";\n");
+//            buffer.append("double car" + (i+1) + "_laneOffset=random(" + cars[i].getMaxLaneOffset() + "-" + cars[i].getMinLaneOffset() + ")+" + cars[i].getMinLaneOffset() + ";\n");
+//            buffer.append("double car" + (i+1) + "_roadOffset=random(" + cars[i].getMaxLaneOffset() + "-" + cars[i].getMinLaneOffset() + ")+" + cars[i].getMinLaneOffset() + ";");
+
+        }
+        buffer.append("};\n");
+    }
+
+    // 1.4 添加定义好的函数部分：行为的操作实现、地图查询方法、车辆查询方法等
+    private void addFunction(StringBuffer buffer) {
+        try {
+            String definedContent = FileUtils.readFileToString(new File("src/main/resources/function.txt"), "UTF-8");
+            buffer.append(definedContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // 2 对应template部分，即每辆车的行为树
@@ -107,18 +163,22 @@ public class Convert {
     private void addLocations(StringBuffer buffer, int index) {
         Behavior[] behaviors = cars[index].getmTree().getBehaviors();
         int countOfLocation = behaviors.length;
-        for(int i = 0; i < countOfLocation; i++) {
-            String id = "id" + behaviors[i].getId(), name = behaviors[i].getName();
-            double x = behaviors[i].getPosition().getX(), y = behaviors[i].getPosition().getY();
-            double nameX = x-10, nameY = y-34;
+        Map<Integer, Boolean> exist = new HashMap<>();
+        for (Behavior behavior : behaviors) {
+            if(!exist.containsKey(behavior.getId())) {
+                exist.put(behavior.getId(), true);
+                String id = "id" + behavior.getId(), name = behavior.getName();
+                double x = behavior.getPosition().getX(), y = behavior.getPosition().getY();
+                double nameX = x - 10, nameY = y - 34;
 
-            buffer.append("\t\t<location id=\"" + id + "\" x=\"" + x + "\" y=\"" + y + "\">\n");
+                buffer.append("\t\t<location id=\"" + id + "\" x=\"" + x + "\" y=\"" + y + "\">\n");
 
-            buffer.append("\t\t\t<name x=\"" + nameX + "\" y=\"" + nameY + "\">");
-            buffer.append(name);
-            buffer.append("</name>\n");
+                buffer.append("\t\t\t<name x=\"" + nameX + "\" y=\"" + nameY + "\">");
+                buffer.append(name);
+                buffer.append("</name>\n");
 
-            buffer.append("\t\t</location>\n");
+                buffer.append("\t\t</location>\n");
+            }
         }
 
     }
@@ -142,19 +202,38 @@ public class Convert {
     }
 
     // 2.6 连线
+    /*
+        keep: 自循环，当"时钟达到duration"时跳出
+        accelerate: 自循环，当"时钟到到达duration"或"速度到达targetSpeed时退出"
+        turnLeft: 瞬时动作，完成后左转道
+        turnRight: 同上
+        changeLeft: 同上
+        changeRight: 同上
+     */
     private void addTransitions(StringBuffer buffer, int index) {
-        //      <transition>
-        //			<source ref="id3"/>
-        //			<target ref="id0"/>
-        //		</transition>
         CommonTransition[] commonTransitions = cars[index].getmTree().getCommonTransitions();
         ProbabilityTransition[] probabilityTransitions = cars[index].getmTree().getProbabilityTransitions();
+        Behavior[] behaviors = cars[index].getmTree().getBehaviors();
 
-        for(CommonTransition commonTransition : commonTransitions) {
+        for (CommonTransition commonTransition : commonTransitions) {
             String from = "id" + commonTransition.getSourceId(), to = "id" + commonTransition.getTargetId();
             buffer.append("\t\t<transition>\n");
             buffer.append("\t\t\t<source ref=\"" + from + "\"/>\n");
             buffer.append("\t\t\t<target ref=\"" + to + "\"/>\n");
+
+            // select 在这里可以妙用，（i,j,k)作为该边在树中的坐标
+            buffer.append("\t\t\t<label kind=\"select\">i: int[" +
+                    commonTransition.getLevel() + "," + commonTransition.getLevel() + "], j:int[" +
+                    commonTransition.getGroup() + "," + commonTransition.getGroup() + "], k:int[" +
+                    commonTransition.getNumber() + "," + commonTransition.getNumber() + "]</label>\n");
+
+            // guard 这里需先比对边是否衔接（坐标对应），再比较其他条件
+            buffer.append("\t\t\t<label kind=\"guard\">" +
+                    "level == i &amp;&amp; group == j" + " &amp;&amp; " +
+                    addGuards(commonTransition.getGuards()) + "</label>\n");
+
+            // update/assignment 先更新边的坐标，再更新其他信息
+            buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+number, number=k</label>\n");
             buffer.append("\t\t</transition>\n");
         }
 
@@ -163,11 +242,45 @@ public class Convert {
             buffer.append("\t\t<transition>\n");
             buffer.append("\t\t\t<source ref=\"" + from + "\"/>\n");
             buffer.append("\t\t\t<target ref=\"" + to + "\"/>\n");
+
+            // select 在这里可以妙用，（i,j,k)作为该边在树中的坐标
+            buffer.append("\t\t\t<label kind=\"select\">i: int[" +
+                    probabilityTransition.getLevel() + "," + probabilityTransition.getLevel() + "], j:int[" +
+                    probabilityTransition.getGroup() + "," + probabilityTransition.getGroup() + "], k:int[" +
+                    probabilityTransition.getNumber() + "," + probabilityTransition.getNumber() + "]</label>\n");
+
+            // update/assignment 先更新边的坐标，再更新其他信息
+            buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+number, number=k</label>\n");
+
+            buffer.append("\t\t\t<label kind=\"probability\">" + probabilityTransition.getWeight() + "</label>\n");
             buffer.append("\t\t</transition>\n");
+        }
+
+        // Keep/Accelerate/Decelerate 都隐含着一条自循环的transition
+        for(Behavior behavior : behaviors) {
+
+            if(behavior.getName().equals("Accelerate")) {
+
+            } else if(behavior.getName().equals("Decelerate")) {
+
+            } else if(behavior.getName().equals("Keep")) {
+
+            }
         }
 
     }
 
+    // 2.6.1 添加guards条件的辅助函数
+    private String addGuards(String[] guards) {
+        StringJoiner joiner = new StringJoiner(" &amp;&amp; ", "(", ")");
+        for(String guard : guards) {
+            joiner.add(guard.
+                    replaceAll(">", "&gt;").
+                    replaceAll("<", "&lt;").
+                    replaceAll("&", "&amp;"));
+        }
+        return joiner.toString();
+    }
 
     // 3 对应system部分，即系统模版声明处
     private void addSystem(StringBuffer buffer) {
@@ -235,6 +348,26 @@ public class Convert {
                 weather = entry.getValue().toString();
             }
 
+        }
+
+        // 需要对Behavior id进行更改，将同名节点归为同一id，否则会有重名节点
+        modifyBehaviorId();
+
+    }
+
+    private void modifyBehaviorId() {
+        // 用于对location去重
+        for(Car car : cars) {
+            int id = 0;
+            for(Behavior behavior : car.getmTree().getBehaviors()) {
+                if(!car.location.containsKey(behavior.getName())) {
+                    car.location.put(behavior.getName(), id);
+                    behavior.setId(id);
+                    id++;
+                } else {
+                    behavior.setId(car.location.get(behavior.getName()));
+                }
+            }
         }
     }
 
