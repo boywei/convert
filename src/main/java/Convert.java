@@ -233,7 +233,7 @@ public class Convert {
                     addGuards(commonTransition.getGuards()) + "</label>\n");
 
             // update/assignment 先更新边的坐标，再更新其他信息
-            buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+number, number=k</label>\n");
+            buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+k, number=k</label>\n");
             buffer.append("\t\t</transition>\n");
         }
 
