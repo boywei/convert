@@ -189,7 +189,7 @@ const double DECELERATION = -5.0;
 **/
 int level = 1;
 int group = 1;
-int number = 0;
+int number = 1;
 int N = 3;
 
 // 函数中不能声明结构体，在这里临时声明一个

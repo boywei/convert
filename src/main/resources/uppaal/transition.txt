@@ -7,7 +7,7 @@
 
 int level = 1;
 int group = 1;
-int number = 0;
+int number = 1;
 int N = 3;
 
 i: int[1,1], j:int[2,2], k:int[3,3]
