@@ -60,7 +60,7 @@ public class Convert {
     // 1.1 添加已经定义好的地图数据结构（包括一些变量信息）
     private void addDefined(StringBuffer buffer) {
         try {
-            String definedContent = FileUtils.readFileToString(new File("src/main/resources/defined.txt"), "UTF-8");
+            String definedContent = FileUtils.readFileToString(new File("src/main/resources/uppaal/defined.txt"), "UTF-8");
             buffer.append(definedContent);
         } catch (IOException e) {
             e.printStackTrace();
@@ -70,7 +70,7 @@ public class Convert {
     // 1.2 根据JSON中提取到的信息，创建声明变量的语句
     private void addMap(StringBuffer buffer) {
 
-        // 解析OpenDrive地图，道路声明
+        // TODO: 解析OpenDrive地图，道路声明
 //        buffer.append(new MapConvert().convertMap(map));
 
     }
@@ -120,7 +120,7 @@ public class Convert {
     // 1.4 添加定义好的函数部分：行为的操作实现、地图查询方法、车辆查询方法等
     private void addFunction(StringBuffer buffer) {
         try {
-            String definedContent = FileUtils.readFileToString(new File("src/main/resources/function.txt"), "UTF-8");
+            String definedContent = FileUtils.readFileToString(new File("src/main/resources/uppaal/function.txt"), "UTF-8");
             buffer.append(definedContent);
         } catch (IOException e) {
             e.printStackTrace();
@@ -256,6 +256,7 @@ public class Convert {
             buffer.append("\t\t</transition>\n");
         }
 
+        // TODO: 增加指向自己的边
         // Keep/Accelerate/Decelerate 都隐含着一条自循环的transition
         for(Behavior behavior : behaviors) {
 
@@ -272,6 +273,7 @@ public class Convert {
 
     // 2.6.1 添加guards条件的辅助函数
     private String addGuards(String[] guards) {
+        // TODO: guards条件转换
         StringJoiner joiner = new StringJoiner(" &amp;&amp; ", "(", ")");
         for(String guard : guards) {
             joiner.add(guard.
@@ -375,7 +377,7 @@ public class Convert {
     public String start() {
         try {
             // 1. 读取
-            String jsonStr = FileUtils.readFileToString(new File("src/main/resources/test.json"), "UTF-8");
+            String jsonStr = FileUtils.readFileToString(new File("src/main/resources/examples/test.json"), "UTF-8");
 
             // 2. 解析
             JSONObject jsonObject = JSON.parseObject(jsonStr);
@@ -389,7 +391,7 @@ public class Convert {
             String result = buffer.toString();
 
             // 3. 写入
-            File f = new File("src/main/resources/test.xml");
+            File f = new File("src/main/resources/models/test.xml");
             FileOutputStream fop = new FileOutputStream(f);
             OutputStreamWriter writer = new OutputStreamWriter(fop, "UTF-8");
 

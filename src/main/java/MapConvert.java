@@ -39,7 +39,7 @@ public class MapConvert {
 
     private void init(String mapPath) {
 
-        // 读取文件
+        // TODO: 根据地图文件位置解析地图
         countOfRoad = 1;
         countOfJunction = 1;
 

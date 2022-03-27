@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>// Place global declarations here.
+// car1 will overtake car2
+
+chan update;
+// car1.x - car2.x; car1.y - car2.y
+int x_distance;
+int y_distance;
+
+const int MAX_DISTANCE_TO_OVERTAKE = 30;
+const int MIN_DISTANCE_TO_TURN = 20;
+const int ACCELERATE_V = 5;
+const int DECELERATE_V = 5;
+const int STEP_TIME = 1;
+int time;
+
+
+
+</declaration>
+	<template>
+		<name x="5" y="5">car1</name>
+		<declaration>// Place local declarations here
+int x = 0;
+int y = 0;
+int speed = 10;
+
+void f_uniform() {
+    y = y + speed * STEP_TIME;
+}</declaration>
+		<location id="id0" x="-110" y="-280">
+			<name x="-120" y="-314">accelerate</name>
+		</location>
+		<location id="id1" x="212" y="-280">
+			<name x="202" y="-314">turn_left</name>
+		</location>
+		<location id="id2" x="212" y="110">
+			<name x="203" y="127">decelerate</name>
+		</location>
+		<location id="id3" x="-110" y="110">
+			<name x="-144" y="127">turn_right</name>
+		</location>
+		<location id="id4" x="-331" y="-102">
+			<name x="-341" y="-136">uniform</name>
+		</location>
+		<init ref="id4"/>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-390" y="-102">update?</label>
+			<label kind="assignment" x="-390" y="-85">f_uniform()</label>
+			<nail x="-408" y="-68"/>
+			<nail x="-399" y="-161"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id2"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="-68" y="-280">distance&lt;MAX_DISTANCE_TO_OVERTAKE</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-106" y="-123">distance&gt;MAX_DISTANCE_TO_OVERTAKE</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id0"/>
+			<label kind="assignment" x="-289" y="-195">speed=speed+ACCELERATE_V</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id4"/>
+			<label kind="assignment" x="-42" y="0">speed=speed-DECELERATE_V</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-68" y="110">distance&gt;MIN_DISTANCE_TO_TURN</label>
+		</transition>
+	</template>
+	<template>
+		<name>car2</name>
+		<location id="id5" x="0" y="0">
+		</location>
+		<init ref="id5"/>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="guard" x="-143" y="-26">time == 1</label>
+			<label kind="synchronisation" x="-143" y="-9">update!</label>
+			<label kind="assignment" x="-143" y="8">time = 0</label>
+			<nail x="-161" y="17"/>
+			<nail x="-144" y="-127"/>
+		</transition>
+	</template>
+	<system>// Place template instantiations here.
+Process = overtake();
+// List one or more processes to be composed into a system.
+system Process;
+    </system>
+	<queries>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>

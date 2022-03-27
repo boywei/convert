@@ -1,0 +1,17 @@
+/**
+    (level,group,number)三元组用于标识自动机运行到达的边
+    level: 表示边所在行为树的第几层
+    group: 表示边所在层的第几棵子树
+    number: 表示边所在子树的第几条
+**/
+
+int level = 1;
+int group = 1;
+int number = 0;
+int N = 3;
+
+i: int[1,1], j:int[2,2], k:int[3,3]
+
+level == i && group == j
+
+group = (group-1)*N+k, level = level+1, number=k
