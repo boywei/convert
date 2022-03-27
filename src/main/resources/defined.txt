@@ -1,0 +1,204 @@
+/*************************************************************************************** 地图相关类型定义 ************************************************************************************************/
+
+// 路的长度列表 单位m
+double roadLengths[1000];
+// 路的最大限速列表 单位m/s
+double  roadMaxSpeeds[1000];
+
+/**  
+    Road的结构体
+
+    elementType = 1        表示Road类型
+    roadId                 唯一标识一条Road
+    junctionId             junction的id 表示当前Road在那一个junction中作为连接路   -1表示不是连接路 不属于任何一条junction
+    junctionIndex          索引值 用于在junction数组中索引
+    roadLengthIndex        路的总长度索引   根据这个索引值可以在roadLengths数组中找到路的总长度
+    predecessorElementType predecessor的类型 根据这个类型 在不同的数组中进行索引
+    predecessorIndex       索引值 表示当前Road的前继 可以是Road 也可以是一个junction  需要配合predecessorElementType在对应的类型数组中索引    用-1表示空
+    successorElementType   successor的类型 根据这个类型 在不同的数组中进行索引
+    successorIndex         索引值 表示当前Road的后继 可以是Road 也可以是一个junction  需要配合successorElementType在对应的类型数组中索引    用-1表示空
+    maxSpeedIndex          路的最大限速索引 根据这个索引可以在roadMaxSpeeds数组中找到路的最大限速
+    laneSections[]         表示当前Road中的道路段索引数组  道路段的顺序就是数组的顺序   道路段中又有很多不同的道路Lane
+**/
+typedef struct {
+    int elementType;
+    int roadId;
+    int junctionIndex;
+    int junctionId;
+    int roadLengthIndex;
+    int predecessorElementType;
+    int predecessorIndex;
+    int successorElementType;
+    int successorIndex;
+    int maxSpeedIndex;
+    int laneSections[10];
+}Road;
+
+// 起始位置偏移量列表 单位m
+double  startPositions[1000];
+//  laneScetion道路段长度列表 单位m
+double  laneSectionLengths[1000];
+
+/**
+    LaneSection结构体
+    
+    elementType = 2          表示LaneSection类型
+    roadIndex                索引值 表示当前LaneSection属于那一条道路 可以在roads数组中查找 
+    roadId                   唯一标志当前LaneSection所属Road
+    LaneSectionId            唯一标志一个LaneSection
+    startPositionIndex       起始偏移位置索引值  可以在startPositions数组中找到当前LaneSection是距离Road起始位置多少m开始
+    lanes                    LaneSection的道路Lane的索引值列表
+    laneSectionLengthIndex   LaneSection长度索引值  可以在laneSectionLengths数组中找到道路段长度
+**/
+typedef struct {
+    int elementType;
+    int roadIndex;
+    int roadId;
+    int laneSectionId;
+    int startPositionIndex;
+    int lanes[10];
+    int laneSectionLengthIndex;
+}LaneSection;
+
+/**
+    Lane结构体
+    
+    elementType = 3          表示Lane类型
+    roadId                   当前Lane所属Road的id
+    roadIndex                当前Lane所属Road的索引值
+    laneSectionIndex         当前Lane所属LaneSection的索引值
+    laneId                   标志当前Lane在LaneSection中的相对位置 中心线为0 左边的道路id一次递减 右边的道路id一次递增
+    type                     表示当前lane是什么类型 1表示driving
+    predecessorIndex         前继Lane的索引值
+    successorIndex           后继Lane的索引值
+    laneChange               int类型 由于车道从右到左id递增 用该变量表示当前lane是否允许变道 -1表示不知道 1表示允许向左变道 2表示允许向右变道 3表示两边都允许 4表示两边都不允许
+    
+**/
+typedef struct{
+    int elementType;
+    int roadId;
+    int roadIndex;
+    int laneSectionIndex;
+    int laneId;
+    int type;
+    int predecessorIndex;
+    int successorIndex;
+    int laneChange;
+}Lane;
+
+/**
+    Junction结构体
+    
+    elementType = 4          表示Junction类型
+    junctionId               唯一标志一个junction
+    connections[]            Connection结构体数组 表示当前junction连接的 incomingRoad 和 connectingRoad
+    
+**/
+typedef struct {
+    int elementType;
+    int junctionId;
+    int connections[10];
+}Junction;
+
+/**
+    Connection结构体
+        
+    incomingRoadId          驶入Road的id  
+    connectingRoadId        驶出Road的id
+    incomingRoadIndex       索引值 表示当前Connection连接的驶入Road
+    connectingRoadIndex     索引值 表示当前Connection连接Road
+    laneLinks               LaneLink结构体数组 表示当前连接Road的Lane 连接 驶入Road的Lane 的信息
+**/
+typedef struct {
+    int incomingRoadId;
+    int connectingRoadId;
+    int incomingRoadIndex;
+    int connectingRoadIndex;
+    int laneLinks[10];
+}Connection;
+
+/**
+    LaneLink结构体
+        
+    from                    表示当前LaneLink连接的 驶入lane的下标索引
+    to                      表示当前LaneLink连接的 驶出lane的下标索引
+    laneLinks               表示当前连接Road的Lane 连接 驶入Road的Lane的信息
+**/
+typedef struct {
+    int from;
+    int to;
+} LaneLink;
+
+/*************************************************************************************** 车辆类型定义 ************************************************************************************************/
+const int COUNT_OF_CARS = 2;
+
+double widths[COUNT_OF_CARS];
+double lengths[COUNT_OF_CARS];
+double speeds[COUNT_OF_CARS];
+double accelerations[COUNT_OF_CARS];
+double roadOffsets[COUNT_OF_CARS];
+double laneOffsets[COUNT_OF_CARS];
+
+typedef struct {
+    //车的静态信息: id编号, 宽度, 长度
+    int id;
+    int widthIndex;
+    int lengthIndex;
+
+    //车的动态信息: 速度, 加速度
+    bool heading;
+    int speedIndex;
+    int accelerationIndex;
+
+    //车的车道信息: 所在road, lanesection, lane及在road和lane上的偏移量
+    int roadId;
+    int laneSectionId;
+    int laneId;
+    int roadIndex;
+    int laneSectionIndex;
+    int laneIndex;
+    int roadOffsetIndex;
+    int laneOffsetIndex;
+
+    //为了初始化简便, 可以将carId和后面所有的Index设置为同一个, 按序号来, 找索引时直接使用carId
+}Car;
+
+/*************************************************************************************** 变量和数据定义 ************************************************************************************************/
+/**
+    time                         时钟
+    TIME_STEP                     时间步长
+
+    MIN_DISTANCE_TO_OVERTAKE     超车的最小距离
+    MIN_DISTANCE_TO_CLOSE        两车最小的距离
+    ACCELERATION                 加速加速度
+    DECELERATION                 减速加速度
+**/
+clock time;
+
+const double MIN_DISTANCE_TO_OVERTAKE = 30.0;
+const double MIN_DISTANCE_TO_CLOSE = 20.0;
+const double ACCELERATION = 5.0;
+const double DECELERATION = -5.0;
+
+/**
+    (level,group,number)三元组用于标识自动机运行到达的边
+    level: 表示边所在行为树的第几层
+    group: 表示边所在层的第几棵子树
+    number: 表示边所在子树的第几条
+    N: 表示行为树中每个节点最多能有多少个子节点
+**/
+int level = 1;
+int group = 1;
+int number = 0;
+int N = 3;
+
+// 函数中不能声明结构体，在这里临时声明一个
+Lane tempLane;
+
+Road roads[1000];
+LaneSection laneSections[1000];
+Lane lanes[1000];
+Junction junctions[1000];
+Connection connections[1000];
+LaneLink laneLinks[1000];
+
