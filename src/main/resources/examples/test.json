@@ -245,7 +245,7 @@
 		"roadId": 1,
 		"treePath": "test2.tree"
 	}],
-	"map": "src/main/java/resources/testMap.xml",
+	"map": "src/main/java/resources/maps/test.xodr",
 	"source": "",
 	"timeStep": 1,
 	"weather": "clear"

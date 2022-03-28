@@ -149,12 +149,12 @@ typedef struct {
     int widthIndex;
     int lengthIndex;
 
-    //车的动态信息: 速度, 加速度
+    //车的动态信息: 朝向, 速度, 加速度
     bool heading;
     int speedIndex;
     int accelerationIndex;
 
-    //车的车道信息: 所在road, lanesection, lane及在road和lane上的偏移量
+    //车的车道信息: 所在road, laneSection, lane及在road和lane上的偏移量
     int roadId;
     int laneSectionId;
     int laneId;
@@ -193,7 +193,7 @@ const double DECELERATION = -5.0;
 **/
 int level = 1;
 int group = 1;
-int number = 0;
+int number = 1;
 int N = 3;
 
 // 函数中不能声明结构体，在这里临时声明一个
