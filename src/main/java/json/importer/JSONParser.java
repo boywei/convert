@@ -55,7 +55,7 @@ public class JSONParser {
                         cars[i] = car;
                     }
                     break;
-                case "map":
+                case "entity":
                     map = entry.getValue().toString();
                     break;
                 case "source":

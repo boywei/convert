@@ -180,18 +180,6 @@ const double MIN_DISTANCE_TO_CLOSE = 20.0;
 const double ACCELERATION = 5.0;
 const double DECELERATION = -5.0;
 
-/**
-    (level,group,number)三元组用于标识自动机运行到达的边
-    level: 表示边所在行为树的第几层
-    group: 表示边所在层的第几棵子树
-    number: 表示边所在子树的第几条
-    N: 表示行为树中每个节点最多能有多少个子节点
-**/
-int level = 1;
-int group = 1;
-int number = 1;
-int N = 3;
-
 // 函数中不能声明结构体，在这里临时声明一个
 Lane tempLane;
 
