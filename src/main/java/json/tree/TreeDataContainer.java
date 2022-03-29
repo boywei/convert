@@ -10,10 +10,6 @@ public class TreeDataContainer {
     private int timeStep;
     private String weather;
 
-    public TreeDataContainer() {
-
-    }
-
     public TreeDataContainer(Car[] cars, String map, String source, int timeStep, String weather) {
         this.cars = cars;
         this.map = map;
