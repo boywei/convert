@@ -21,6 +21,11 @@ public class XMLWriter {
     private static int timeStep;
     private static String weather;
 
+    // 已定义好的数据结构路径、函数路径、边的变量路径
+    private static String DEFINED_PATH = "src/main/resources/uppaal/defined.txt";
+    private static String FUNCTION_PATH = "src/main/resources/uppaal/function.txt";
+    private static String TRANSITION_PATH = "src/main/resources/uppaal/transition.txt";
+
     // （一）对应XML声明头
     private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
     private static final String UPPAAL_HEAD = "<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>\n";
@@ -59,7 +64,7 @@ public class XMLWriter {
     // 1.1 添加已经定义好的地图数据结构（包括一些变量信息）
     private static void addDefined(StringBuffer buffer) {
         try {
-            String definedContent = FileUtils.readFileToString(new File("src/main/resources/uppaal/defined.txt"), "UTF-8");
+            String definedContent = FileUtils.readFileToString(new File(DEFINED_PATH), "UTF-8");
             buffer.append(definedContent);
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,7 +124,7 @@ public class XMLWriter {
     // 1.4 添加定义好的函数部分：行为的操作实现、地图查询方法、车辆查询方法等
     private static void addFunction(StringBuffer buffer) {
         try {
-            String definedContent = FileUtils.readFileToString(new File("src/main/resources/uppaal/function.txt"), "UTF-8");
+            String definedContent = FileUtils.readFileToString(new File(FUNCTION_PATH), "UTF-8");
             buffer.append(definedContent);
         } catch (IOException e) {
             e.printStackTrace();
@@ -149,11 +154,16 @@ public class XMLWriter {
         buffer.append("</name>\n");
     }
 
-    // 2.2 局部变量的声明
+    // 2.2 局部变量的声明: 包含三元组算法和自循环加锁算法的变量
     private static void addLocalDeclaration(StringBuffer buffer, int index) {
         buffer.append("\t\t<declaration>\n");
 
-        // 局部变量，也可以不写
+        try {
+            String content = FileUtils.readFileToString(new File(TRANSITION_PATH), "UTF-8");
+            buffer.append(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         buffer.append("\t\t</declaration>\n");
     }
