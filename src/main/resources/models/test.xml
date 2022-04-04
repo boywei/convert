@@ -137,17 +137,16 @@ typedef struct {
     int acceleration;
     int maxSpeed;
 
-    //车的车道信息: 所在road, laneSection, lane及在road和lane上的偏移量
+    //车的车道信息: 所在road, laneSection, lane及在road上的偏移量
     int roadId;
     int laneSectionId;
     int laneId;
     int roadIndex;
     int laneSectionIndex;
     int laneIndex;
-    int roadOffset;
-    int laneOffset;
+    int offset;
 
-    //为了初始化简便, 可以将carId和后面所有的Index设置为同一个, 按序号来, 找索引时直接使用carId
+    //为了初始化简便, 可以将carId和后面所有的Index设置为同一个, 按序号来, 找索引时直接使用id
 }Car;
 
 /************************************* 变量和数据 *************************************/
@@ -175,8 +174,8 @@ Connection connections[1000];
 LaneLink laneLinks[1000];
 
 const int TIME_STEP = 10;
-//id, width, length, heading, speed, acceleration, maxSpeed, ..., minOffset, maxOffset
-Car car[1] = {{0, 15, 25, true, 10, 0, 100, 1, 0, 0, 0, 0, 0, 0, 200}};
+//id, width, length, heading, speed, acceleration, maxSpeed, ..., offset
+Car car[1] = {{0, 15, 25, true, 10, 0, 100, 1, 0, 0, 0, 0, 0, 0}};
 /************************************* 车辆查询方法 *************************************/
 
 /**
@@ -302,26 +301,21 @@ int accelerate_v(int v, int a, int t) {
     return v + a * t/10;
 }
 
-void modifyRoadLane(Car car) {
+void modifyRoadLane(Car&amp; car) {
     // lane, laneSection: 若偏移大于laneSection长度, 即进入了下一lane和laneSection
-    int lsLength = laneSections[car.laneSectionIndex].length;
     int rLength = roads[car.roadIndex].length;
-    if(car.laneOffset &gt;= lsLength) {
-        car.laneOffset -= lsLength;
-        laneSections[car.laneSectionIndex] = laneSections[sucLaneSectionIndex(laneSections[car.laneSectionIndex])];
-        car.laneIndex = sucLaneIndex(lanes[car.laneIndex]);
-    }
+    // TODO: modify laneIndex, id
     // road: 同理
-    if(car.roadOffset &gt;= rLength) {
-        car.roadOffset -= rLength;
-        roads[car.roadIndex] = roads[sucRoadIndex(roads[car.roadIndex])];
+    if(car.offset &gt;= rLength) {
+        car.offset -= rLength;
+        car.roadIndex = sucRoadIndex(roads[car.roadIndex]);
     }
 }
 
 /**
 	加速:
-	1. 根据加速度公式v'=v+at计算速度: speed += timestep * accelation? 同时需要判断是否到达最大车速
-	2. 根据位移公式x=vt+0.5at^2计算移动距离(需根据是否到达最大速度计算): movement = speed * timestep + 0.5 * accelation * timestep * timestep
+	1. 根据加速度公式v'=v+at计算速度: speed += timestep * acceletion? 同时需要判断是否到达最大车速
+	2. 根据位移公式x=vt+0.5at^2计算移动距离(需根据是否到达最大速度计算): movement = speed * timestep + 0.5 * acceletion * timestep * timestep
     3. 判断是否驶出当前车道, 修改road和lane信息并计算偏移: offset += movement?
 **/
 void speedUp(Car&amp; car, int targetSpeed, int duration){
@@ -345,8 +339,7 @@ void speedUp(Car&amp; car, int targetSpeed, int duration){
     }
 
     car.speed = v2;
-    car.roadOffset += movement;
-    car.laneOffset += movement;
+    car.offset += movement;
     modifyRoadLane(car);
 }
 
@@ -373,8 +366,7 @@ void speedDown(Car&amp; car, int targetSpeed, int duration){
     }
 
     car.speed = v2;
-    car.roadOffset += movement;
-    car.laneOffset += movement;
+    car.offset += movement;
     modifyRoadLane(car);
 }
 
@@ -383,11 +375,10 @@ void speedDown(Car&amp; car, int targetSpeed, int duration){
     0. 可看作加速度为0的加速运动, 逻辑同上
     1. 无需考虑速度是否为0或达到最大, 只需考虑是否驶出当前lane和road
 **/
-void keep(Car car){
+void keep(Car&amp; car){
     int v = car.speed;
     int movement = v * TIME_STEP / 10;
-    car.roadOffset += movement;
-    car.laneOffset += movement;
+    car.offset += movement;
     modifyRoadLane(car);
 }
 
@@ -398,12 +389,11 @@ void keep(Car car){
     2. 设置一个因子k, 因为左转也会前进一部分, k代表左转道前进的路程占直接匀速前进路程的比例
     3. 若无法左转该?
 **/
-void changeToLeftLane(Car car){
+void changeToLeftLane(Car&amp; car){
     int k = 8;
     int v = car.speed;
     int movement = v * TIME_STEP * k / 100;
-    car.roadOffset += movement;
-    car.laneOffset += movement;
+    car.offset += movement;
     if(lanes[car.laneIndex].laneChange == 1 || lanes[car.laneIndex].laneChange == 3) {
      	car.laneIndex = leftLaneIndex(lanes[car.laneIndex]);
     }
@@ -414,12 +404,11 @@ void changeToLeftLane(Car car){
     转到右车道:
     0. 逻辑同上转到左车道
 **/
-void changeToRightLane(Car car){
+void changeToRightLane(Car&amp; car){
     int k = 8;
     int v = car.speed;
     int movement = v * TIME_STEP * k / 100;
-    car.roadOffset += movement;
-    car.laneOffset += movement;
+    car.offset += movement;
     if(lanes[car.laneIndex].laneChange == 2 || lanes[car.laneIndex].laneChange == 3) {
      	car.laneIndex = leftLaneIndex(lanes[car.laneIndex]);
     }
@@ -431,7 +420,7 @@ void changeToRightLane(Car car){
     0. 视为一个瞬时动作
     1. speed不变, road和lane都变为左转后的; 若无?
 **/
-void turnLeft(){
+void turnLeft(Car&amp; car){
     // 存疑, 暂未实现
 }
 
@@ -439,7 +428,7 @@ void turnLeft(){
    右转:
    0. 逻辑同上左转
 **/
-void turnRight(){
+void turnRight(Car&amp; car){
     // 存疑, 暂未实现
 }
 
@@ -450,7 +439,7 @@ void turnRight(){
    	两车在同一road比才有意义, 否则直接距离差视为无穷大
 **/
 int getDistance(Car car1, Car car2){
-    int distance = car1.roadOffset - car2.roadOffset;
+    int distance = car1.offset - car2.offset;
 	if(car1.roadIndex == car2.roadIndex) {
         return distance;
     } else {
@@ -458,32 +447,39 @@ int getDistance(Car car1, Car car2){
     }
 }
 
+/**
+   	初始化汽车，加入随机性
+**/
+void initCar(Car&amp; car, int offset){
+    car.offset = offset;
+}
+
 	</declaration>
-    <template>
-        <name>timer</name>
-        <location id="id3" x="-144" y="-8">
-            <name x="-154" y="-42">Start</name>
-            <label kind="invariant" x="-154" y="9">time &lt;= 1</label>
-        </location>
-        <location id="id4" x="144" y="-8">
-            <name x="127" y="-42">End</name>
-        </location>
-        <init ref="id3"/>
-        <transition>
-            <source ref="id3"/>
-            <target ref="id4"/>
-            <label kind="synchronisation" x="-126" y="-25">end?</label>
-        </transition>
-        <transition>
-            <source ref="id3"/>
-            <target ref="id3"/>
-            <label kind="guard" x="-245" y="-135">time == 1</label>
-            <label kind="synchronisation" x="-245" y="-118">update!</label>
-            <label kind="assignment" x="-245" y="-101">time = 0</label>
-            <nail x="-272" y="-161"/>
-            <nail x="-51" y="-161"/>
-        </transition>
-    </template>
+	<template>
+		<name>timer</name>
+		<location id="id0" x="-144" y="-8">
+			<name x="-154" y="-42">Start</name>
+			<label kind="invariant" x="-154" y="9">time &lt;= 1</label>
+		</location>
+		<location id="id1" x="144" y="-8">
+			<name x="127" y="-42">End</name>
+		</location>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-126" y="-25">end?</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-245" y="-135">time == 1</label>
+			<label kind="synchronisation" x="-245" y="-118">update!</label>
+			<label kind="assignment" x="-245" y="-101">time = 0</label>
+			<nail x="-272" y="-161"/>
+			<nail x="-51" y="-161"/>
+		</transition>
+	</template>
 	<template>
 		<name>car1</name>
 		<declaration>
@@ -524,123 +520,150 @@ int v = 0;
 int t = 0;
 bool lock = true;
 		</declaration>
-		<location id="id0">
-			<name>Start</name>
-		</location>		<location id="id1" x="283.79999999999995" y="24.79999961853028">
-			<name x="273.79999999999995" y="-9.20000038146972">Accelerate</name>
+		<location id="id2" x="40" y="80">
+			<name x="30" y="50">Start</name>
 		</location>
-		<location id="id2" x="208.60000305175788" y="253.59998779296876">
-			<name x="198.60000305175788" y="219.59998779296876">ChangeRight</name>
+		<location id="id3" x="190" y="80">
+			<name x="180" y="50">Accelerate</name>
 		</location>
-		<location id="id3" x="206.99999694824237" y="361.59999389648436">
-			<name x="196.99999694824237" y="327.59999389648436">Keep</name>
+		<location id="id4" x="190" y="230">
+			<name x="180" y="200">ChangeRight</name>
 		</location>
-		<location id="id4" x="336.6000061035155" y="250.39999694824218">
-			<name x="326.6000061035155" y="216.39999694824218">TurnLeft</name>
+		<location id="id5" x="40" y="230">
+			<name x="30" y="200">Keep</name>
 		</location>
-		<branchpoint id="id5" x="382.4" y="142.59999999999997">
+		<location id="id6" x="340" y="80">
+			<name x="330" y="50">TurnLeft</name>
+		</location>
+		<branchpoint id="id7" x="340" y="230">
 		</branchpoint>
-		<init ref="id0"/>
-<transition>
-			<source ref="id0"/>
-			<target ref="id1"/>
-		</transition>		<transition>
-			<source ref="id1"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[1,1], j:int[1,1], k:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
-		</transition>
-		<transition>
-			<source ref="id1"/>
-			<target ref="id2"/>
-			<label kind="select">i: int[2,2], j:int[1,1], k:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
-		</transition>
+		<init ref="id2"/>
 		<transition>
 			<source ref="id2"/>
 			<target ref="id3"/>
-			<label kind="select">i: int[3,3], j:int[1,1], k:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
+			<label kind="select" x="55" y="35">offset:int[0,200]</label>
+			<label kind="assignment" x="55" y="80">initCar(car[0], offset)</label>
 		</transition>
 		<transition>
 			<source ref="id3"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[4,4], j:int[1,1], k:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
+			<target ref="id3"/>
+			<label kind="select" x="130" y="35">i: int[1,1], j:int[1,1], k:int[1,1]</label>
+			<label kind="guard" x="130" y="50">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="assignment" x="130" y="80">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
+			<nail x="160" y="50"/>
+			<nail x="220" y="50"/>
 		</transition>
 		<transition>
-			<source ref="id1"/>
-			<target ref="id5"/>
-			<label kind="select">i: int[1,1], j:int[1,1], k:int[2,2]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
-		</transition>
-		<transition>
-			<source ref="id5"/>
+			<source ref="id3"/>
 			<target ref="id4"/>
-			<label kind="select">i: int[2,2], j:int[2,2], k:int[1,1]</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k</label>
-			<label kind="probability">1</label>
+			<label kind="select" x="130" y="110">i: int[2,2], j:int[1,1], k:int[1,1]</label>
+			<label kind="guard" x="130" y="125">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="assignment" x="130" y="155">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id5"/>
+			<label kind="select" x="55" y="185">i: int[3,3], j:int[1,1], k:int[1,1]</label>
+			<label kind="guard" x="55" y="200">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="assignment" x="55" y="230">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
 			<source ref="id5"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[2,2], j:int[2,2], k:int[2,2]</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k</label>
-			<label kind="probability">2</label>
+			<target ref="id3"/>
+			<label kind="select" x="55" y="110">i: int[4,4], j:int[1,1], k:int[1,1]</label>
+			<label kind="guard" x="55" y="125">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="assignment" x="55" y="155">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
-			<source ref="id1"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[1,1], j:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
+			<source ref="id3"/>
+			<target ref="id7"/>
+			<label kind="select" x="205" y="110">i: int[1,1], j:int[1,1], k:int[2,2]</label>
+			<label kind="guard" x="205" y="125">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="assignment" x="205" y="155">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
-			<source ref="id1"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[2,2], j:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
+			<source ref="id7"/>
+			<target ref="id6"/>
+			<label kind="select" x="280" y="110">i: int[2,2], j:int[2,2], k:int[1,1]</label>
+			<label kind="assignment" x="280" y="155">level = level+1, group = (group-1)*N+k, number=k</label>
+			<label kind="probability" x="280" y="170">1</label>
 		</transition>
 		<transition>
-			<source ref="id2"/>
-			<target ref="id2"/>
-			<label kind="select">i: int[3,3], j:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
+			<source ref="id7"/>
+			<target ref="id3"/>
+			<label kind="select" x="205" y="110">i: int[2,2], j:int[2,2], k:int[2,2]</label>
+			<label kind="assignment" x="205" y="155">level = level+1, group = (group-1)*N+k, number=k</label>
+			<label kind="probability" x="205" y="170">2</label>
 		</transition>
 		<transition>
 			<source ref="id3"/>
 			<target ref="id3"/>
-			<label kind="select">i: int[4,4], j:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
+			<label kind="select" x="130" y="35">i: int[1,1], j:int[1,1]</label>
+			<label kind="guard" x="130" y="50">level == i &amp;&amp; group == j &amp;&amp; lock</label>
+			<label kind="synchronisation" x="130" y="65">update?</label>
+			<label kind="assignment" x="130" y="80">lock=(false), t=t+TIME_STEP</label>
+			<nail x="160" y="50"/>
+			<nail x="220" y="50"/>
 		</transition>
 		<transition>
-			<source ref="id1"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[5,5], j:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="select" x="130" y="35">i: int[2,2], j:int[1,1]</label>
+			<label kind="guard" x="130" y="50">level == i &amp;&amp; group == j &amp;&amp; lock</label>
+			<label kind="synchronisation" x="130" y="65">update?</label>
+			<label kind="assignment" x="130" y="80">lock=(false), t=t+TIME_STEP</label>
+			<nail x="160" y="50"/>
+			<nail x="220" y="50"/>
 		</transition>
 		<transition>
 			<source ref="id4"/>
 			<target ref="id4"/>
-			<label kind="select">i: int[3,3], j:int[4,4]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
+			<label kind="select" x="130" y="185">i: int[3,3], j:int[1,1]</label>
+			<label kind="guard" x="130" y="200">level == i &amp;&amp; group == j &amp;&amp; lock</label>
+			<label kind="synchronisation" x="130" y="215">update?</label>
+			<label kind="assignment" x="130" y="230">lock=(false), t=t+TIME_STEP</label>
+			<nail x="160" y="200"/>
+			<nail x="220" y="200"/>
 		</transition>
 		<transition>
-			<source ref="id1"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[3,3], j:int[5,5]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
+			<source ref="id5"/>
+			<target ref="id5"/>
+			<label kind="select" x="-20" y="185">i: int[4,4], j:int[1,1]</label>
+			<label kind="guard" x="-20" y="200">level == i &amp;&amp; group == j &amp;&amp; lock</label>
+			<label kind="synchronisation" x="-20" y="215">update?</label>
+			<label kind="assignment" x="-20" y="230">lock=(false), t=t+TIME_STEP</label>
+			<nail x="10" y="200"/>
+			<nail x="70" y="200"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="select" x="130" y="35">i: int[5,5], j:int[1,1]</label>
+			<label kind="guard" x="130" y="50">level == i &amp;&amp; group == j &amp;&amp; lock</label>
+			<label kind="synchronisation" x="130" y="65">update?</label>
+			<label kind="assignment" x="130" y="80">lock=(false), t=t+TIME_STEP</label>
+			<nail x="160" y="50"/>
+			<nail x="220" y="50"/>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id6"/>
+			<label kind="select" x="280" y="35">i: int[3,3], j:int[4,4]</label>
+			<label kind="guard" x="280" y="50">level == i &amp;&amp; group == j &amp;&amp; lock</label>
+			<label kind="synchronisation" x="280" y="65">update?</label>
+			<label kind="assignment" x="280" y="80">lock=(false), t=t+TIME_STEP</label>
+			<nail x="310" y="50"/>
+			<nail x="370" y="50"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="select" x="130" y="35">i: int[3,3], j:int[5,5]</label>
+			<label kind="guard" x="130" y="50">level == i &amp;&amp; group == j &amp;&amp; lock</label>
+			<label kind="synchronisation" x="130" y="65">update?</label>
+			<label kind="assignment" x="130" y="80">lock=(false), t=t+TIME_STEP</label>
+			<nail x="160" y="50"/>
+			<nail x="220" y="50"/>
 		</transition>
 	</template>
 	<system>

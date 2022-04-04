@@ -93,7 +93,7 @@ public class XMLWriter {
     // 1.3 添加车辆声明 TODO: 车辆初始偏移随机
     private static void addCar(StringBuffer buffer) {
         int countOfCar = cars.length;
-        buffer.append("//id, width, length, heading, speed, acceleration, maxSpeed, ..., minOffset, maxOffset\n");
+        buffer.append("//id, width, length, heading, speed, acceleration, maxSpeed, ..., offset\n");
         buffer.append("Car car[" + countOfCar + "] = {");
         for(int i = 0; i < countOfCar; i++) {
 //            System.out.println(cars[i].toString());
@@ -113,8 +113,7 @@ public class XMLWriter {
             buffer.append(cars[i].getRoadIndex() + ", ");
             buffer.append(cars[i].getLaneSectionIndex() + ", ");
             buffer.append(cars[i].getLaneIndex() + ", ");
-            buffer.append(f(cars[i].getMinOffset()) + ", ");
-            buffer.append(f(cars[i].getMaxOffset()));
+            buffer.append(f(cars[i].getOffset()));
             buffer.append("}");
 
             if(i != countOfCar-1) {
@@ -187,7 +186,7 @@ public class XMLWriter {
         // 新增一个初始状态
         buffer.append("\t\t<location id=\"id0\">\n" +
                 "\t\t\t<name>Start</name>\n" +
-                "\t\t</location>");
+                "\t\t</location>\n");
 
         Behavior[] behaviors = cars[index].getmTree().getBehaviors();
         Map<Integer, Boolean> exist = new HashMap<>();
@@ -195,12 +194,10 @@ public class XMLWriter {
             if(!exist.containsKey(behavior.getId())) {
                 exist.put(behavior.getId(), true);
                 String id = "id" + behavior.getId(), name = behavior.getName();
-                double x = behavior.getPosition().getX(), y = behavior.getPosition().getY();
-                double nameX = x - 10, nameY = y - 34;
 
-                buffer.append("\t\t<location id=\"" + id + "\" x=\"" + x + "\" y=\"" + y + "\">\n");
+                buffer.append("\t\t<location id=\"" + id + "\">\n");
 
-                buffer.append("\t\t\t<name x=\"" + nameX + "\" y=\"" + nameY + "\">");
+                buffer.append("\t\t\t<name>");
                 buffer.append(name);
                 buffer.append("</name>\n");
 
@@ -233,10 +230,12 @@ public class XMLWriter {
         ProbabilityTransition[] probabilityTransitions = cars[index].getmTree().getProbabilityTransitions();
 
         // Start到行为树的根结点
-        buffer.append("<transition>\n" +
+        buffer.append("\t\t<transition>\n" +
                 "\t\t\t<source ref=\"id0\"/>\n" +
                 "\t\t\t<target ref=\"id1\"/>\n" +
-                "\t\t</transition>");
+                "\t\t\t<label kind=\"select\">offset:int[" + f(cars[index].getMinOffset()) + "," + f(cars[index].getMaxOffset()) + "]</label>\n" +
+                "\t\t\t<label kind=\"assignment\">initCar(car[" + index + "], offset)</label>\n" +
+                "\t\t</transition>\n");
 
         for (CommonTransition commonTransition : commonTransitions) {
             String from = "id" + commonTransition.getSourceId(), to = "id" + commonTransition.getTargetId();
@@ -335,7 +334,7 @@ public class XMLWriter {
                 "level == i &amp;&amp; group == j &amp;&amp; lock" +
                 "</label>\n");
 
-        buffer.append("<label kind=\"synchronisation\">update?</label>");
+        buffer.append("\t\t\t<label kind=\"synchronisation\">update?</label>\n");
 
         // update/assignment 先更新边的坐标，再更新其他信息
         buffer.append("\t\t\t<label kind=\"assignment\">" +
