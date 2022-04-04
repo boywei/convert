@@ -2,7 +2,7 @@ package json.tree;
 
 /**
  * @author wei
- * @description TODO
+ * @description
  * @date 2022-04-03 16:40
  */
 public enum BehaviorType {
@@ -14,7 +14,9 @@ public enum BehaviorType {
     TURN_RIGHT("TurnRight"),
     CHANGE_LEFT("ChangeLeft"),
     CHANGE_RIGHT("ChangeRight"),
-    IDLE("Idle")
+    IDLE("Idle"),
+    START("Start"),
+    END("End")
     ;
 
     private String value;

@@ -133,17 +133,16 @@ typedef struct {
     int acceleration;
     int maxSpeed;
 
-    //车的车道信息: 所在road, laneSection, lane及在road和lane上的偏移量
+    //车的车道信息: 所在road, laneSection, lane及在road上的偏移量
     int roadId;
     int laneSectionId;
     int laneId;
     int roadIndex;
     int laneSectionIndex;
     int laneIndex;
-    int roadOffset;
-    int laneOffset;
+    int offset;
 
-    //为了初始化简便, 可以将carId和后面所有的Index设置为同一个, 按序号来, 找索引时直接使用carId
+    //为了初始化简便, 可以将carId和后面所有的Index设置为同一个, 按序号来, 找索引时直接使用id
 }Car;
 
 /************************************* 变量和数据 *************************************/

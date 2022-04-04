@@ -137,17 +137,16 @@ typedef struct {
     int acceleration;
     int maxSpeed;
 
-    //车的车道信息: 所在road, laneSection, lane及在road和lane上的偏移量
+    //车的车道信息: 所在road, laneSection, lane及在road上的偏移量
     int roadId;
     int laneSectionId;
     int laneId;
     int roadIndex;
     int laneSectionIndex;
     int laneIndex;
-    int roadOffset;
-    int laneOffset;
+    int offset;
 
-    //为了初始化简便, 可以将carId和后面所有的Index设置为同一个, 按序号来, 找索引时直接使用carId
+    //为了初始化简便, 可以将carId和后面所有的Index设置为同一个, 按序号来, 找索引时直接使用id
 }Car;
 
 /************************************* 变量和数据 *************************************/
@@ -175,7 +174,7 @@ Connection connections[1000];
 LaneLink laneLinks[1000];
 
 const int TIME_STEP = 10;
-Car car[1] = {{0, 0, 0, true, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0}};
+Car car[1] = {{0, 0, 0, true, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0}};
 
 /************************************* 车辆查询方法 *************************************/
 
@@ -302,26 +301,21 @@ int accelerate_v(int v, int a, int t) {
     return v + a * t/10;
 }
 
-void modifyRoadLane(Car car) {
+void modifyRoadLane(Car&amp; car) {
     // lane, laneSection: 若偏移大于laneSection长度, 即进入了下一lane和laneSection
-    int lsLength = laneSections[car.laneSectionIndex].length;
     int rLength = roads[car.roadIndex].length;
-    if(car.laneOffset &gt;= lsLength) {
-        car.laneOffset -= lsLength;
-        laneSections[car.laneSectionIndex] = laneSections[sucLaneSectionIndex(laneSections[car.laneSectionIndex])];
-        car.laneIndex = sucLaneIndex(lanes[car.laneIndex]);
-    }
+    // TODO: modify laneIndex, id
     // road: 同理
-    if(car.roadOffset &gt;= rLength) {
-        car.roadOffset -= rLength;
-        roads[car.roadIndex] = roads[sucRoadIndex(roads[car.roadIndex])];
+    if(car.offset &gt;= rLength) {
+        car.offset -= rLength;
+        car.roadIndex = sucRoadIndex(roads[car.roadIndex]);
     }
 }
 
 /**
 	加速:
-	1. 根据加速度公式v'=v+at计算速度: speed += timestep * accelation? 同时需要判断是否到达最大车速
-	2. 根据位移公式x=vt+0.5at^2计算移动距离(需根据是否到达最大速度计算): movement = speed * timestep + 0.5 * accelation * timestep * timestep
+	1. 根据加速度公式v'=v+at计算速度: speed += timestep * acceletion? 同时需要判断是否到达最大车速
+	2. 根据位移公式x=vt+0.5at^2计算移动距离(需根据是否到达最大速度计算): movement = speed * timestep + 0.5 * acceletion * timestep * timestep
     3. 判断是否驶出当前车道, 修改road和lane信息并计算偏移: offset += movement?
 **/
 void speedUp(Car&amp; car, int targetSpeed, int duration){
@@ -345,8 +339,7 @@ void speedUp(Car&amp; car, int targetSpeed, int duration){
     }
 
     car.speed = v2;
-    car.roadOffset += movement;
-    car.laneOffset += movement;
+    car.offset += movement;
     modifyRoadLane(car);
 }
 
@@ -373,8 +366,7 @@ void speedDown(Car&amp; car, int targetSpeed, int duration){
     }
 
     car.speed = v2;
-    car.roadOffset += movement;
-    car.laneOffset += movement;
+    car.offset += movement;
     modifyRoadLane(car);
 }
 
@@ -383,11 +375,10 @@ void speedDown(Car&amp; car, int targetSpeed, int duration){
     0. 可看作加速度为0的加速运动, 逻辑同上
     1. 无需考虑速度是否为0或达到最大, 只需考虑是否驶出当前lane和road
 **/
-void keep(Car car){
+void keep(Car&amp; car){
     int v = car.speed;
     int movement = v * TIME_STEP / 10;
-    car.roadOffset += movement;
-    car.laneOffset += movement;
+    car.offset += movement;
     modifyRoadLane(car);
 }
 
@@ -398,12 +389,11 @@ void keep(Car car){
     2. 设置一个因子k, 因为左转也会前进一部分, k代表左转道前进的路程占直接匀速前进路程的比例
     3. 若无法左转该?
 **/
-void changeToLeftLane(Car car){
+void changeToLeftLane(Car&amp; car){
     int k = 8;
     int v = car.speed;
     int movement = v * TIME_STEP * k / 100;
-    car.roadOffset += movement;
-    car.laneOffset += movement;
+    car.offset += movement;
     if(lanes[car.laneIndex].laneChange == 1 || lanes[car.laneIndex].laneChange == 3) {
      	car.laneIndex = leftLaneIndex(lanes[car.laneIndex]);
     }
@@ -414,12 +404,11 @@ void changeToLeftLane(Car car){
     转到右车道:
     0. 逻辑同上转到左车道
 **/
-void changeToRightLane(Car car){
+void changeToRightLane(Car&amp; car){
     int k = 8;
     int v = car.speed;
     int movement = v * TIME_STEP * k / 100;
-    car.roadOffset += movement;
-    car.laneOffset += movement;
+    car.offset += movement;
     if(lanes[car.laneIndex].laneChange == 2 || lanes[car.laneIndex].laneChange == 3) {
      	car.laneIndex = leftLaneIndex(lanes[car.laneIndex]);
     }
@@ -431,7 +420,7 @@ void changeToRightLane(Car car){
     0. 视为一个瞬时动作
     1. speed不变, road和lane都变为左转后的; 若无?
 **/
-void turnLeft(){
+void turnLeft(Car&amp; car){
     // 存疑, 暂未实现
 }
 
@@ -439,7 +428,7 @@ void turnLeft(){
    右转:
    0. 逻辑同上左转
 **/
-void turnRight(){
+void turnRight(Car&amp; car){
     // 存疑, 暂未实现
 }
 
@@ -450,7 +439,7 @@ void turnRight(){
    	两车在同一road比才有意义, 否则直接距离差视为无穷大
 **/
 int getDistance(Car car1, Car car2){
-    int distance = car1.roadOffset - car2.roadOffset;
+    int distance = car1.offset - car2.offset;
 	if(car1.roadIndex == car2.roadIndex) {
         return distance;
     } else {
@@ -458,6 +447,12 @@ int getDistance(Car car1, Car car2){
     }
 }
 
+/**
+   	初始化汽车，加入随机性
+**/
+void initCar(Car&amp; car, int offset){
+    car.offset = offset;
+}
 	</declaration>
 	<template>
 		<name>car1</name>
