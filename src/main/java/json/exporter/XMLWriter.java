@@ -96,7 +96,7 @@ public class XMLWriter {
         buffer.append("//id, width, length, heading, speed, acceleration, maxSpeed, ..., minOffset, maxOffset\n");
         buffer.append("Car car[" + countOfCar + "] = {");
         for(int i = 0; i < countOfCar; i++) {
-            System.out.println(cars[i].toString());
+//            System.out.println(cars[i].toString());
             buffer.append("{");
             buffer.append(i + ", ");
             buffer.append(f(cars[i].getWidth()) + ", ");
@@ -253,7 +253,7 @@ public class XMLWriter {
             // guard 这里需先比对边是否衔接（坐标对应），再比较其他条件
             buffer.append("\t\t\t<label kind=\"guard\">" +
                     "level == i &amp;&amp; group == j &amp;&amp; !lock" +
-                    " &amp;&amp; " + addGuards(commonTransition.getGuards()) + "</label>\n");
+                    addGuards(commonTransition.getGuards()) + "</label>\n");
 
             // sync 普通迁移不需要信号，自循环才需要
             // buffer.append("<label kind=\"synchronisation\">update?</label>");
@@ -287,15 +287,16 @@ public class XMLWriter {
     // 2.6.1 添加guards条件的辅助函数
     private static String addGuards(String[] guards) {
         // TODO: guards条件转换
-        StringJoiner joiner = new StringJoiner(" &amp;&amp; ", "(", ")");
-        for(String guard : guards) {
-            joiner.add(guard.
-                    replaceAll("&", "&amp;").
-                    replaceAll(">", "&gt;").
-                    replaceAll("<", "&lt;")
-                    );
-        }
-        return joiner.toString();
+//        StringJoiner joiner = new StringJoiner(" &amp;&amp; ", "(", ")");
+//        for(String guard : guards) {
+//            joiner.add(guard.
+//                    replaceAll("&", "&amp;").
+//                    replaceAll(">", "&gt;").
+//                    replaceAll("<", "&lt;")
+//                    );
+//        }
+//        return joiner.toString();
+        return "";
     }
 
     // 2.7 自循环边

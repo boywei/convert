@@ -54,15 +54,11 @@ public class JSONParser {
             probabilityTransition.setSourceId(ids.get(probabilityTransition.getSourceId()));
             probabilityTransition.setTargetId(ids.get(probabilityTransition.getTargetId()));
         }
-        System.out.println(ids);
-        System.out.println(locationIds);
+
     }
 
     // 初始化各边和各自环对应的三元组
     private static void initEdge(Car car) {
-        int level, group, number;
-        level = group = number = 1;
-
         Behavior[] behaviors = car.getmTree().getBehaviors();
         CommonTransition[] commonTransitions = car.getmTree().getCommonTransitions();
         ProbabilityTransition[] probabilityTransitions = car.getmTree().getProbabilityTransitions();

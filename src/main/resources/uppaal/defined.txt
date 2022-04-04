@@ -127,10 +127,11 @@ typedef struct {
     int width;
     int length;
 
-    //车的动态信息: 朝向, 速度, 加速度
+    //车的动态信息: 朝向, 速度, 加速度, 最大速度
     bool heading;
     int speed;
     int acceleration;
+    int maxSpeed;
 
     //车的车道信息: 所在road, laneSection, lane及在road和lane上的偏移量
     int roadId;
@@ -152,16 +153,12 @@ typedef struct {
 
     MIN_DISTANCE_TO_OVERTAKE     超车的最小距离
     MIN_DISTANCE_TO_CLOSE        两车最小的距离
-    ACCELERATION                 加速加速度
-    DECELERATION                 减速加速度
 **/
 clock time;
 chan update, end;
 
-const double MIN_DISTANCE_TO_OVERTAKE = 30.0;
-const double MIN_DISTANCE_TO_CLOSE = 20.0;
-const double ACCELERATION = 5.0;
-const double DECELERATION = -5.0;
+const int MIN_DISTANCE_TO_OVERTAKE = 300;
+const int MIN_DISTANCE_TO_CLOSE = 200;
 
 // 函数中不能声明结构体，在这里临时声明一个
 Lane tempLane;
