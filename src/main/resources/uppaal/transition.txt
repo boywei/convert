@@ -23,14 +23,14 @@ int N = 3;
     v: 速度，用于计算是否达到一个行为的目标速度
     lock: 锁，用于标识是否完成一个行为，完成时释放锁，lock=false；未完成则保留锁，lock=true
     1 迁入:
-      Update -&gt; t=0.0, v=0.0, lock=true
+      Update -&gt; t=0, v=0, lock=true
     2 自循环:
       Guard  -&gt; t&lt;duration &amp;&amp; v&lt;target_speed &amp;&amp; lock
       Update -&gt; t=t+TIME_STEP, v据算法而定, lock=(duration&gt;=t||v&gt;=target_speed)
     3 迁出:
       Guard  -&gt; !lock
-      Update -&gt; t=0.0, v=0.0, lock=true
+      Update -&gt; t=0, v=0, lock=true
 **/
-double v = 0.0;
-double t = 0.0;
+int v = 0;
+int t = 0;
 bool lock = true;

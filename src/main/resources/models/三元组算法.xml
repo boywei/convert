@@ -21,24 +21,6 @@ int group = 1;
 int number = 1;
 int N = 3;
 
-/**
-    自循环加锁算法: 进入一个Location后，应先"完成行为"再迁出，该算法使用了锁，保证了流程的正确性
-    (t, v, lock) 用于判断是否可以迁出
-    t: 时间，用于计算是否达到一个行为的持续时间
-    v: 速度，用于计算是否达到一个行为的目标速度
-    lock: 锁，用于标识是否完成一个行为，完成时释放锁，lock=false；未完成则保留锁，lock=true
-    1 迁入:
-      Update -&gt; t=0.0, v=0.0, lock=true
-    2 自循环:
-      Guard  -&gt; t&lt;duration &amp;&amp; v&lt;target_speed &amp;&amp; lock
-      Update -&gt; t=t+TIME_STEP, v据算法而定, lock=(duration&gt;=t||v&gt;=target_speed)
-    3 迁出:
-      Guard  -&gt; !lock
-      Update -&gt; t=0.0, v=0.0, lock=true
-**/
-double v = 0.0;
-double t = 0.0;
-bool lock = true;
 </declaration>
 		<location id="id0" x="-229" y="-25">
 			<name x="-239" y="-59">A</name>

@@ -1,5 +1,7 @@
 package xodr.map.entity;
 
+import java.util.List;
+
 /**
  Junction结构体
 
@@ -12,7 +14,8 @@ package xodr.map.entity;
 public class Junction {
     private int elementType;
     private int junctionId;
-    private int[] connections;
+    private List<Integer> connectionsIndex;
+    private List<Connection> connections;
 
     public int getElementType() {
         return elementType;
@@ -30,11 +33,19 @@ public class Junction {
         this.junctionId = junctionId;
     }
 
-    public int[] getConnections() {
+    public List<Integer> getConnectionsIndex() {
+        return connectionsIndex;
+    }
+
+    public void setConnectionsIndex(List<Integer> connectionsIndex) {
+        this.connectionsIndex = connectionsIndex;
+    }
+
+    public List<Connection> getConnections() {
         return connections;
     }
 
-    public void setConnections(int[] connections) {
+    public void setConnections(List<Connection> connections) {
         this.connections = connections;
     }
 }

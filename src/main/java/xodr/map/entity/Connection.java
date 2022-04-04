@@ -1,5 +1,7 @@
 package xodr.map.entity;
 
+import java.util.List;
+
 /**
  Connection结构体
 
@@ -15,7 +17,8 @@ public class Connection {
     private int connectingRoadId;
     private int incomingRoadIndex;
     private int connectingRoadIndex;
-    private int[] laneLinks;
+    private List<Integer> laneLinksIndex;
+    private List<LaneLink> laneLinks;
 
     public int getIncomingRoadId() {
         return incomingRoadId;
@@ -49,11 +52,19 @@ public class Connection {
         this.connectingRoadIndex = connectingRoadIndex;
     }
 
-    public int[] getLaneLinks() {
+    public List<Integer> getLaneLinksIndex() {
+        return laneLinksIndex;
+    }
+
+    public void setLaneLinksIndex(List<Integer> laneLinksIndex) {
+        this.laneLinksIndex = laneLinksIndex;
+    }
+
+    public List<LaneLink> getLaneLinks() {
         return laneLinks;
     }
 
-    public void setLaneLinks(int[] laneLinks) {
+    public void setLaneLinks(List<LaneLink> laneLinks) {
         this.laneLinks = laneLinks;
     }
 }

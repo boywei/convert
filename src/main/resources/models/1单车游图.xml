@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
 <nta>
-	<declaration>// Place global declarations here.</declaration>
+	<declaration>// Place global declarations here.
+int a = 40;</declaration>
 	<template>
 		<name x="5" y="5">Template</name>
 		<declaration>// Place local declarations here.</declaration>
@@ -25,6 +26,13 @@
 		</location>
 		<init ref="id0"/>
 		<transition>
+			<source ref="id0"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-339" y="-165">a &lt; 5</label>
+			<label kind="assignment" x="-339" y="-131">a = a * a / 10</label>
+			<nail x="-161" y="-93"/>
+		</transition>
+		<transition>
 			<source ref="id3"/>
 			<target ref="id0"/>
 		</transition>
@@ -35,6 +43,8 @@
 		<transition>
 			<source ref="id0"/>
 			<target ref="id1"/>
+			<label kind="guard" x="-357" y="-22">a &gt; 2</label>
+			<label kind="assignment" x="-357" y="12">a *= 10</label>
 		</transition>
 	</template>
 	<system>// Place template instantiations here.

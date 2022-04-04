@@ -17,14 +17,68 @@ package xodr.map.entity;
 
 public class Lane {
     private int elementType;
-    private int roadId;
+    private int roadId; // 表示相对位置
+    private int id; // 表示标识符
     private int roadIndex;
     private int laneSectionIndex;
+    private int laneSectionId;
     private int laneId;
     private int type;
     private int predecessorIndex;
+    private int predecessorLaneId; // 与laneId同类，表示相对位置
+    private int predecessorId; // 标识符
     private int successorIndex;
+    private int successorLaneId;
+    private int successorId;
     private int laneChange;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getPredecessorLaneId() {
+        return predecessorLaneId;
+    }
+
+    public void setPredecessorLaneId(int predecessorLaneId) {
+        this.predecessorLaneId = predecessorLaneId;
+    }
+
+    public int getSuccessorLaneId() {
+        return successorLaneId;
+    }
+
+    public void setSuccessorLaneId(int successorLaneId) {
+        this.successorLaneId = successorLaneId;
+    }
+
+    public int getLaneSectionId() {
+        return laneSectionId;
+    }
+
+    public void setLaneSectionId(int laneSectionId) {
+        this.laneSectionId = laneSectionId;
+    }
+
+    public int getPredecessorId() {
+        return predecessorId;
+    }
+
+    public void setPredecessorId(int predecessorId) {
+        this.predecessorId = predecessorId;
+    }
+
+    public int getSuccessorId() {
+        return successorId;
+    }
+
+    public void setSuccessorId(int successorId) {
+        this.successorId = successorId;
+    }
 
     public int getElementType() {
         return elementType;

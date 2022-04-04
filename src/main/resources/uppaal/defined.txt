@@ -1,23 +1,18 @@
-/*************************************************************************************** 地图相关类型定义 ************************************************************************************************/
-
-// 路的长度列表 单位m
-double roadLengths[1000];
-// 路的最大限速列表 单位m/s
-double  roadMaxSpeeds[1000];
+/************************************* 地图类型定义 *************************************/
 
 /**  
     Road的结构体
 
     elementType = 1        表示Road类型
     roadId                 唯一标识一条Road
-    junctionId             junction的id 表示当前Road在那一个junction中作为连接路   -1表示不是连接路 不属于任何一条junction
+    junctionId             junction的id 表示当前Road在哪一个junction中作为连接路   -1表示不是连接路 不属于任何一条junction
     junctionIndex          索引值 用于在junction数组中索引
-    roadLengthIndex        路的总长度索引   根据这个索引值可以在roadLengths数组中找到路的总长度
+    length                 路的总长度
     predecessorElementType predecessor的类型 根据这个类型 在不同的数组中进行索引
     predecessorIndex       索引值 表示当前Road的前继 可以是Road 也可以是一个junction  需要配合predecessorElementType在对应的类型数组中索引    用-1表示空
     successorElementType   successor的类型 根据这个类型 在不同的数组中进行索引
     successorIndex         索引值 表示当前Road的后继 可以是Road 也可以是一个junction  需要配合successorElementType在对应的类型数组中索引    用-1表示空
-    maxSpeedIndex          路的最大限速索引 根据这个索引可以在roadMaxSpeeds数组中找到路的最大限速
+    maxSpeed               路的最大限速索引 根据这个索引可以在roadMaxSpeeds数组中找到路的最大限速
     laneSections[]         表示当前Road中的道路段索引数组  道路段的顺序就是数组的顺序   道路段中又有很多不同的道路Lane
 **/
 typedef struct {
@@ -25,19 +20,14 @@ typedef struct {
     int roadId;
     int junctionIndex;
     int junctionId;
-    int roadLengthIndex;
+    int length;
     int predecessorElementType;
     int predecessorIndex;
     int successorElementType;
     int successorIndex;
-    int maxSpeedIndex;
+    int maxSpeed;
     int laneSections[10];
 }Road;
-
-// 起始位置偏移量列表 单位m
-double  startPositions[1000];
-//  laneScetion道路段长度列表 单位m
-double  laneSectionLengths[1000];
 
 /**
     LaneSection结构体
@@ -46,18 +36,18 @@ double  laneSectionLengths[1000];
     roadIndex                索引值 表示当前LaneSection属于那一条道路 可以在roads数组中查找 
     roadId                   唯一标志当前LaneSection所属Road
     LaneSectionId            唯一标志一个LaneSection
-    startPositionIndex       起始偏移位置索引值  可以在startPositions数组中找到当前LaneSection是距离Road起始位置多少m开始
+    startPosition            起始偏移位置索引值  可以在startPositions数组中找到当前LaneSection是距离Road起始位置多少m开始
     lanes                    LaneSection的道路Lane的索引值列表
-    laneSectionLengthIndex   LaneSection长度索引值  可以在laneSectionLengths数组中找到道路段长度
+    length                   LaneSection长度索引值  可以在laneSectionLengths数组中找到道路段长度
 **/
 typedef struct {
     int elementType;
     int roadIndex;
     int roadId;
     int laneSectionId;
-    int startPositionIndex;
+    int startPosition;
     int lanes[10];
-    int laneSectionLengthIndex;
+    int length;
 }LaneSection;
 
 /**
@@ -67,7 +57,7 @@ typedef struct {
     roadId                   当前Lane所属Road的id
     roadIndex                当前Lane所属Road的索引值
     laneSectionIndex         当前Lane所属LaneSection的索引值
-    laneId                   标志当前Lane在LaneSection中的相对位置 中心线为0 左边的道路id一次递减 右边的道路id一次递增
+    laneId                   标志当前Lane在LaneSection中的相对位置 中心线为0 左边的道路id依次递增 右边的道路id依次递减
     type                     表示当前lane是什么类型 1表示driving
     predecessorIndex         前继Lane的索引值
     successorIndex           后继Lane的索引值
@@ -129,26 +119,18 @@ typedef struct {
     int to;
 } LaneLink;
 
-/*************************************************************************************** 车辆类型定义 ************************************************************************************************/
-const int COUNT_OF_CARS = 2;
-
-double widths[COUNT_OF_CARS];
-double lengths[COUNT_OF_CARS];
-double speeds[COUNT_OF_CARS];
-double accelerations[COUNT_OF_CARS];
-double roadOffsets[COUNT_OF_CARS];
-double laneOffsets[COUNT_OF_CARS];
+/************************************* 车辆类型定义 *************************************/
 
 typedef struct {
     //车的静态信息: id编号, 宽度, 长度
     int id;
-    int widthIndex;
-    int lengthIndex;
+    int width;
+    int length;
 
     //车的动态信息: 朝向, 速度, 加速度
     bool heading;
-    int speedIndex;
-    int accelerationIndex;
+    int speed;
+    int acceleration;
 
     //车的车道信息: 所在road, laneSection, lane及在road和lane上的偏移量
     int roadId;
@@ -157,13 +139,13 @@ typedef struct {
     int roadIndex;
     int laneSectionIndex;
     int laneIndex;
-    int roadOffsetIndex;
-    int laneOffsetIndex;
+    int roadOffset;
+    int laneOffset;
 
     //为了初始化简便, 可以将carId和后面所有的Index设置为同一个, 按序号来, 找索引时直接使用carId
 }Car;
 
-/*************************************************************************************** 变量和数据定义 ************************************************************************************************/
+/************************************* 变量和数据 *************************************/
 /**
     time                         时钟
     TIME_STEP                     时间步长
@@ -174,6 +156,7 @@ typedef struct {
     DECELERATION                 减速加速度
 **/
 clock time;
+chan update, end;
 
 const double MIN_DISTANCE_TO_OVERTAKE = 30.0;
 const double MIN_DISTANCE_TO_CLOSE = 20.0;

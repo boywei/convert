@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
 <nta>
-	<declaration>
+	<declaration>typedef struct {
+    int speed;
+    int a;
+    int offset;
+}Car;
 
-int f(int a, int b) {
-    return a+b;
-}
+Car car = {15, 15, 0}; 
+int timestep = 10;
 
-</declaration>
+clock time;
+chan update;
+chan end;
+
+void acc(Car&amp; car) {
+    int s = car.speed/100 * timestep/100 +  car.a/100 * timestep/100 * timestep/100 * 1/2; // s=vt+1/2at*t
+    car.speed += car.a * timestep/100; // v=v+at
+    car.offset += s; // offset=offset+s
+}</declaration>
 	<template>
 		<name x="5" y="5">Template</name>
 		<declaration>/**
@@ -43,16 +54,10 @@ int N = 3;
       Guard  -&gt; !lock
       Update -&gt; t=0.0, v=0.0, lock=true
 **/
-double v = 0.0;
-double t = 0.0;
+int v = 0;
+int t = 0;
 bool lock = true;
 
-
-bool f1() {
-    t = t + 1.0;
-    v = v + 1.0;
-    return (t&gt;5.0 &amp;&amp; v&gt;7.0);
-}
 
 </declaration>
 		<location id="id0" x="-518" y="8">
@@ -62,14 +67,15 @@ bool f1() {
 			<name x="-222" y="-26">keep</name>
 		</location>
 		<location id="id2" x="170" y="8">
-			<name x="160" y="-26">end</name>
+			<name x="160" y="-26">End</name>
 		</location>
 		<init ref="id0"/>
 		<transition>
 			<source ref="id1"/>
 			<target ref="id1"/>
 			<label kind="guard" x="-313" y="-110">lock</label>
-			<label kind="assignment" x="-313" y="-76">t = t+1.0, v = v+1.0, lock = (t&lt;5.0&amp;&amp;v&lt;5.0)</label>
+			<label kind="synchronisation" x="-313" y="-93">update?</label>
+			<label kind="assignment" x="-313" y="-76">acc(car), t=t+timestep, lock=(t&lt;50&amp;&amp;v&lt;80)</label>
 			<nail x="-331" y="-161"/>
 			<nail x="-119" y="-161"/>
 		</transition>
@@ -77,18 +83,44 @@ bool f1() {
 			<source ref="id1"/>
 			<target ref="id2"/>
 			<label kind="guard" x="-194" y="-26">!lock</label>
-			<label kind="assignment" x="-194" y="8">lock=true, t=0.0, v=0.0</label>
+			<label kind="synchronisation" x="-194" y="-9">end!</label>
+			<label kind="assignment" x="-194" y="8">lock=true, t=0</label>
 		</transition>
 		<transition>
 			<source ref="id0"/>
 			<target ref="id1"/>
-			<label kind="assignment" x="-500" y="8">t=0.0, v=0.0, lock=true</label>
+			<label kind="assignment" x="-500" y="8">t=0, lock=true</label>
+		</transition>
+	</template>
+	<template>
+		<name>timer</name>
+		<location id="id3" x="-144" y="-8">
+			<name x="-195" y="-25">Start</name>
+			<label kind="invariant" x="-154" y="9">time &lt;= 1</label>
+		</location>
+		<location id="id4" x="144" y="-8">
+			<name x="127" y="-42">End</name>
+		</location>
+		<init ref="id3"/>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="-34" y="-34">end?</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id3"/>
+			<label kind="guard" x="-221" y="-187">time == 1</label>
+			<label kind="synchronisation" x="-221" y="-161">update!</label>
+			<label kind="assignment" x="-221" y="-136">time = 0</label>
+			<nail x="-272" y="-161"/>
+			<nail x="-51" y="-161"/>
 		</transition>
 	</template>
 	<system>// Place template instantiations here.
 Process = Template();
 // List one or more processes to be composed into a system.
-system Process;
+system Process, timer;
     </system>
 	<queries>
 		<query>

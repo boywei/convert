@@ -1,0 +1,17 @@
+package xodr.map;
+
+public enum ElementType {
+
+    ROAD(1), LANE_SECTION(2), LANE(3), JUNCTION(4), CONNECTION(5), LANE_LINK(6);
+
+    private Integer value;
+
+    ElementType(int value) {
+        this.value = value;
+    }
+
+    public Integer getValue() {
+        return value;
+    }
+
+}

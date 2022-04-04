@@ -1,5 +1,7 @@
 package xodr.map.entity;
 
+import java.util.List;
+
 /**
  LaneSection结构体
 
@@ -7,9 +9,9 @@ package xodr.map.entity;
  roadIndex                索引值 表示当前LaneSection属于那一条道路 可以在roads数组中查找
  roadId                   唯一标志当前LaneSection所属Road
  LaneSectionId            唯一标志一个LaneSection
- startPositionIndex       起始偏移位置索引值  可以在startPositions数组中找到当前LaneSection是距离Road起始位置多少m开始
+ startPosition            起始偏移位置, 距离Road起始位置多少m开始
  lanes                    LaneSection的道路Lane的索引值列表
- laneSectionLengthIndex   LaneSection长度索引值  可以在laneSectionLengths数组中找到道路段长度
+ length                   LaneSection长度
  **/
 
 public class LaneSection {
@@ -17,9 +19,10 @@ public class LaneSection {
     private int roadIndex;
     private int roadId;
     private int laneSectionId;
-    private int startPositionIndex;
-    private int[] lanes;
-    private int laneSectionLengthIndex;
+    private double startPosition;
+    private List<Integer> lanesIndex;
+    private List<Lane> lanes;
+    private double length;
 
     public int getElementType() {
         return elementType;
@@ -53,27 +56,35 @@ public class LaneSection {
         this.laneSectionId = laneSectionId;
     }
 
-    public int getStartPositionIndex() {
-        return startPositionIndex;
+    public double getStartPosition() {
+        return startPosition;
     }
 
-    public void setStartPositionIndex(int startPositionIndex) {
-        this.startPositionIndex = startPositionIndex;
+    public void setStartPosition(double startPosition) {
+        this.startPosition = startPosition;
     }
 
-    public int[] getLanes() {
+    public List<Integer> getLanesIndex() {
+        return lanesIndex;
+    }
+
+    public void setLanesIndex(List<Integer> lanesIndex) {
+        this.lanesIndex = lanesIndex;
+    }
+
+    public List<Lane> getLanes() {
         return lanes;
     }
 
-    public void setLanes(int[] lanes) {
+    public void setLanes(List<Lane> lanes) {
         this.lanes = lanes;
     }
 
-    public int getLaneSectionLengthIndex() {
-        return laneSectionLengthIndex;
+    public double getLength() {
+        return length;
     }
 
-    public void setLaneSectionLengthIndex(int laneSectionLengthIndex) {
-        this.laneSectionLengthIndex = laneSectionLengthIndex;
+    public void setLength(double length) {
+        this.length = length;
     }
 }

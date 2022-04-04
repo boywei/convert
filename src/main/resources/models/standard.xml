@@ -131,10 +131,11 @@ typedef struct {
     int width;
     int length;
 
-    //车的动态信息: 朝向, 速度, 加速度
+    //车的动态信息: 朝向, 速度, 加速度, 最大速度
     bool heading;
     int speed;
     int acceleration;
+    int maxSpeed;
 
     //车的车道信息: 所在road, laneSection, lane及在road和lane上的偏移量
     int roadId;
@@ -160,12 +161,11 @@ typedef struct {
     DECELERATION                 减速加速度
 **/
 clock time;
-chan update, end;
 
-const double MIN_DISTANCE_TO_OVERTAKE = 30.0;
-const double MIN_DISTANCE_TO_CLOSE = 20.0;
-const double ACCELERATION = 5.0;
-const double DECELERATION = -5.0;
+const int MIN_DISTANCE_TO_OVERTAKE = 300;
+const int MIN_DISTANCE_TO_CLOSE = 200;
+const int ACCELERATION = 50;
+const int DECELERATION = -50;
 
 // 函数中不能声明结构体，在这里临时声明一个
 Lane tempLane;
@@ -177,9 +177,9 @@ Junction junctions[1000];
 Connection connections[1000];
 LaneLink laneLinks[1000];
 
-const int TIME_STEP = 10;
-//id, width, length, heading, speed, acceleration, maxSpeed, ..., minOffset, maxOffset
-Car car[1] = {{0, 15, 25, true, 10, 0, 100, 1, 0, 0, 0, 0, 0, 0, 200}};
+const double TIME_STEP = 1;
+Car car[1] = {{0, 0, 0, true, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0}};
+
 /************************************* 车辆查询方法 *************************************/
 
 /**
@@ -198,15 +198,15 @@ int sucLaneIndex(Lane lane){
 
 /**
    	车的左侧lane:
-   	0. 根据laneId的性质来写: 中心线为0 左边的道路id依次递减 右边的道路id依次递增
-   	1. 在同一laneSection中, 若某个laneId与当前laneId2差为-1, 则该lane为当前左侧lane
+   	0. 根据laneId的性质来写: 中心线为0 左边的道路id依次递增 右边的道路id依次递减
+   	1. 在同一laneSection中, 若某个laneId1与当前laneId2差为1, 则该lane为当前左侧lane
 **/
 int leftLaneIndex(Lane lane){
     int i;
 	for(i=0; i&lt;10; i++) {
         int index = laneSections[roads[lane.roadIndex].laneSections[lane.laneSectionIndex]].lanes[i];
         tempLane = lanes[index];
-        if(tempLane.laneId - lane.laneId == -1) {
+        if(tempLane.laneId - lane.laneId == 1) {
             return index;
         }
     }
@@ -215,7 +215,7 @@ int leftLaneIndex(Lane lane){
 
 /**
    	车的右侧lane:
-   	0. 同上; 若差值为+1, 则该lane为当前右侧lane
+   	0. 同上; 若差值为-1, 则该lane为当前右侧lane
 **/
 int rightLaneIndex(Lane lane){
     int i;
@@ -281,9 +281,9 @@ int sucLaneSectionIndex(LaneSection laneSection){
     - int roadId            	当前所在road的id
     - int laneSectionId			当前所在laneSection的id
     - int laneId            	当前所在lane的id
-    - double offset				车辆在当前lane上的位置
-    - double speed             	当前速度大小
-    - double accelaration        	当前加速度(包含方向)
+    - int offset				车辆在当前lane上的位置
+    - int speed             	当前速度大小
+    - int accelaration        	当前加速度(包含方向)
 
     全局的属性:
     - double timestep 			设置的时间步长
@@ -297,12 +297,12 @@ int sucLaneSectionIndex(LaneSection laneSection){
 	accelerate_v 	匀加速直线运动速度公式
 	modifyRoadLane 	运动一段时间后可能改变了road和lane信息, 这时根据偏移修改
 **/
-double accelerate_s(double v, double a, double t) {
-    return v*t + 0.5 * a * t * t;
+int accelerate_s(int v, int a, int t) {
+    return v*t/10 +   a * t * t/200;
 }
 
-double accelerate_v(double v, double a, double t) {
-    return v + a * t;
+int accelerate_v(int v, int a, int t) {
+    return v + a * t/10;
 }
 
 void modifyRoadLane(Car car) {
@@ -327,7 +327,11 @@ void modifyRoadLane(Car car) {
 	2. 根据位移公式x=vt+0.5at^2计算移动距离(需根据是否到达最大速度计算): movement = speed * timestep + 0.5 * accelation * timestep * timestep
     3. 判断是否驶出当前车道, 修改road和lane信息并计算偏移: offset += movement?
 **/
-void speedUp(Car car){
+void speedUp(Car car, int targetSpeed, int duration){
+    int roadMaxSpeed = roads[car.roadIndex].maxSpeed;
+    int carMaxSpeed = car.maxSpeed;
+    int maxSpeed = (roadMaxSpeed &gt; carMaxSpeed? carMaxSpeed : roadMaxSpeed);
+
 	double v1 = speeds[car.id];
     double a = accelerations[car.id];
     double v2 = accelerate_v(v1, a, TIME_STEP);
@@ -460,31 +464,6 @@ double getDistance(Car car1, Car car2){
 }
 
 	</declaration>
-    <template>
-        <name>timer</name>
-        <location id="id3" x="-144" y="-8">
-            <name x="-154" y="-42">Start</name>
-            <label kind="invariant" x="-154" y="9">time &lt;= 1</label>
-        </location>
-        <location id="id4" x="144" y="-8">
-            <name x="127" y="-42">End</name>
-        </location>
-        <init ref="id3"/>
-        <transition>
-            <source ref="id3"/>
-            <target ref="id4"/>
-            <label kind="synchronisation" x="-126" y="-25">end?</label>
-        </transition>
-        <transition>
-            <source ref="id3"/>
-            <target ref="id3"/>
-            <label kind="guard" x="-245" y="-135">time == 1</label>
-            <label kind="synchronisation" x="-245" y="-118">update!</label>
-            <label kind="assignment" x="-245" y="-101">time = 0</label>
-            <nail x="-272" y="-161"/>
-            <nail x="-51" y="-161"/>
-        </transition>
-    </template>
 	<template>
 		<name>car1</name>
 		<declaration>
@@ -525,127 +504,12 @@ int v = 0;
 int t = 0;
 bool lock = true;
 		</declaration>
-		<location id="id0">
-			<name>Start</name>
-		</location>		<location id="id1" x="283.79999999999995" y="24.79999961853028">
-			<name x="273.79999999999995" y="-9.20000038146972">Accelerate</name>
+		<location id="id0" x="-17" y="-85">
 		</location>
-		<location id="id2" x="208.60000305175788" y="253.59998779296876">
-			<name x="198.60000305175788" y="219.59998779296876">ChangeRight</name>
-		</location>
-		<location id="id3" x="206.99999694824237" y="361.59999389648436">
-			<name x="196.99999694824237" y="327.59999389648436">Keep</name>
-		</location>
-		<location id="id4" x="336.6000061035155" y="250.39999694824218">
-			<name x="326.6000061035155" y="216.39999694824218">TurnLeft</name>
-		</location>
-		<branchpoint id="id5" x="382.4" y="142.59999999999997">
-		</branchpoint>
 		<init ref="id0"/>
-<transition>
-			<source ref="id0"/>
-			<target ref="id1"/>
-		</transition>		<transition>
-			<source ref="id1"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[1,1], j:int[1,1], k:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock &amp;&amp; (next_junction &lt; 20 &amp;&amp; next_junction &gt; 10)</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
-		</transition>
-		<transition>
-			<source ref="id1"/>
-			<target ref="id2"/>
-			<label kind="select">i: int[2,2], j:int[1,1], k:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock &amp;&amp; (has_left_lane)</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
-		</transition>
-		<transition>
-			<source ref="id2"/>
-			<target ref="id3"/>
-			<label kind="select">i: int[3,3], j:int[1,1], k:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock &amp;&amp; ()</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
-		</transition>
-		<transition>
-			<source ref="id3"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[4,4], j:int[1,1], k:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock &amp;&amp; ()</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
-		</transition>
-		<transition>
-			<source ref="id1"/>
-			<target ref="id5"/>
-			<label kind="select">i: int[1,1], j:int[1,1], k:int[2,2]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock &amp;&amp; (is_junction)</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
-		</transition>
-		<transition>
-			<source ref="id5"/>
-			<target ref="id4"/>
-			<label kind="select">i: int[2,2], j:int[2,2], k:int[1,1]</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k</label>
-			<label kind="probability">1</label>
-		</transition>
-		<transition>
-			<source ref="id5"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[2,2], j:int[2,2], k:int[2,2]</label>
-			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k</label>
-			<label kind="probability">2</label>
-		</transition>
-		<transition>
-			<source ref="id1"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[1,1], j:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
-		</transition>
-		<transition>
-			<source ref="id1"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[2,2], j:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
-		</transition>
-		<transition>
-			<source ref="id2"/>
-			<target ref="id2"/>
-			<label kind="select">i: int[3,3], j:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
-		</transition>
-		<transition>
-			<source ref="id3"/>
-			<target ref="id3"/>
-			<label kind="select">i: int[4,4], j:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
-		</transition>
-		<transition>
-			<source ref="id1"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[5,5], j:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
-		</transition>
-		<transition>
-			<source ref="id4"/>
-			<target ref="id4"/>
-			<label kind="select">i: int[3,3], j:int[4,4]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
-		</transition>
-		<transition>
-			<source ref="id1"/>
-			<target ref="id1"/>
-			<label kind="select">i: int[3,3], j:int[5,5]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
-<label kind="synchronisation">update?</label>			<label kind="assignment">lock=(false), t=t+TIME_STEP</label>
-		</transition>
 	</template>
 	<system>
-system timer, car1;
+system car1;
 	</system>
 	<queries>
 		<query>

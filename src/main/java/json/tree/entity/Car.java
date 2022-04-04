@@ -1,43 +1,35 @@
 package json.tree.entity;
 
-import java.util.HashMap;
-
+// 解析时变量顺序必须和json一致！
+// 什么玩意！构造函数也得和json对应？
 public class Car {
     private boolean heading;
     private double initSpeed;
     private int laneId;
     private MTree mTree;
+    private double maxSpeed;
     private String model;
     private String name;
-    private double offset;
+    private double minOffset;
+    private double maxOffset;
     private double roadDeviation;
     private int roadId;
     private String treePath;
-    private double minLaneOffset;
-    private double maxLaneOffset;
 
+    private double offset;
     private int laneSectionId;
     private int laneIndex;
     private int laneSectionIndex;
     private int roadIndex;
-    private double width;
-    private double length;
-    private double widthIndex;
-    private double lengthIndex;
+    private double width = 1.5;
+    private double length = 2.5;
 
-    public HashMap<String, Integer> location  = new HashMap<String, Integer>();
+    public double getMaxSpeed() {
+        return maxSpeed;
+    }
 
-    public Car(boolean heading, double initSpeed, int laneId, MTree mTree, String model, String name, double offset, double roadDeviation, int roadId, String treePath) {
-        this.heading = heading;
-        this.initSpeed = initSpeed;
-        this.laneId = laneId;
-        this.mTree = mTree;
-        this.model = model;
-        this.name = name;
-        this.offset = offset;
-        this.roadDeviation = roadDeviation;
-        this.roadId = roadId;
-        this.treePath = treePath;
+    public void setMaxSpeed(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
     }
 
     public boolean isHeading() {
@@ -120,20 +112,20 @@ public class Car {
         this.treePath = treePath;
     }
 
-    public double getMinLaneOffset() {
-        return minLaneOffset;
+    public double getMinOffset() {
+        return minOffset;
     }
 
-    public void setMinLaneOffset(double minLaneOffset) {
-        this.minLaneOffset = minLaneOffset;
+    public void setMinOffset(double minOffset) {
+        this.minOffset = minOffset;
     }
 
-    public double getMaxLaneOffset() {
-        return maxLaneOffset;
+    public double getMaxOffset() {
+        return maxOffset;
     }
 
-    public void setMaxLaneOffset(double maxLaneOffset) {
-        this.maxLaneOffset = maxLaneOffset;
+    public void setMaxOffset(double maxOffset) {
+        this.maxOffset = maxOffset;
     }
 
     public int getLaneSectionId() {
@@ -184,21 +176,27 @@ public class Car {
         this.length = length;
     }
 
-    public double getWidthIndex() {
-        return widthIndex;
+    @Override
+    public String toString() {
+        return "Car{" +
+                "heading=" + heading +
+                ", initSpeed=" + initSpeed +
+                ", laneId=" + laneId +
+                ", mTree=" + mTree +
+                ", name='" + name + '\'' +
+                ", offset=" + offset +
+                ", roadDeviation=" + roadDeviation +
+                ", roadId=" + roadId +
+                ", treePath='" + treePath + '\'' +
+                ", minOffset=" + minOffset +
+                ", maxOffset=" + maxOffset +
+                ", maxSpeed=" + maxSpeed +
+                ", laneSectionId=" + laneSectionId +
+                ", laneIndex=" + laneIndex +
+                ", laneSectionIndex=" + laneSectionIndex +
+                ", roadIndex=" + roadIndex +
+                ", width=" + width +
+                ", length=" + length +
+                '}';
     }
-
-    public void setWidthIndex(double widthIndex) {
-        this.widthIndex = widthIndex;
-    }
-
-    public double getLengthIndex() {
-        return lengthIndex;
-    }
-
-    public void setLengthIndex(double lengthIndex) {
-        this.lengthIndex = lengthIndex;
-    }
-
-
 }

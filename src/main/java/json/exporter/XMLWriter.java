@@ -1,5 +1,6 @@
 package json.exporter;
 
+import json.tree.BehaviorType;
 import json.tree.TreeDataContainer;
 import json.tree.entity.*;
 import org.apache.commons.io.FileUtils;
@@ -29,6 +30,9 @@ public class XMLWriter {
     private static final String DEFINED_PATH = "src/main/resources/uppaal/defined.txt";
     private static final String FUNCTION_PATH = "src/main/resources/uppaal/function.txt";
     private static final String TRANSITION_PATH = "src/main/resources/uppaal/transition.txt";
+    private static final String TIMER_PATH = "src/main/resources/uppaal/timer.xml";
+
+    public static final int K = 10;
 
     // （一）对应XML声明头
     private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
@@ -39,6 +43,7 @@ public class XMLWriter {
         buffer.append("<nta>\n");
 
         addDeclaration(buffer);
+        addTimer(buffer);
         for(int i = 0; i < cars.length; i++) {
             addTemplate(buffer, i);
         }
@@ -54,7 +59,7 @@ public class XMLWriter {
 
         // 1）已定义的数据结构和变量信息
         addDefined(buffer);
-        buffer.append("const double TIME_STEP = " + timeStep + ";\n");
+        buffer.append("const int TIME_STEP = " + f(timeStep) + ";\n");
         // TODO: 2) 声明路网，初始化
 //        addMap(buffer);
         // 3) 声明车辆，初始化
@@ -85,45 +90,36 @@ public class XMLWriter {
         BufferWriter.write(container, buffer);
     }
 
-    // TODO: 车辆外double数组未未初始化
-    // 1.3 添加车辆声明
+    // 1.3 添加车辆声明 TODO: 车辆初始偏移随机
     private static void addCar(StringBuffer buffer) {
         int countOfCar = cars.length;
+        buffer.append("//id, width, length, heading, speed, acceleration, maxSpeed, ..., minOffset, maxOffset\n");
         buffer.append("Car car[" + countOfCar + "] = {");
         for(int i = 0; i < countOfCar; i++) {
+            System.out.println(cars[i].toString());
             buffer.append("{");
             buffer.append(i + ", ");
-            buffer.append(i + ", ");
-            buffer.append(i + ", ");
+            buffer.append(f(cars[i].getWidth()) + ", ");
+            buffer.append(f(cars[i].getLength()) + ", ");
 
             buffer.append(cars[i].isHeading() + ", ");
-            buffer.append(i + ", ");
-            buffer.append(i + ", ");
+            buffer.append(f(cars[i].getInitSpeed()) + ", ");
+            buffer.append(0 + ", ");
+            buffer.append(f(cars[i].getMaxSpeed()) + ", ");
 
             buffer.append(cars[i].getRoadId() + ", ");
             buffer.append(cars[i].getLaneId() + ", ");
             buffer.append(cars[i].getLaneSectionId() + ", ");
-            buffer.append(i + ", ");
-            buffer.append(i + ", ");
-            buffer.append(i + ", ");
-            buffer.append(i + ", ");
-            buffer.append(i);
+            buffer.append(cars[i].getRoadIndex() + ", ");
+            buffer.append(cars[i].getLaneSectionIndex() + ", ");
+            buffer.append(cars[i].getLaneIndex() + ", ");
+            buffer.append(f(cars[i].getMinOffset()) + ", ");
+            buffer.append(f(cars[i].getMaxOffset()));
             buffer.append("}");
 
             if(i != countOfCar-1) {
                 buffer.append(",");
             }
-
-//            buffer.append("bool car" + (i+1) + "_heading = " + cars[i].isHeading() + ";\n");
-//            buffer.append("double car" + (i+1) + "_speed = " + cars[i].getInitSpeed() + ";\n");
-//            buffer.append("double car" + (i+1) + "_acceleration = " + 0 + ";\n");
-//            buffer.append("double car" + (i+1) + "_width = " + 1.0 + ";\n");
-//            buffer.append("double car" + (i+1) + "_length = " + 2.0 + ";\n");
-//            buffer.append("int car" + (i+1) + "_laneId = " + cars[i].getLaneId() + ";\n");
-//            buffer.append("int car" + (i+1) + "_roadId = " + cars[i].getRoadId() + ";\n");
-//            buffer.append("double car" + (i+1) + "_laneOffset=random(" + cars[i].getMaxLaneOffset() + "-" + cars[i].getMinLaneOffset() + ")+" + cars[i].getMinLaneOffset() + ";\n");
-//            buffer.append("double car" + (i+1) + "_roadOffset=random(" + cars[i].getMaxLaneOffset() + "-" + cars[i].getMinLaneOffset() + ")+" + cars[i].getMinLaneOffset() + ";");
-
         }
         buffer.append("};\n");
     }
@@ -138,6 +134,16 @@ public class XMLWriter {
         }
     }
 
+    // 2.0 timer自动机，用于同步时间
+    private static void addTimer(StringBuffer buffer) {
+        try {
+            String definedContent = FileUtils.readFileToString(new File(TIMER_PATH), "UTF-8");
+            buffer.append(definedContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     // 2 对应template部分，即每辆车的行为树
     private static void addTemplate(StringBuffer buffer, int index) {
         buffer.append("\t<template>\n");
@@ -146,8 +152,9 @@ public class XMLWriter {
         addLocalDeclaration(buffer, index);
         addLocations(buffer, index);
         addBranchPoints(buffer, index);
-        addInit(buffer, index);
+        addInit(buffer);
         addTransitions(buffer, index);
+        addSelfTransitions(buffer, index);
 
         buffer.append("\t</template>\n");
     }
@@ -177,6 +184,11 @@ public class XMLWriter {
 
     // 2.3 自动机的每个location，每个状态
     private static void addLocations(StringBuffer buffer, int index) {
+        // 新增一个初始状态
+        buffer.append("\t\t<location id=\"id0\">\n" +
+                "\t\t\t<name>Start</name>\n" +
+                "\t\t</location>");
+
         Behavior[] behaviors = cars[index].getmTree().getBehaviors();
         Map<Integer, Boolean> exist = new HashMap<>();
         for (Behavior behavior : behaviors) {
@@ -210,25 +222,21 @@ public class XMLWriter {
     }
 
     // 2.5 初始节点
-    private static void addInit(StringBuffer buffer, int index) {
-        // <init ref="id0"/>
+    private static void addInit(StringBuffer buffer) {
         String id = "id0";
         buffer.append("\t\t<init ref=\"" + id + "\"/>\n");
     }
 
     // 2.6 连线
-    /*
-        keep: 自循环，当"时钟达到duration"时跳出
-        accelerate: 自循环，当"时钟到到达duration"或"速度到达targetSpeed时退出"
-        turnLeft: 瞬时动作，完成后左转道
-        turnRight: 同上
-        changeLeft: 同上
-        changeRight: 同上
-     */
     private static void addTransitions(StringBuffer buffer, int index) {
         CommonTransition[] commonTransitions = cars[index].getmTree().getCommonTransitions();
         ProbabilityTransition[] probabilityTransitions = cars[index].getmTree().getProbabilityTransitions();
-        Behavior[] behaviors = cars[index].getmTree().getBehaviors();
+
+        // Start到行为树的根结点
+        buffer.append("<transition>\n" +
+                "\t\t\t<source ref=\"id0\"/>\n" +
+                "\t\t\t<target ref=\"id1\"/>\n" +
+                "\t\t</transition>");
 
         for (CommonTransition commonTransition : commonTransitions) {
             String from = "id" + commonTransition.getSourceId(), to = "id" + commonTransition.getTargetId();
@@ -244,11 +252,14 @@ public class XMLWriter {
 
             // guard 这里需先比对边是否衔接（坐标对应），再比较其他条件
             buffer.append("\t\t\t<label kind=\"guard\">" +
-                    "level == i &amp;&amp; group == j" + " &amp;&amp; " +
-                    addGuards(commonTransition.getGuards()) + "</label>\n");
+                    "level == i &amp;&amp; group == j &amp;&amp; !lock" +
+                    " &amp;&amp; " + addGuards(commonTransition.getGuards()) + "</label>\n");
+
+            // sync 普通迁移不需要信号，自循环才需要
+            // buffer.append("<label kind=\"synchronisation\">update?</label>");
 
             // update/assignment 先更新边的坐标，再更新其他信息
-            buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+k, number=k</label>\n");
+            buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>\n");
             buffer.append("\t\t</transition>\n");
         }
 
@@ -265,23 +276,10 @@ public class XMLWriter {
                     probabilityTransition.getNumber() + "," + probabilityTransition.getNumber() + "]</label>\n");
 
             // update/assignment 先更新边的坐标，再更新其他信息
-            buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+number, number=k</label>\n");
+            buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+k, number=k</label>\n");
 
             buffer.append("\t\t\t<label kind=\"probability\">" + probabilityTransition.getWeight() + "</label>\n");
             buffer.append("\t\t</transition>\n");
-        }
-
-        // TODO: 增加指向自己的边
-        // Keep/Accelerate/Decelerate 都隐含着一条自循环的transition
-        for(Behavior behavior : behaviors) {
-
-            if(behavior.getName().equals("Accelerate")) {
-
-            } else if(behavior.getName().equals("Decelerate")) {
-
-            } else if(behavior.getName().equals("Keep")) {
-
-            }
         }
 
     }
@@ -292,21 +290,95 @@ public class XMLWriter {
         StringJoiner joiner = new StringJoiner(" &amp;&amp; ", "(", ")");
         for(String guard : guards) {
             joiner.add(guard.
+                    replaceAll("&", "&amp;").
                     replaceAll(">", "&gt;").
-                    replaceAll("<", "&lt;").
-                    replaceAll("&", "&amp;"));
+                    replaceAll("<", "&lt;")
+                    );
         }
         return joiner.toString();
+    }
+
+    // 2.7 自循环边
+    /*
+        keep: 自循环，当"时钟达到duration"时跳出
+        accelerate: 自循环，当"时钟到到达duration"或"速度到达targetSpeed时退出"
+        turnLeft: 瞬时动作，完成后左转道
+        turnRight: 同上
+        changeLeft: 同上
+        changeRight: 同上
+     */
+    private static void addSelfTransitions(StringBuffer buffer, int index) {
+        // TODO: 增加指向自己的边
+        Behavior[] behaviors = cars[index].getmTree().getBehaviors();
+        for(Behavior behavior : behaviors) {
+            resolveBehavior(buffer, behavior);
+        }
+    }
+
+    // 2.7.1 操作执行：自循环边不需要k也不需要更新group和level
+    private static void resolveBehavior(StringBuffer buffer, Behavior behavior) {
+        String from = "id" + behavior.getId(), to = "id" + behavior.getId();
+        buffer.append("\t\t<transition>\n");
+        buffer.append("\t\t\t<source ref=\"" + from + "\"/>\n");
+        buffer.append("\t\t\t<target ref=\"" + to + "\"/>\n");
+
+        // select 在这里可以妙用，（i,j,k)作为该边在树中的坐标
+        buffer.append("\t\t\t<label kind=\"select\">" +
+                "i: int[" + behavior.getLevel() + "," + behavior.getLevel() + "], " +
+                "j:int[" + behavior.getGroup() + "," + behavior.getGroup() + "]" +
+//                "k:int[" + behavior.getNumber() + "," + behavior.getNumber() + "]" +
+                "</label>\n");
+
+        // guard 这里需先比对边是否衔接（坐标对应），再比较其他条件
+        buffer.append("\t\t\t<label kind=\"guard\">" +
+                "level == i &amp;&amp; group == j &amp;&amp; lock" +
+                "</label>\n");
+
+        buffer.append("<label kind=\"synchronisation\">update?</label>");
+
+        // update/assignment 先更新边的坐标，再更新其他信息
+        buffer.append("\t\t\t<label kind=\"assignment\">" +
+//                "level = level+1, group = (group-1)*N+k, number=k, " +
+                "lock=(" + operate(behavior) + "), " +
+                "t=t+TIME_STEP" +
+                "</label>\n");
+        buffer.append("\t\t</transition>\n");
+
+    }
+
+    // 2.7.2
+    private static String operate(Behavior behavior) {
+        StringBuffer buffer = new StringBuffer();
+
+        if(behavior.getName().equals(BehaviorType.ACCELERATE.getValue())) {
+
+        } else if(behavior.getName().equals(BehaviorType.DECELERATE.getValue())) {
+
+        } else if(behavior.getName().equals(BehaviorType.KEEP.getValue())) {
+
+        } else if(behavior.getName().equals(BehaviorType.TURN_LEFT.getValue())) {
+
+        } else if(behavior.getName().equals(BehaviorType.TURN_RIGHT.getValue())) {
+
+        } else if(behavior.getName().equals(BehaviorType.CHANGE_LEFT.getValue())) {
+
+        } else if(behavior.getName().equals(BehaviorType.CHANGE_RIGHT.getValue())) {
+
+        } else if(behavior.getName().equals(BehaviorType.IDLE.getValue())) {
+
+        }
+
+//        return buffer.toString();
+        return "false";
     }
 
     // 3 对应system部分，即系统模版声明处
     private static void addSystem(StringBuffer buffer) {
         buffer.append("\t<system>\n");
 
-        buffer.append("system ");
-        buffer.append(cars[0].getName());
-        for(int i=1; i<cars.length; i++) {
-            buffer.append(", " + cars[i].getName());
+        buffer.append("system timer");
+        for (Car car : cars) {
+            buffer.append(", " + car.getName());
         }
         buffer.append(";\n");
 
@@ -336,6 +408,11 @@ public class XMLWriter {
         buffer.append("</comment>\n" );
 
         buffer.append("\t\t</query>\n");
+    }
+
+    // 用于计算放大后的数字，因为uppaal中double计算验证会出问题
+    private static int f(double x) {
+        return (int) Math.round(x * K);
     }
 
     // 初始化，便于使用

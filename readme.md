@@ -12,14 +12,11 @@
     - tree：行为树对应的Java类
     - importer：JSON文本读取、解析并转化为Java对象
     - exporter：解析后数据写入
-    - Convert.java：模型转换主类
     
 - xodr：OpenDRIVE地图的解析
     - map：路网结构对应的Java类
     - importer：地图读取、解析并转化为Java对象
     - exporter：解析后数据写入
-    - util：常用方法封装
-    - MapConvert.java：地图解析主类
 - deprecated：没用，单纯不舍得删
 - Main：主类，项目启动口
 
