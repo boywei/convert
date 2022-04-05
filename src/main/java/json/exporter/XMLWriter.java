@@ -1,6 +1,7 @@
 package json.exporter;
 
 import json.tree.BehaviorType;
+import json.tree.GuardType;
 import json.tree.TreeDataContainer;
 import json.tree.entity.*;
 import org.apache.commons.io.FileUtils;
@@ -252,7 +253,7 @@ public class XMLWriter {
             // guard 这里需先比对边是否衔接（坐标对应），再比较其他条件
             buffer.append("\t\t\t<label kind=\"guard\">" +
                     "level == i &amp;&amp; group == j &amp;&amp; !lock" +
-                    addGuards(commonTransition.getGuards()) + "</label>\n");
+                    addGuards(commonTransition.getGuards(), index) + "</label>\n");
 
             // sync 普通迁移不需要信号，自循环才需要
             // buffer.append("<label kind=\"synchronisation\">update?</label>");
@@ -284,18 +285,25 @@ public class XMLWriter {
     }
 
     // 2.6.1 添加guards条件的辅助函数
-    private static String addGuards(String[] guards) {
-        // TODO: guards条件转换
-//        StringJoiner joiner = new StringJoiner(" &amp;&amp; ", "(", ")");
-//        for(String guard : guards) {
-//            joiner.add(guard.
-//                    replaceAll("&", "&amp;").
-//                    replaceAll(">", "&gt;").
-//                    replaceAll("<", "&lt;")
-//                    );
-//        }
-//        return joiner.toString();
-        return "";
+    /*
+        guard条件命名参照GuardType
+     */
+    private static String addGuards(String[] guards, int index) {
+        StringBuffer buffer = new StringBuffer();
+        for(String guard : guards) {
+            for(String guardType : GuardType.allGuards) {
+                if(guard.equals(guardType)) {
+                    buffer.append(" &amp;&amp; " + guard.
+                            replaceAll("\\(\\)", "(car[" + index + "])").
+                            replaceAll("&", "&amp;").
+                            replaceAll(">", "&gt;").
+                            replaceAll("<", "&lt;")
+                    );
+                    break;
+                }
+            }
+        }
+        return buffer.toString();
     }
 
     // 2.7 自循环边
@@ -351,7 +359,7 @@ public class XMLWriter {
         StringBuffer buffer = new StringBuffer();
 
         if(behavior.getName().equals(BehaviorType.ACCELERATE.getValue())) {
-
+            // accelerate
         } else if(behavior.getName().equals(BehaviorType.DECELERATE.getValue())) {
 
         } else if(behavior.getName().equals(BehaviorType.KEEP.getValue())) {
