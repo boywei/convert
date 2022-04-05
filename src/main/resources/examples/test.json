@@ -22,9 +22,9 @@
 				}
 			}, {
 				"id": 1,
-				"name": "Accelerate",
+				"name": "Decelerate",
 				"params": {
-					"acceleration": "-2",
+					"acceleration": "2",
 					"target speed": "2",
 					"duration": "6"
 				},
@@ -98,9 +98,9 @@
 				}
 			}, {
 				"id": 11,
-				"name": "Accelerate",
+				"name": "Decelerate",
 				"params": {
-					"acceleration": "-5",
+					"acceleration": "5",
 					"target speed": "0",
 					"duration": "3"
 				},
@@ -121,7 +121,7 @@
 				}
 			}],
 			"commonTransitions": [{
-				"guards": ["next_junction < 20", "next_junction > 10"],
+				"guards": ["distanceToEnd() < 20", "distanceToEnd() > 10"],
 				"id": 5,
 				"linkPoints": [{
 					"x": 285.9673060914619,
@@ -137,7 +137,7 @@
 					"y": 77.66327800750737
 				}
 			}, {
-				"guards": ["has_left_lane"],
+				"guards": ["canChangeLeft()"],
 				"id": 6,
 				"linkPoints": [{
 					"x": 218.22692273416467,
@@ -185,7 +185,7 @@
 					"y": 415.4
 				}
 			}, {
-				"guards": ["is_junction"],
+				"guards": ["isJunction()"],
 				"id": 12,
 				"linkPoints": [{
 					"x": 304.9799323369354,

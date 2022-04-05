@@ -2,7 +2,7 @@
         <name>timer</name>
         <location id="id3" x="-144" y="-8">
             <name x="-154" y="-42">Start</name>
-            <label kind="invariant" x="-154" y="9">time &lt;= 1</label>
+            <label kind="invariant" x="-154" y="9">time &lt;= TIME_STEP</label>
         </location>
         <location id="id4" x="144" y="-8">
             <name x="127" y="-42">End</name>
@@ -16,7 +16,7 @@
         <transition>
             <source ref="id3"/>
             <target ref="id3"/>
-            <label kind="guard" x="-245" y="-135">time == 1</label>
+            <label kind="guard" x="-245" y="-135">time == TIME_STEP</label>
             <label kind="synchronisation" x="-245" y="-118">update!</label>
             <label kind="assignment" x="-245" y="-101">time = 0</label>
             <nail x="-272" y="-161"/>

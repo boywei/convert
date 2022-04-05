@@ -146,18 +146,15 @@ typedef struct {
 }Car;
 
 /************************************* 变量和数据 *************************************/
-/**
-    time                         时钟
-    TIME_STEP                     时间步长
 
-    MIN_DISTANCE_TO_OVERTAKE     超车的最小距离
-    MIN_DISTANCE_TO_CLOSE        两车最小的距离
-**/
-clock time;
+clock time; // 时钟
 chan update, end;
 
-const int MIN_DISTANCE_TO_OVERTAKE = 300;
-const int MIN_DISTANCE_TO_CLOSE = 200;
+const int FACTOR = 10; // 为保留小数而放大的倍数
+const int MIN_DISTANCE_TO_OVERTAKE = 30 * FACTOR; // 超车的最小距离
+const int MIN_DISTANCE_TO_CLOSE = 20 * FACTOR; // 两车最小的距离
+const int INT16_MIN = -32768;
+const int INT16_MAX =  32767;
 
 // 函数中不能声明结构体，在这里临时声明一个
 Lane tempLane;

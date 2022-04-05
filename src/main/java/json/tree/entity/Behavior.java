@@ -5,7 +5,7 @@ import java.util.Map;
 public class Behavior {
     private int id;
     private String name;
-    private Map<String, String> params;
+    private Map<String, Double> params;
     private Position position;
     private Position treeTextPosition;
 
@@ -13,40 +13,12 @@ public class Behavior {
     private int group;
     private int number;
 
-    private double acceleration;
-    private double targetSpeed;
-    private double duration;
-
-    public Behavior(int id, String name, Map<String, String> params, Position position, Position treeTextPosition) {
+    public Behavior(int id, String name, Map<String, Double> params, Position position, Position treeTextPosition) {
         this.id = id;
         this.name = name;
         this.params = params;
         this.position = position;
         this.treeTextPosition = treeTextPosition;
-    }
-
-    public double getTargetSpeed() {
-        return targetSpeed;
-    }
-
-    public void setTargetSpeed(double targetSpeed) {
-        this.targetSpeed = targetSpeed;
-    }
-
-    public double getAcceleration() {
-        return acceleration;
-    }
-
-    public void setAcceleration(double acceleration) {
-        this.acceleration = acceleration;
-    }
-
-    public double getDuration() {
-        return duration;
-    }
-
-    public void setDuration(double duration) {
-        this.duration = duration;
     }
 
     public int getLevel() {
@@ -89,11 +61,11 @@ public class Behavior {
         this.name = name;
     }
 
-    public Map<String, String> getParams() {
+    public Map<String, Double> getParams() {
         return params;
     }
 
-    public void setParams(Map<String, String> params) {
+    public void setParams(Map<String, Double> params) {
         this.params = params;
     }
 

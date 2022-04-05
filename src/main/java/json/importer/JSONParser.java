@@ -134,16 +134,6 @@ public class JSONParser {
         }
     }
 
-    private static void initBehavior(Car car) {
-        for(Behavior behavior : car.getmTree().getBehaviors()) {
-            for(String param : params) {
-                if (behavior.getParams().get(param) != null) {
-                    behavior.setAcceleration(Double.parseDouble(behavior.getParams().get(param)));
-                }
-            }
-        }
-    }
-
     public static TreeDataContainer parse(String input) {
         System.out.println("Parsing input...");
 
@@ -186,8 +176,6 @@ public class JSONParser {
         for(Car car : cars) {
             // 初始化（level, group, number）
             initEdge(car);
-            // 初始化Behavior: targetSpeed, duration
-            initBehavior(car);
             // 需要对id进行去重并更改，将同名节点归为同一id，否则会有重名节点
             modifyId(car);
         }
@@ -195,5 +183,4 @@ public class JSONParser {
         System.out.println("Finishing parsing...");
         return new TreeDataContainer(cars, map, source, timeStep, weather);
     }
-
 }

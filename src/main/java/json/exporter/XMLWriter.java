@@ -1,6 +1,7 @@
 package json.exporter;
 
 import json.tree.BehaviorType;
+import json.tree.GuardType;
 import json.tree.TreeDataContainer;
 import json.tree.entity.*;
 import org.apache.commons.io.FileUtils;
@@ -16,7 +17,6 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 
 public class XMLWriter {
 
@@ -33,6 +33,8 @@ public class XMLWriter {
     private static final String TIMER_PATH = "src/main/resources/uppaal/timer.xml";
 
     public static final int K = 10;
+    public static final int INT16_MAX = 32767;
+    public static final int INT16_MIN = -32768;
 
     // （一）对应XML声明头
     private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
@@ -252,7 +254,7 @@ public class XMLWriter {
             // guard 这里需先比对边是否衔接（坐标对应），再比较其他条件
             buffer.append("\t\t\t<label kind=\"guard\">" +
                     "level == i &amp;&amp; group == j &amp;&amp; !lock" +
-                    addGuards(commonTransition.getGuards()) + "</label>\n");
+                    addGuards(commonTransition.getGuards(), index) + "</label>\n");
 
             // sync 普通迁移不需要信号，自循环才需要
             // buffer.append("<label kind=\"synchronisation\">update?</label>");
@@ -284,18 +286,25 @@ public class XMLWriter {
     }
 
     // 2.6.1 添加guards条件的辅助函数
-    private static String addGuards(String[] guards) {
-        // TODO: guards条件转换
-//        StringJoiner joiner = new StringJoiner(" &amp;&amp; ", "(", ")");
-//        for(String guard : guards) {
-//            joiner.add(guard.
-//                    replaceAll("&", "&amp;").
-//                    replaceAll(">", "&gt;").
-//                    replaceAll("<", "&lt;")
-//                    );
-//        }
-//        return joiner.toString();
-        return "";
+    /*
+        guard条件命名参照GuardType
+     */
+    private static String addGuards(String[] guards, int index) {
+        StringBuffer buffer = new StringBuffer();
+        for(String guard : guards) {
+            for(String guardType : GuardType.allGuards) {
+                if(guard.equals(guardType)) {
+                    buffer.append(" &amp;&amp; " + guard.
+                            replaceAll("\\(\\)", "(car[" + index + "])").
+                            replaceAll("&", "&amp;").
+                            replaceAll(">", "&gt;").
+                            replaceAll("<", "&lt;")
+                    );
+                    break;
+                }
+            }
+        }
+        return buffer.toString();
     }
 
     // 2.7 自循环边
@@ -308,15 +317,14 @@ public class XMLWriter {
         changeRight: 同上
      */
     private static void addSelfTransitions(StringBuffer buffer, int index) {
-        // TODO: 增加指向自己的边
         Behavior[] behaviors = cars[index].getmTree().getBehaviors();
         for(Behavior behavior : behaviors) {
-            resolveBehavior(buffer, behavior);
+            resolveBehavior(buffer, behavior, index);
         }
     }
 
     // 2.7.1 操作执行：自循环边不需要k也不需要更新group和level
-    private static void resolveBehavior(StringBuffer buffer, Behavior behavior) {
+    private static void resolveBehavior(StringBuffer buffer, Behavior behavior, int index) {
         String from = "id" + behavior.getId(), to = "id" + behavior.getId();
         buffer.append("\t\t<transition>\n");
         buffer.append("\t\t\t<source ref=\"" + from + "\"/>\n");
@@ -339,37 +347,73 @@ public class XMLWriter {
         // update/assignment 先更新边的坐标，再更新其他信息
         buffer.append("\t\t\t<label kind=\"assignment\">" +
 //                "level = level+1, group = (group-1)*N+k, number=k, " +
-                "lock=(" + operate(behavior) + "), " +
-                "t=t+TIME_STEP" +
+                "t=t+TIME_STEP" + operate(behavior, index) +
                 "</label>\n");
         buffer.append("\t\t</transition>\n");
 
     }
 
-    // 2.7.2
-    private static String operate(Behavior behavior) {
+    // 2.7.2 TODO: 未完成但后续条件满足时跳出？需不需要加锁; 左右转问题
+    private static String operate(Behavior behavior, int index) {
         StringBuffer buffer = new StringBuffer();
+        // 不存在则设置为最大值
+        double targetSpeed = behavior.getParams().getOrDefault("target speed", INT16_MAX/K * 1.0);
+        double acceleration = behavior.getParams().getOrDefault("acceleration", 0.0);
+        double duration = behavior.getParams().getOrDefault("duration", INT16_MAX/10 * 1.0);
 
         if(behavior.getName().equals(BehaviorType.ACCELERATE.getValue())) {
+            // *acceleration, *target speed, duration
+            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", speedUp(car[" + index + "]," + f(targetSpeed) + ")");
+            buffer.append(", lock = (t&lt;" + f(duration) + " &amp;&amp; car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
 
         } else if(behavior.getName().equals(BehaviorType.DECELERATE.getValue())) {
+            // *acceleration, *target speed, duration
+            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", speedDown(car[" + index + "]," + f(targetSpeed) + ")");
+            buffer.append(", lock = (t&lt;" + f(duration) + " &amp;&amp; car[" + index + "].speed&gt;" + f(targetSpeed) + ")");
 
         } else if(behavior.getName().equals(BehaviorType.KEEP.getValue())) {
-
+            // duration
+            // , keep(car[0])
+            //, lock=(t<5)
+            buffer.append(", keep(car[" + index + "])");
+            buffer.append(", lock = (t&lt;" + f(duration) + ")");
         } else if(behavior.getName().equals(BehaviorType.TURN_LEFT.getValue())) {
-
+            // *acceleration, *target speed
+            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", turnLeft(car[" + index + "])");
+//            buffer.append(", lock = (car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.TURN_RIGHT.getValue())) {
-
+            // *acceleration, *target speed
+            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", turnRight(car[" + index + "])");
+//            buffer.append(", lock = (car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.CHANGE_LEFT.getValue())) {
-
+            // acceleration, target speed
+            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", changeLeft(car[" + index + "])");
+//            buffer.append(", lock = (car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.CHANGE_RIGHT.getValue())) {
-
+            // acceleration, target speed
+            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", changeRight(car[" + index + "])");
+//            buffer.append(", lock = (car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.IDLE.getValue())) {
-
+            // duration
+            buffer.append(", car[" + index + "].speed = 0)");
+//            buffer.append(", lock = (car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", lock = (t&lt;" + f(duration) + ")");
+        } else if(behavior.getName().equals(BehaviorType.LANE_OFFSET.getValue())) {
+            // *offset, acceleration, target speed, duration
+            buffer.append(", lock = false");
         }
 
-//        return buffer.toString();
-        return "false";
+        return buffer.toString();
     }
 
     // 3 对应system部分，即系统模版声明处

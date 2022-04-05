@@ -15,6 +15,7 @@ public enum BehaviorType {
     CHANGE_LEFT("ChangeLeft"),
     CHANGE_RIGHT("ChangeRight"),
     IDLE("Idle"),
+    LANE_OFFSET("laneOffset"),
     START("Start"),
     END("End")
     ;
