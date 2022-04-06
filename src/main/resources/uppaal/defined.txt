@@ -93,13 +93,15 @@ typedef struct {
 /**
     Connection结构体
         
-    incomingRoadId          驶入Road的id  
+    direction               1 left, 2 straight, 3 right, 4 none
+    incomingRoadId          驶入Road的id
     connectingRoadId        驶出Road的id
     incomingRoadIndex       索引值 表示当前Connection连接的驶入Road
     connectingRoadIndex     索引值 表示当前Connection连接Road
     laneLinks               LaneLink结构体数组 表示当前连接Road的Lane 连接 驶入Road的Lane 的信息
 **/
 typedef struct {
+    int direction;
     int incomingRoadId;
     int connectingRoadId;
     int incomingRoadIndex;
@@ -109,7 +111,7 @@ typedef struct {
 
 /**
     LaneLink结构体
-        
+
     from                    表示当前LaneLink连接的 驶入lane的下标索引
     to                      表示当前LaneLink连接的 驶出lane的下标索引
     laneLinks               表示当前连接Road的Lane 连接 驶入Road的Lane的信息
@@ -156,8 +158,9 @@ const int MIN_DISTANCE_TO_CLOSE = 20 * FACTOR; // 两车最小的距离
 const int INT16_MIN = -32768;
 const int INT16_MAX =  32767;
 
-// 函数中不能声明结构体，在这里临时声明一个
+// 函数中不能声明结构体，在这里临时声明
 Lane tempLane;
+Connection tempConnection;
 
 Road roads[1000];
 LaneSection laneSections[1000];

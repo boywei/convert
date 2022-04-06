@@ -97,13 +97,15 @@ typedef struct {
 /**
     Connection结构体
         
-    incomingRoadId          驶入Road的id  
+    direction               1 left, 2 straight, 3 right, 4 none
+    incomingRoadId          驶入Road的id
     connectingRoadId        驶出Road的id
     incomingRoadIndex       索引值 表示当前Connection连接的驶入Road
     connectingRoadIndex     索引值 表示当前Connection连接Road
     laneLinks               LaneLink结构体数组 表示当前连接Road的Lane 连接 驶入Road的Lane 的信息
 **/
 typedef struct {
+    int direction;
     int incomingRoadId;
     int connectingRoadId;
     int incomingRoadIndex;
@@ -113,7 +115,7 @@ typedef struct {
 
 /**
     LaneLink结构体
-        
+
     from                    表示当前LaneLink连接的 驶入lane的下标索引
     to                      表示当前LaneLink连接的 驶出lane的下标索引
     laneLinks               表示当前连接Road的Lane 连接 驶入Road的Lane的信息
@@ -160,8 +162,9 @@ const int MIN_DISTANCE_TO_CLOSE = 20 * FACTOR; // 两车最小的距离
 const int INT16_MIN = -32768;
 const int INT16_MAX =  32767;
 
-// 函数中不能声明结构体，在这里临时声明一个
+// 函数中不能声明结构体，在这里临时声明
 Lane tempLane;
+Connection tempConnection;
 
 Road roads[1000];
 LaneSection laneSections[1000];
@@ -173,6 +176,81 @@ LaneLink laneLinks[1000];
 const int TIME_STEP = 10;
 //id, width, length, heading, speed, acceleration, maxSpeed, ..., offset
 Car car[1] = {{0, 15, 25, true, 10, 0, 100, 1, 0, 0, 0, 0, 0, 0}};
+/************************************* 常用函数 *************************************/
+
+/**
+   	获取两车的距离差:
+   	两车在同一road比才有意义, 否则直接距离差视为无穷大
+**/
+int distance(Car car1, Car car2){
+    int distance = car1.offset - car2.offset;
+	if(car1.roadIndex == car2.roadIndex) {
+        return distance;
+    } else {
+        return INT16_MAX;
+    }
+}
+
+/**
+   	初始化汽车，加入随机性
+**/
+void initCar(Car&amp; car, int offset){
+    car.offset = offset;
+}
+/**
+    汽车到路尽头的距离
+**/
+int distanceToEnd(Car car){
+    return car.heading? roads[car.roadIndex].length-car.offset : car.offset;
+}
+
+/**
+    所在road是junction
+**/
+bool isJunction(Car car) {
+    return roads[car.roadIndex].junctionId != -1;
+}
+
+/**
+    可以左转；可以右转；可以左换道；可以右换道；
+**/
+bool canTurnLeft(Car car){
+    int i;
+    if(!isJunction(car)) { // not in a junction
+        return false;
+    }
+    for(i=0; i&lt;10; i++) { // one of the connections'direction is 1(left)
+        tempConnection = connections[junctions[roads[car.roadIndex].junctionIndex].connections[i]];
+        if(tempConnection.connectingRoadId == car.roadId &amp;&amp; tempConnection.direction == 1){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool canTurnRight(Car car){
+    int i;
+    if(!isJunction(car)) { // not in a junction
+        return false;
+    }
+    for(i=0; i&lt;10; i++) { // one of the connections'direction is 3(right)
+        tempConnection = connections[junctions[roads[car.roadIndex].junctionIndex].connections[i]];
+        if(tempConnection.connectingRoadId == car.roadId &amp;&amp; tempConnection.direction == 3){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool canChangeLeft(Car car){
+    return lanes[car.laneIndex].laneChange == 1 || lanes[car.laneIndex].laneChange == 3;
+}
+
+bool canChangeRight(Car car){
+    return lanes[car.laneIndex].laneChange == 2 || lanes[car.laneIndex].laneChange == 3;
+}
+
+
 /************************************* 车辆查询方法 *************************************/
 
 /**
@@ -455,7 +533,23 @@ void changeRight(Car&amp; car){
     1. speed不变, road和lane都变为左转后的; 若无?
 **/
 void turnLeft(Car&amp; car){
-    // 存疑, 暂未实现
+    int i = 0;
+    if(!canTurnLeft(car)) {
+        return;
+    } else {
+        for(i=0; i&lt;10; i++) { // one of the connections'direction is 1(left)
+            tempConnection = connections[junctions[roads[car.roadIndex].junctionIndex].connections[i]];
+            if(tempConnection.connectingRoadId == car.roadId &amp;&amp; tempConnection.direction == 1){ // enter the begin of next road
+                car.offset = 0;
+                car.roadId = tempConnection.incomingRoadId;
+                car.roadIndex = tempConnection.incomingRoadIndex;
+                car.laneSectionId = laneSections[roads[car.roadIndex].laneSections[0]].laneSectionId;
+                car.laneSectionIndex = roads[car.roadIndex].laneSections[0];
+                car.laneId = lanes[laneSections[car.laneSectionIndex].lanes[0]].laneId;
+                car.laneIndex = laneSections[car.laneSectionIndex].lanes[0];
+            }
+        }
+    }
 }
 
 /**
@@ -463,63 +557,24 @@ void turnLeft(Car&amp; car){
    0. 逻辑同上左转
 **/
 void turnRight(Car&amp; car){
-    // 存疑, 暂未实现
-}
-
-/************************************* 常用函数 *************************************/
-
-/**
-   	获取两车的距离差:
-   	两车在同一road比才有意义, 否则直接距离差视为无穷大
-**/
-int distance(Car car1, Car car2){
-    int distance = car1.offset - car2.offset;
-	if(car1.roadIndex == car2.roadIndex) {
-        return distance;
+    int i = 0;
+    if(!canTurnRight(car)) {
+        return;
     } else {
-        return INT16_MAX;
+        for(i=0; i&lt;10; i++) { // one of the connections'direction is 3(right)
+            tempConnection = connections[junctions[roads[car.roadIndex].junctionIndex].connections[i]];
+            if(tempConnection.connectingRoadId == car.roadId &amp;&amp; tempConnection.direction == 3){ // enter the begin of next road
+                car.offset = 0;
+                car.roadId = tempConnection.incomingRoadId;
+                car.roadIndex = tempConnection.incomingRoadIndex;
+                car.laneSectionId = laneSections[roads[car.roadIndex].laneSections[0]].laneSectionId;
+                car.laneSectionIndex = roads[car.roadIndex].laneSections[0];
+                car.laneId = lanes[laneSections[car.laneSectionIndex].lanes[0]].laneId;
+                car.laneIndex = laneSections[car.laneSectionIndex].lanes[0];
+            }
+        }
     }
 }
-
-/**
-   	初始化汽车，加入随机性
-**/
-void initCar(Car&amp; car, int offset){
-    car.offset = offset;
-}
-/**
-    汽车到路尽头的距离
-**/
-int distanceToEnd(Car car){
-    return car.heading? roads[car.roadIndex].length-car.offset : car.offset;
-}
-
-/**
-    可以左转；可以右转；可以左换道；可以右换道；
-**/
-bool canTurnLeft(Car car){
-    return true;
-}
-
-bool canTurnRight(Car car){
-    return true;
-}
-
-bool canChangeLeft(Car car){
-    return lanes[car.laneIndex].laneChange == 1 || lanes[car.laneIndex].laneChange == 3;
-}
-
-bool canChangeRight(Car car){
-    return lanes[car.laneIndex].laneChange == 2 || lanes[car.laneIndex].laneChange == 3;
-}
-
-/**
-    所在road是junction
-**/
-bool isJunction(Car car) {
-    return roads[car.roadIndex].junctionId != -1;
-}
-
 
 	</declaration>
 	<template>

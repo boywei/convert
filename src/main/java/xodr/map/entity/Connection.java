@@ -13,12 +13,31 @@ import java.util.List;
  **/
 
 public class Connection {
+    private int direction; // 1左转 2直行 3右转
     private int incomingRoadId;
     private int connectingRoadId;
-    private int incomingRoadIndex;
-    private int connectingRoadIndex;
+    private int incomingRoadIndex; //
+    private int connectingRoadIndex; //
     private List<Integer> laneLinksIndex;
+
     private List<LaneLink> laneLinks;
+    private int index;
+
+    public int getDirection() {
+        return direction;
+    }
+
+    public void setDirection(int direction) {
+        this.direction = direction;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
 
     public int getIncomingRoadId() {
         return incomingRoadId;
@@ -66,5 +85,19 @@ public class Connection {
 
     public void setLaneLinks(List<LaneLink> laneLinks) {
         this.laneLinks = laneLinks;
+    }
+
+    @Override
+    public String toString() {
+        return "Connection{" +
+                "direction=" + direction +
+                ", incomingRoadId=" + incomingRoadId +
+                ", connectingRoadId=" + connectingRoadId +
+                ", incomingRoadIndex=" + incomingRoadIndex +
+                ", connectingRoadIndex=" + connectingRoadIndex +
+                ", laneLinksIndex=" + laneLinksIndex +
+                ", laneLinks=" + laneLinks +
+                ", index=" + index +
+                '}';
     }
 }

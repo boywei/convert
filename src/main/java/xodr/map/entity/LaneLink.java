@@ -11,6 +11,16 @@ public class LaneLink {
     private int from;
     private int to;
 
+    private int index;
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
     public int getFrom() {
         return from;
     }
@@ -25,5 +35,14 @@ public class LaneLink {
 
     public void setTo(int to) {
         this.to = to;
+    }
+
+    @Override
+    public String toString() {
+        return "LaneLink{" +
+                "from=" + from +
+                ", to=" + to +
+                ", index=" + index +
+                '}';
     }
 }

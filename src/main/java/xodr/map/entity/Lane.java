@@ -18,19 +18,29 @@ package xodr.map.entity;
 public class Lane {
     private int elementType;
     private int roadId; // 表示相对位置
-    private int id; // 表示标识符
     private int roadIndex;
     private int laneSectionIndex;
-    private int laneSectionId;
     private int laneId;
     private int type;
-    private int predecessorIndex;
-    private int predecessorLaneId; // 与laneId同类，表示相对位置
+    private int predecessorIndex; //
+    private int successorIndex; //
+    private int laneChange;
+
+    private int laneSectionId;
+    private int id; // 表示标识符
+    private int index;
+    private int predecessorLaneId; // 与laneId同类，表示相对位置; 暂时用0表示不存在
     private int predecessorId; // 标识符
-    private int successorIndex;
     private int successorLaneId;
     private int successorId;
-    private int laneChange;
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
 
     public int getId() {
         return id;
@@ -150,5 +160,27 @@ public class Lane {
 
     public void setLaneChange(int laneChange) {
         this.laneChange = laneChange;
+    }
+
+    @Override
+    public String toString() {
+        return "Lane{" +
+                "elementType=" + elementType +
+                ", roadId=" + roadId +
+                ", roadIndex=" + roadIndex +
+                ", laneSectionIndex=" + laneSectionIndex +
+                ", laneId=" + laneId +
+                ", type=" + type +
+                ", predecessorIndex=" + predecessorIndex +
+                ", successorIndex=" + successorIndex +
+                ", laneChange=" + laneChange +
+                ", laneSectionId=" + laneSectionId +
+                ", id=" + id +
+                ", index=" + index +
+                ", predecessorLaneId=" + predecessorLaneId +
+                ", predecessorId=" + predecessorId +
+                ", successorLaneId=" + successorLaneId +
+                ", successorId=" + successorId +
+                '}';
     }
 }

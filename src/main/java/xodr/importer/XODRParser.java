@@ -5,6 +5,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import util.Uppaal;
+import xodr.exporter.BufferWriter;
 import xodr.map.ElementType;
 import xodr.map.MapDataContainer;
 import xodr.map.entity.*;
@@ -22,14 +24,42 @@ import java.util.Map;
 public class XODRParser {
 
     // 映射：id -> index
-    private static Map<Integer, Integer> roadMap = new HashMap<>();
-//    private static Map<Integer, Integer> laneSectionMap = new HashMap<>();
-//    private static Map<Integer, Integer> laneMap = new HashMap<>();
-    private static Map<Integer, Integer> junctionMap = new HashMap<>();
-//    private static Map<Integer, Integer> connectionMap = new HashMap<>();
-//    private static Map<Integer, Integer> laneLinkMap = new HashMap<>();
+    private static Map<Integer, Integer> roadMap;
+    private static Map<Integer, Integer> laneSectionMap;
+    private static Map<Integer, Integer> laneMap;
+    private static Map<Integer, Integer> junctionMap;
 
+    // id: 分配的；roadId和junctionId本身自带
     private static int laneSectionId;
+    private static int laneId;
+
+    // index: 分配的
+    private static int roadIndex;
+    private static int laneSectionIndex;
+    private static int laneIndex;
+    private static int junctionIndex;
+    private static int connectionIndex;
+    private static int laneLinkIndex;
+
+    // laneChange: type -> uppaal number
+    private static final Map<String, Integer> laneChangeType = new HashMap<String, Integer>() {{
+        put("increase", 1);
+        put("decrease", 2);
+        put("both", 3);
+        put("none", 4);
+    }};
+
+    public static void main(String[] args) {
+        StringBuffer buffer = new StringBuffer();
+        String map = "src/main/resources/maps/Town02.xodr";
+        // 1. 读取
+        String input = XODRInputReader.readFromFile(map);
+        // 2. 解析
+        MapDataContainer container = XODRParser.parse(input);
+        // 3. 写入buffer
+        BufferWriter.write(container, buffer);
+        System.out.println(buffer.toString());
+    }
 
     public static MapDataContainer parse(String input) {
         System.out.println("Parsing input...");
@@ -40,7 +70,20 @@ public class XODRParser {
         List<Connection> connections = new ArrayList<>();
         List<LaneLink> laneLinks = new ArrayList<>();
 
+        roadMap = new HashMap<>();
+        laneSectionMap = new HashMap<>();
+        laneMap = new HashMap<>();
+        junctionMap = new HashMap<>();
+
         laneSectionId = 0;
+        laneId = 0;
+
+        roadIndex = 0;
+        laneSectionIndex = 0;
+        laneIndex = 0;
+        junctionIndex = 0;
+        connectionIndex = 0;
+        laneLinkIndex = 0;
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try {
@@ -55,6 +98,9 @@ public class XODRParser {
             // 2. 解析junction及子元素
             NodeList junctionList = root.getElementsByTagName("junction");
             parseJunction(junctionList, junctions, connections, laneLinks);
+            
+            // 3. 初始化index; 初始化connection的direction
+            initIndex(roads, laneSections, lanes, junctions, connections, laneLinks);
 
             System.out.println("Finishing parsing...");
             return new MapDataContainer(roads, junctions, laneSections, lanes, connections, laneLinks);
@@ -79,6 +125,10 @@ public class XODRParser {
                 //    int roadId;
                 int roadId = Integer.parseInt(roadElement.getAttribute("id"));
                 road.setRoadId(roadId);
+
+                road.setIndex(roadIndex); // 初始化index
+                roadMap.put(roadId, roadIndex++);
+
                 //    int junctionId;
                 int junctionId = Integer.parseInt(roadElement.getAttribute("junction"));
                 road.setJunctionId(junctionId);
@@ -89,8 +139,8 @@ public class XODRParser {
                 //    int successorElementType;
                 int predecessorId = -1;
                 int successorId = -1;
-                ElementType predecessorElementType = ElementType.ROAD;
-                ElementType successorElementType = ElementType.ROAD;
+                ElementType predecessorElementType;
+                ElementType successorElementType;
 
                 NodeList linkList = roadElement.getElementsByTagName("link");
                 Element myLinkList =  (Element) linkList.item(0);
@@ -102,7 +152,10 @@ public class XODRParser {
                         predecessorId = Integer.parseInt(predecessor.getAttribute("elementId"));
                         predecessorElementType = predecessor.getAttribute("elementType")
                                 .equalsIgnoreCase("junction") ? ElementType.JUNCTION : ElementType.ROAD;
+                        road.setPredecessorElementType(predecessorElementType.getValue());
                     }
+                } else {
+                    road.setPredecessorElementType(-1);
                 }
 
                 NodeList successorList = myLinkList.getElementsByTagName("successor");
@@ -112,20 +165,30 @@ public class XODRParser {
                         successorId = Integer.parseInt(successor.getAttribute("elementId"));
                         successorElementType = successor.getAttribute("elementType")
                                 .equalsIgnoreCase("junction") ? ElementType.JUNCTION : ElementType.ROAD;
+                        road.setSuccessorElementType(successorElementType.getValue());
                     }
+                } else {
+                    road.setSuccessorElementType(-1);
                 }
 
                 road.setPredecessorId(predecessorId);
                 road.setSuccessorId(successorId);
-                road.setPredecessorElementType(predecessorElementType.getValue());
-                road.setSuccessorElementType(successorElementType.getValue());
+
                 //    int maxSpeed;
                 NodeList typeNodeList = roadElement.getElementsByTagName("type");
-                Element speedElement = (Element) typeNodeList.item(0);
-                double maxSpeed = Double.parseDouble(speedElement.getAttribute("max"));
-                road.setMaxSpeed(maxSpeed);
-
-                //  TODO: road本身变量，各种索引
+                if(typeNodeList != null) {
+                    Element typeElement = (Element) typeNodeList.item(0);
+                    if(typeElement != null) {
+                        NodeList speedNodeList = typeElement.getElementsByTagName("speed");
+                        if(speedNodeList != null) {
+                            Element speedElement = (Element) speedNodeList.item(0);
+                            double maxSpeed = Double.parseDouble(speedElement.getAttribute("max"));
+                            road.setMaxSpeed(maxSpeed);
+                        }
+                    }
+                } else {
+                    road.setMaxSpeed(Uppaal.INT16_MAX / Uppaal.K);
+                }
 
                 // laneSections
                 NodeList lanesNodeList = roadElement.getElementsByTagName("lanes");
@@ -142,8 +205,8 @@ public class XODRParser {
 
     private static void parseLaneSection(NodeList laneSectionList, Road road, List<LaneSection> laneSections, List<Lane> lanes){
         try{
-            double preS = 0.0;
             List<LaneSection> roadLaneSections = new ArrayList<>();
+            List<Integer> laneSectionsIndex = new ArrayList<>();
             for(int i = 0; i < laneSectionList.getLength(); i++) {
                 Element laneSectionElement = (Element) laneSectionList.item(i);
                 LaneSection laneSection = new LaneSection();
@@ -153,16 +216,20 @@ public class XODRParser {
 //                private int roadIndex;
 //                private int roadId;
                 laneSection.setRoadId(road.getRoadId());
+                laneSection.setRoadIndex(road.getIndex());
+
 //                private int laneSectionId;
-                laneSection.setLaneSectionId(laneSectionId++);
+                laneSection.setLaneSectionId(laneSectionId);
+                laneSection.setIndex(laneSectionIndex);
+                laneSectionsIndex.add(laneSectionIndex);
+                laneSectionMap.put(laneSectionId++, laneSectionIndex++);
+
 //                private double startPosition;
                 double s = Double.parseDouble(laneSectionElement.getAttribute("s"));
                 laneSection.setStartPosition(s);
-//                private List<Integer> lanesIndex;
-//                private List<Lane> lanes;
+
 //                private double length;
-                double length = s - preS; //上一个的长度：本车道段起始位置减去上一个的起始位置。TODO: 后期应往后移；length可以去掉？
-                preS = s;
+                double length = 0; //上一个的长度：本车道段起始位置减去上一个的起始位置。
                 laneSection.setLength(length);
 
                 // lanes
@@ -172,6 +239,7 @@ public class XODRParser {
                 roadLaneSections.add(laneSection);
                 laneSections.add(laneSection);
             }
+            road.setLaneSectionsIndex(laneSectionsIndex);
             road.setLaneSections(roadLaneSections);
         } catch (Exception e) {
             e.printStackTrace();
@@ -181,6 +249,7 @@ public class XODRParser {
     private static void parseLane(NodeList laneList, LaneSection laneSection, List<Lane> lanes){
         try{
             List<Lane> laneSectionLanes = new ArrayList<>();
+            List<Integer> lanesIndex = new ArrayList<>();
             for(int i = 0; i < laneList.getLength(); i++) {
                 Element laneElement = (Element) laneList.item(i);
                 Lane lane = new Lane();
@@ -190,11 +259,19 @@ public class XODRParser {
 //                private int roadId;
                 lane.setRoadId(laneSection.getRoadId());
 //                private int roadIndex;
+                lane.setRoadIndex(laneSection.getRoadIndex());
 //                private int laneSectionIndex;
+                lane.setLaneSectionIndex(laneSection.getIndex());
 //                private int laneSectionId;
                 lane.setLaneSectionId(laneSection.getLaneSectionId());
 //                private int laneId;
                 lane.setLaneId(Integer.parseInt(laneElement.getAttribute("id")));
+
+                lane.setId(laneId); //上面的setLaneId中是相对位置，这里是标识符
+                lane.setIndex(laneIndex);
+                lanesIndex.add(laneIndex);
+                laneMap.put(laneId++, laneIndex++);
+
 //                private int type;
                 String type = laneElement.getAttribute("type");
                 if(type.equals("driving")) {
@@ -204,18 +281,42 @@ public class XODRParser {
                 }
 //                private int predecessorIndex;
 //                private int predecessorLaneId; // 与laneId同类，表示相对位置
-                NodeList predecessorList = laneElement.getElementsByTagName("predecessor");
-                Element predecessorElement = (Element) predecessorList.item(0);
-                String predecessorLaneId = predecessorElement.getAttribute("id");
-                lane.setPredecessorLaneId(Integer.parseInt(predecessorLaneId));
 //                private int predecessorId; // 标识符
+                NodeList predecessorList = laneElement.getElementsByTagName("predecessor");
+                String predecessorLaneId;
+                if(predecessorList != null) {
+                    Element predecessorElement = (Element) predecessorList.item(0);
+                    if(predecessorElement != null) {
+                        predecessorLaneId = predecessorElement.getAttribute("id");
+                        lane.setPredecessorLaneId(Integer.parseInt(predecessorLaneId));
+                    }
+                } else {
+                    lane.setPredecessorLaneId(0); // 不存在
+                }
 //                private int successorIndex; 
 //                private int successorLaneId;
 //                private int successorId;
+                NodeList successorList = laneElement.getElementsByTagName("successor");
+                String successorLaneId;
+                if(successorList != null) {
+                    Element successorElement = (Element) successorList.item(0);
+                    if(successorElement != null) {
+                        successorLaneId = successorElement.getAttribute("id");
+                        lane.setSuccessorLaneId(Integer.parseInt(successorLaneId));
+                    }
+                } else {
+                    lane.setSuccessorLaneId(0); // 不存在
+                }
 //                private int laneChange;
+                NodeList roadMarkList = laneElement.getElementsByTagName("roadMark");
+                Element roadMarkElement = (Element) roadMarkList.item(0);
+                String laneChange = roadMarkElement.getAttribute("laneChange");
+                lane.setLaneChange(laneChangeType.getOrDefault(laneChange, 0));
+
                 laneSectionLanes.add(lane);
                 lanes.add(lane);
             }
+            laneSection.setLanesIndex(lanesIndex);
             laneSection.setLanes(laneSectionLanes);
         } catch (Exception e) {
             e.printStackTrace();
@@ -233,7 +334,9 @@ public class XODRParser {
                 junction.setElementType(ElementType.JUNCTION.getValue());
                 // int junctionId;
                 int junctionId = Integer.parseInt(junctionElement.getAttribute("id"));
-                // TODO: junction本身变量
+
+                junction.setIndex(junctionIndex);
+                junctionMap.put(junctionId, junctionIndex++);
 
                 // connections;
                 NodeList connectionList = junctionElement.getElementsByTagName("connection");
@@ -249,14 +352,20 @@ public class XODRParser {
     private static void parseConnection(NodeList connectionList, Junction junction, List<Connection> connections, List<LaneLink> laneLinks) {
         try{
             List<Connection> junctionConnections = new ArrayList<>();
+            List<Integer> connectionsIndex = new ArrayList<>();
             for(int i = 0; i < connectionList.getLength(); i++) {
                 Element connectionElement = (Element) connectionList.item(i);
 
                 Connection connection = new Connection();
                 int incomingRoadId  = Integer.parseInt(connectionElement.getAttribute("incomingRoad"));
                 int connectingRoadId  = Integer.parseInt(connectionElement.getAttribute("connectingRoad"));
-                // TODO: connection本身变量
-                
+
+                connection.setIncomingRoadId(incomingRoadId);
+                connection.setConnectingRoadId(connectingRoadId);
+
+                connection.setIndex(connectionIndex);
+                connectionsIndex.add(connectionIndex++); // 上级junction中connection索引
+
                 // laneLinks
                 NodeList laneLinkList = connectionElement.getElementsByTagName("laneLink");
                 parseLaneLink(laneLinkList, connection, laneLinks);
@@ -264,6 +373,7 @@ public class XODRParser {
                 connections.add(connection);
                 junctionConnections.add(connection);
             }
+            junction.setConnectionsIndex(connectionsIndex);
             junction.setConnections(junctionConnections);
         } catch (Exception e) {
             e.printStackTrace();
@@ -273,18 +383,96 @@ public class XODRParser {
     private static void parseLaneLink(NodeList laneLinkList, Connection connection, List<LaneLink> laneLinks) {
         try{
             List<LaneLink> connectionLaneLinks = new ArrayList<>();
+            List<Integer> laneLinksIndex = new ArrayList<>();
             for(int i = 0; i < laneLinkList.getLength(); i++) {
                 Element laneLinkElement = (Element) laneLinkList.item(i);
                 LaneLink laneLink = new LaneLink();
-                // TODO: laneLink本身变量
+
+                laneLink.setFrom(Integer.parseInt(laneLinkElement.getAttribute("from")));
+                laneLink.setTo(Integer.parseInt(laneLinkElement.getAttribute("to")));
+
+                laneLink.setIndex(laneLinkIndex);
+                laneLinksIndex.add(laneLinkIndex++); // 上级laneLinks索引
 
                 connectionLaneLinks.add(laneLink);
                 laneLinks.add(laneLink);
             }
+            connection.setLaneLinksIndex(laneLinksIndex);
             connection.setLaneLinks(connectionLaneLinks);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // 初始化各结构的索引；初始化connection的direction
+    private static void initIndex(List<Road> roads, List<LaneSection> laneSections, List<Lane> lanes,
+                                  List<Junction> junctions, List<Connection> connections, List<LaneLink> laneLinks) {
+        // road: junctionIndex, predecessorIndex, successorIndex
+        initRoad(roads);
+        // lane: predecessorIndex, successorIndex
+        initLane(lanes);
+        // connection: incomingRoadIndex, connectionRoadIndex; direction
+        initConnection(connections, junctions, roads);
+    }
+
+    private static void initRoad(List<Road> roads) {
+        // road: junctionIndex, predecessorIndex, successorIndex
+        for(Road road : roads) {
+            // junctionIndex
+            road.setJunctionIndex(junctionMap.getOrDefault(road.getJunctionId(), -1));
+            // predecessorIndex
+            if(road.getPredecessorElementType() == 1) { // road
+                road.setPredecessorIndex(roadMap.getOrDefault(road.getPredecessorId(), -1));
+            } else if(road.getPredecessorElementType() == 4) { // junction
+                road.setPredecessorIndex(junctionMap.getOrDefault(road.getPredecessorId(), -1));
+            } else {
+                road.setPredecessorIndex(-1);
+            }
+            // successorIndex
+            if(road.getSuccessorElementType() == 1) { // road
+                road.setSuccessorIndex(roadMap.getOrDefault(road.getSuccessorId(), -1));
+            } else if(road.getSuccessorElementType() == 4) { // junction
+                road.setSuccessorIndex(junctionMap.getOrDefault(road.getSuccessorId(), -1));
+            } else {
+                road.setSuccessorIndex(-1);
+            }
+        }
+    }
+
+    private static void initLane(List<Lane> lanes) {
+        // TODO: lane: predecessorIndex, successorIndex
+
+    }
+
+    private static void initConnection(List<Connection> connections, List<Junction> junctions, List<Road> roads) {
+        // connection: incomingRoadIndex, connectionRoadIndex
+        for(Connection connection : connections) {
+            connection.setIncomingRoadIndex(roadMap.getOrDefault(connection.getIncomingRoadId(), -1));
+            connection.setConnectingRoadIndex(roadMap.getOrDefault(connection.getConnectingRoadId(), -1));
+        }
+
+        // 设置direction（这里可以优化）
+        for(Road road : roads) {
+            if(road.getJunctionId() != -1) {
+                int direction = 1; // 1左转 2直行 3右转 其他都不正常忽略掉
+                for(Junction junction : junctions) {
+                    List<Connection> junctionConnections = junction.getConnections();
+                    for(Connection connection : junctionConnections) {
+                        if(connection.getConnectingRoadId() == road.getRoadId()) { // 作为连接路
+                            connection.setDirection(direction++);
+                        }
+                    }
+                    junction.setConnections(junctionConnections);
+                }
+                direction = 1; // 全局的connections也要初始化一遍
+                for(Connection connection : connections) {
+                    if(connection.getConnectingRoadId() == road.getRoadId()) {
+                        connection.setDirection(direction++);
+                    }
+                }
+            }
+        }
+    }
+
+    
 }

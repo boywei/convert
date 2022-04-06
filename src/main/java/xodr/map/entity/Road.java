@@ -20,18 +20,28 @@ import java.util.List;
 public class Road {
     private int elementType;
     private int roadId;
-    private int junctionIndex;
+    private int junctionIndex; // init: 第一次初始化时无法确定，需要在init中再次初始化
     private int junctionId;
     private double length;
     private int predecessorElementType;
-    private int predecessorId;
-    private int predecessorIndex;
+    private int predecessorIndex; // init
     private int successorElementType;
-    private int successorId;
-    private int successorIndex;
+    private int successorIndex; // init
     private double maxSpeed;
     private List<Integer> laneSectionsIndex;
+
     private List<LaneSection> laneSections;
+    private int successorId;
+    private int predecessorId;
+    private int index;
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
 
     public int getPredecessorId() {
         return predecessorId;
@@ -145,4 +155,24 @@ public class Road {
         this.laneSections = laneSections;
     }
 
+    @Override
+    public String toString() {
+        return "Road{" +
+                "elementType=" + elementType +
+                ", roadId=" + roadId +
+                ", junctionIndex=" + junctionIndex +
+                ", junctionId=" + junctionId +
+                ", length=" + length +
+                ", predecessorElementType=" + predecessorElementType +
+                ", predecessorIndex=" + predecessorIndex +
+                ", successorElementType=" + successorElementType +
+                ", successorIndex=" + successorIndex +
+                ", maxSpeed=" + maxSpeed +
+                ", laneSectionsIndex=" + laneSectionsIndex +
+                ", laneSections=" + laneSections +
+                ", successorId=" + successorId +
+                ", predecessorId=" + predecessorId +
+                ", index=" + index +
+                '}';
+    }
 }

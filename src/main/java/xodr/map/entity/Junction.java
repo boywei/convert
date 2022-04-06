@@ -15,7 +15,17 @@ public class Junction {
     private int elementType;
     private int junctionId;
     private List<Integer> connectionsIndex;
+
     private List<Connection> connections;
+    private int index;
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
 
     public int getElementType() {
         return elementType;
@@ -47,5 +57,16 @@ public class Junction {
 
     public void setConnections(List<Connection> connections) {
         this.connections = connections;
+    }
+
+    @Override
+    public String toString() {
+        return "Junction{" +
+                "elementType=" + elementType +
+                ", junctionId=" + junctionId +
+                ", connectionsIndex=" + connectionsIndex +
+                ", connections=" + connections +
+                ", index=" + index +
+                '}';
     }
 }

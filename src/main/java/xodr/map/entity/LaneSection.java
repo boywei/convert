@@ -21,8 +21,18 @@ public class LaneSection {
     private int laneSectionId;
     private double startPosition;
     private List<Integer> lanesIndex;
-    private List<Lane> lanes;
+
     private double length;
+    private List<Lane> lanes;
+    private int index;
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
 
     public int getElementType() {
         return elementType;
@@ -86,5 +96,20 @@ public class LaneSection {
 
     public void setLength(double length) {
         this.length = length;
+    }
+
+    @Override
+    public String toString() {
+        return "LaneSection{" +
+                "elementType=" + elementType +
+                ", roadIndex=" + roadIndex +
+                ", roadId=" + roadId +
+                ", laneSectionId=" + laneSectionId +
+                ", startPosition=" + startPosition +
+                ", lanesIndex=" + lanesIndex +
+                ", length=" + length +
+                ", lanes=" + lanes +
+                ", index=" + index +
+                '}';
     }
 }
