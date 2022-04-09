@@ -12,7 +12,7 @@
     predecessorIndex       索引值 表示当前Road的前继 可以是Road 也可以是一个junction  需要配合predecessorElementType在对应的类型数组中索引    用-1表示空
     successorElementType   successor的类型 根据这个类型 在不同的数组中进行索引
     successorIndex         索引值 表示当前Road的后继 可以是Road 也可以是一个junction  需要配合successorElementType在对应的类型数组中索引    用-1表示空
-    maxSpeed               路的最大限速索引 根据这个索引可以在roadMaxSpeeds数组中找到路的最大限速
+    maxSpeed               路的最大限速
     laneSections[]         表示当前Road中的道路段索引数组  道路段的顺序就是数组的顺序   道路段中又有很多不同的道路Lane
 **/
 typedef struct {
@@ -31,14 +31,14 @@ typedef struct {
 
 /**
     LaneSection结构体
-    
+
     elementType = 2          表示LaneSection类型
-    roadIndex                索引值 表示当前LaneSection属于那一条道路 可以在roads数组中查找 
+    roadIndex                索引值 表示当前LaneSection属于那一条道路 可以在roads数组中查找
     roadId                   唯一标志当前LaneSection所属Road
     LaneSectionId            唯一标志一个LaneSection
-    startPosition            起始偏移位置索引值  可以在startPositions数组中找到当前LaneSection是距离Road起始位置多少m开始
+    startPosition            起始偏移位置, 当前LaneSection是距离Road起始位置多少m开始
     lanes                    LaneSection的道路Lane的索引值列表
-    length                   LaneSection长度索引值  可以在laneSectionLengths数组中找到道路段长度
+    length                   LaneSection长度
 **/
 typedef struct {
     int elementType;
@@ -52,7 +52,7 @@ typedef struct {
 
 /**
     Lane结构体
-    
+
     elementType = 3          表示Lane类型
     roadId                   当前Lane所属Road的id
     roadIndex                当前Lane所属Road的索引值
@@ -62,7 +62,7 @@ typedef struct {
     predecessorIndex         前继Lane的索引值
     successorIndex           后继Lane的索引值
     laneChange               int类型 由于车道从右到左id递增 用该变量表示当前lane是否允许变道 -1表示不知道 1表示允许向左变道 2表示允许向右变道 3表示两边都允许 4表示两边都不允许
-    
+
 **/
 typedef struct{
     int elementType;
@@ -78,11 +78,11 @@ typedef struct{
 
 /**
     Junction结构体
-    
+
     elementType = 4          表示Junction类型
     junctionId               唯一标志一个junction
     connections[]            Connection结构体数组 表示当前junction连接的 incomingRoad 和 connectingRoad
-    
+
 **/
 typedef struct {
     int elementType;
@@ -92,7 +92,7 @@ typedef struct {
 
 /**
     Connection结构体
-        
+
     direction               1 left, 2 straight, 3 right, 4 none
     incomingRoadId          驶入Road的id
     connectingRoadId        驶出Road的id
@@ -150,7 +150,7 @@ typedef struct {
 /************************************* 变量和数据 *************************************/
 
 clock time; // 时钟
-chan update, end;
+broadcast chan update, end;
 
 const int FACTOR = 10; // 为保留小数而放大的倍数
 const int MIN_DISTANCE_TO_OVERTAKE = 30 * FACTOR; // 超车的最小距离
@@ -158,14 +158,20 @@ const int MIN_DISTANCE_TO_CLOSE = 20 * FACTOR; // 两车最小的距离
 const int INT16_MIN = -32768;
 const int INT16_MAX =  32767;
 
+// RSS
+const int ret = 1; // 司机反应时间
+const int maxAcc = 6; // 最大加速度
+const int minBra = 5; // 最大刹车加速度
+const int minCor = 5; // 最大刹车加速度?
+
 // 函数中不能声明结构体，在这里临时声明
 Lane tempLane;
 Connection tempConnection;
 
-Road roads[1000];
-LaneSection laneSections[1000];
-Lane lanes[1000];
-Junction junctions[1000];
-Connection connections[1000];
-LaneLink laneLinks[1000];
+Road roads[2];
+LaneSection laneSections[5];
+Lane lanes[10];
+Junction junctions[1];
+Connection connections[2];
+LaneLink laneLinks[2];
 

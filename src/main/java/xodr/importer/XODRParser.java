@@ -29,10 +29,6 @@ public class XODRParser {
     private static Map<Integer, Integer> laneMap;
     private static Map<Integer, Integer> junctionMap;
 
-    // id: 分配的；roadId和junctionId本身自带
-    private static int laneSectionId;
-    private static int laneId;
-
     // index: 分配的
     private static int roadIndex;
     private static int laneSectionIndex;
@@ -40,6 +36,10 @@ public class XODRParser {
     private static int junctionIndex;
     private static int connectionIndex;
     private static int laneLinkIndex;
+
+    // id: 分配的；roadId和junctionId本身自带
+    private static int laneSectionId;
+    private static int laneId;
 
     // laneChange: type -> uppaal number
     private static final Map<String, Integer> laneChangeType = new HashMap<String, Integer>() {{
@@ -51,7 +51,7 @@ public class XODRParser {
 
     public static void main(String[] args) {
         StringBuffer buffer = new StringBuffer();
-        String map = "src/main/resources/maps/Town02.xodr";
+        String map = "src/main/resources/maps/test.xodr";
         // 1. 读取
         String input = XODRInputReader.readFromFile(map);
         // 2. 解析
@@ -407,11 +407,11 @@ public class XODRParser {
     // 初始化各结构的索引；初始化connection的direction
     private static void initIndex(List<Road> roads, List<LaneSection> laneSections, List<Lane> lanes,
                                   List<Junction> junctions, List<Connection> connections, List<LaneLink> laneLinks) {
-        // road: junctionIndex, predecessorIndex, successorIndex
+        // road: 需要初始化junctionIndex, predecessorIndex, successorIndex
         initRoad(roads);
-        // lane: predecessorIndex, successorIndex
+        // lane: 需要初始化predecessorIndex, successorIndex
         initLane(lanes);
-        // connection: incomingRoadIndex, connectionRoadIndex; direction
+        // connection: 需要初始化incomingRoadIndex, connectionRoadIndex; direction
         initConnection(connections, junctions, roads);
     }
 
@@ -441,7 +441,7 @@ public class XODRParser {
 
     private static void initLane(List<Lane> lanes) {
         // TODO: lane: predecessorIndex, successorIndex
-
+        System.out.println("Have not finished");
     }
 
     private static void initConnection(List<Connection> connections, List<Junction> junctions, List<Road> roads) {

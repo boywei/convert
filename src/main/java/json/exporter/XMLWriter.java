@@ -188,6 +188,7 @@ public class XMLWriter {
         // 新增一个初始状态
         buffer.append("\t\t<location id=\"id0\">\n" +
                 "\t\t\t<name>Start</name>\n" +
+                "\t\t\t<committed/>\n" +
                 "\t\t</location>\n");
 
         Behavior[] behaviors = cars[index].getmTree().getBehaviors();
@@ -359,7 +360,7 @@ public class XMLWriter {
         // 不存在则设置为最大值
         double targetSpeed = behavior.getParams().getOrDefault("target speed", INT16_MAX/K * 1.0);
         double acceleration = behavior.getParams().getOrDefault("acceleration", 0.0);
-        double duration = behavior.getParams().getOrDefault("duration", INT16_MAX/10 * 1.0);
+        double duration = behavior.getParams().getOrDefault("duration", INT16_MAX/K * 1.0);
 
         if(behavior.getName().equals(BehaviorType.ACCELERATE.getValue())) {
             // *acceleration, *target speed, duration

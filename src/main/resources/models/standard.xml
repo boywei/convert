@@ -16,7 +16,7 @@
     predecessorIndex       索引值 表示当前Road的前继 可以是Road 也可以是一个junction  需要配合predecessorElementType在对应的类型数组中索引    用-1表示空
     successorElementType   successor的类型 根据这个类型 在不同的数组中进行索引
     successorIndex         索引值 表示当前Road的后继 可以是Road 也可以是一个junction  需要配合successorElementType在对应的类型数组中索引    用-1表示空
-    maxSpeed               路的最大限速索引 根据这个索引可以在roadMaxSpeeds数组中找到路的最大限速
+    maxSpeed               路的最大限速
     laneSections[]         表示当前Road中的道路段索引数组  道路段的顺序就是数组的顺序   道路段中又有很多不同的道路Lane
 **/
 typedef struct {
@@ -40,9 +40,9 @@ typedef struct {
     roadIndex                索引值 表示当前LaneSection属于那一条道路 可以在roads数组中查找 
     roadId                   唯一标志当前LaneSection所属Road
     LaneSectionId            唯一标志一个LaneSection
-    startPosition            起始偏移位置索引值  可以在startPositions数组中找到当前LaneSection是距离Road起始位置多少m开始
+    startPosition            起始偏移位置, 当前LaneSection是距离Road起始位置多少m开始
     lanes                    LaneSection的道路Lane的索引值列表
-    length                   LaneSection长度索引值  可以在laneSectionLengths数组中找到道路段长度
+    length                   LaneSection长度
 **/
 typedef struct {
     int elementType;
@@ -154,7 +154,7 @@ typedef struct {
 /************************************* 变量和数据 *************************************/
 
 clock time; // 时钟
-chan update, end; 
+broadcast chan update, end;
 
 const int FACTOR = 10; // 为保留小数而放大的倍数
 const int MIN_DISTANCE_TO_OVERTAKE = 30 * FACTOR; // 超车的最小距离
@@ -162,16 +162,22 @@ const int MIN_DISTANCE_TO_CLOSE = 20 * FACTOR; // 两车最小的距离
 const int INT16_MIN = -32768;
 const int INT16_MAX =  32767;
 
+// RSS
+const int ret = 1; // 司机反应时间
+const int maxAcc = 6; // 最大加速度
+const int minBra = 5; // 最大刹车加速度
+const int minCor = 5; // 最大刹车加速度?
+
 // 函数中不能声明结构体，在这里临时声明
 Lane tempLane; 
 Connection tempConnection;
 
-Road roads[1000];
-LaneSection laneSections[1000];
-Lane lanes[1000];
-Junction junctions[1000];
-Connection connections[1000];
-LaneLink laneLinks[1000];
+Road roads[2];
+LaneSection laneSections[5];
+Lane lanes[10];
+Junction junctions[1];
+Connection connections[2];
+LaneLink laneLinks[2];
 
 const int TIME_STEP = 10;
 Car car[1] = {{0, 0, 0, true, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0}};
@@ -464,17 +470,17 @@ void speedUp(Car&amp; car, int targetSpeed){
 void speedDown(Car&amp; car, int targetSpeed){
     int v1 = car.speed;
     int a = car.acceleration;
-    int v2 = accelerate_v(v1, a, TIME_STEP);
+    int v2 = accelerate_v(v1, -a, TIME_STEP);
     int t = 0;
     int movement = 0;
     int minSpeed = (targetSpeed &gt; 0? targetSpeed : 0);
 
-    if(v2 &lt; minSpeed) { //在时间段之前已经到达最大速度了, 后面保持匀速
+    if(v2 &lt; minSpeed) { //在时间段之前已经到达最小速度了, 后面保持匀速
 		v2 = minSpeed;
-        t = (v2 - v1) / a; //加速时间
-        movement = accelerate_s(v1, a, t) + v2 * (TIME_STEP - t) / FACTOR;
+        t = (v1 - v2) / a; //减速时间
+        movement = accelerate_s(v1, -a, t) + v2 * (TIME_STEP - t) / FACTOR;
     } else {
-        movement = accelerate_s(v1, a, TIME_STEP);
+        movement = accelerate_s(v1, -a, TIME_STEP);
     }
 
     car.speed = v2;

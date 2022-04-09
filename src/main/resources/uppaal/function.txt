@@ -286,17 +286,17 @@ void speedUp(Car&amp; car, int targetSpeed){
 void speedDown(Car&amp; car, int targetSpeed){
     int v1 = car.speed;
     int a = car.acceleration;
-    int v2 = accelerate_v(v1, a, TIME_STEP);
+    int v2 = accelerate_v(v1, -a, TIME_STEP);
     int t = 0;
     int movement = 0;
     int minSpeed = (targetSpeed &gt; 0? targetSpeed : 0);
 
-    if(v2 &lt; minSpeed) { //在时间段之前已经到达最大速度了, 后面保持匀速
+    if(v2 &lt; minSpeed) { //在时间段之前已经到达最小速度了, 后面保持匀速
 		v2 = minSpeed;
-        t = (v2 - v1) / a; //加速时间
-        movement = accelerate_s(v1, a, t) + v2 * (TIME_STEP - t) / FACTOR;
+        t = (v1 - v2) / a; //减速时间
+        movement = accelerate_s(v1, -a, t) + v2 * (TIME_STEP - t) / FACTOR;
     } else {
-        movement = accelerate_s(v1, a, TIME_STEP);
+        movement = accelerate_s(v1, -a, TIME_STEP);
     }
 
     car.speed = v2;

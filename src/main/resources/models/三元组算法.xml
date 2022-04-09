@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
 <nta>
+	<declaration>typedef struct{
+    int i;
+    int j[2];
+}B;
+
+B b = {1,{1,2}}; // right
+</declaration>
 	<template>
-		<name x="5" y="5">Template</name>
+		<name x="5" y="5">tree</name>
 		<declaration>/**
     三元组算法: 由树转化为自动机时，状态迁出时应走行为树对应的边，该算法用于判断相应的边
     (level,group,number)三元组用于标识自动机运行到达的边
@@ -104,11 +111,19 @@ int N = 3;
 		</transition>
 	</template>
 	<system>// Place template instantiations here.
-Process = Template();
+Process = tree();
 // List one or more processes to be composed into a system.
 system Process;
     </system>
 	<queries>
+		<query>
+			<formula>Pr[&lt;=20](&lt;&gt; b.i&gt;5)</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>A[] b.i==1</formula>
+			<comment></comment>
+		</query>
 		<query>
 			<formula></formula>
 			<comment></comment>
