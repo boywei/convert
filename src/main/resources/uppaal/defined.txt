@@ -168,10 +168,5 @@ const int minCor = 5; // 最大刹车加速度?
 Lane tempLane;
 Connection tempConnection;
 
-Road roads[2];
-LaneSection laneSections[5];
-Lane lanes[10];
-Junction junctions[1];
-Connection connections[2];
-LaneLink laneLinks[2];
+
 

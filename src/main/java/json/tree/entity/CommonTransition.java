@@ -12,6 +12,34 @@ public class CommonTransition {
     private int group;
     private int number;
 
+    private Behavior sourceBehavior;
+    private Behavior targetBehavior;
+    private BranchPoint targetBranchPoint;
+
+    public Behavior getSourceBehavior() {
+        return sourceBehavior;
+    }
+
+    public void setSourceBehavior(Behavior sourceBehavior) {
+        this.sourceBehavior = sourceBehavior;
+    }
+
+    public Behavior getTargetBehavior() {
+        return targetBehavior;
+    }
+
+    public void setTargetBehavior(Behavior targetBehavior) {
+        this.targetBehavior = targetBehavior;
+    }
+
+    public BranchPoint getTargetBranchPoint() {
+        return targetBranchPoint;
+    }
+
+    public void setTargetBranchPoint(BranchPoint targetBranchPoint) {
+        this.targetBranchPoint = targetBranchPoint;
+    }
+
     public CommonTransition(String[] guards, int id, Position[] linkPoints, int sourceId, int targetId, Position treeTextPosition) {
         this.guards = guards;
         this.id = id;

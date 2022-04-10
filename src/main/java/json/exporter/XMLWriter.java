@@ -23,7 +23,7 @@ public class XMLWriter {
     private static Car[] cars;
     private static String map;
     private static String source;
-    private static int timeStep;
+    private static double timeStep;
     private static String weather;
 
     // 已定义好的数据结构路径、函数路径、边的变量路径
@@ -35,6 +35,8 @@ public class XMLWriter {
     public static final int K = 10;
     public static final int INT16_MAX = 32767;
     public static final int INT16_MIN = -32768;
+
+    public static Map<String, Integer> carNameIndexMap;
 
     // （一）对应XML声明头
     private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
@@ -62,8 +64,7 @@ public class XMLWriter {
         // 1）已定义的数据结构和变量信息
         addDefined(buffer);
         buffer.append("const int TIME_STEP = " + f(timeStep) + ";\n");
-        // TODO: 2) 声明路网，初始化
-//        addMap(buffer);
+        addMap(buffer);
         // 3) 声明车辆，初始化
         addCar(buffer);
         // 4）已定义好的函数部分
@@ -292,11 +293,18 @@ public class XMLWriter {
      */
     private static String addGuards(String[] guards, int index) {
         StringBuffer buffer = new StringBuffer();
+        if(guards == null) {
+            return "";
+        }
         for(String guard : guards) {
             for(String guardType : GuardType.allGuards) {
                 if(guard.equals(guardType)) {
-                    buffer.append(" &amp;&amp; " + guard.
-                            replaceAll("\\(\\)", "(car[" + index + "])").
+                    String s = guard;
+                    for(String name : carNameIndexMap.keySet()) {
+                        s = guard.replaceAll(name, "car[" + carNameIndexMap.get(name) + "]");
+                    }
+                    buffer.append(" &amp;&amp; " + s.
+//                            replaceAll("\\(\\)", "(car[" + index + "])").
                             replaceAll("&", "&amp;").
                             replaceAll(">", "&gt;").
                             replaceAll("<", "&lt;")
@@ -357,10 +365,19 @@ public class XMLWriter {
     // 2.7.2 TODO: 未完成但后续条件满足时跳出？需不需要加锁; 左右转问题
     private static String operate(Behavior behavior, int index) {
         StringBuffer buffer = new StringBuffer();
+
+        Map<String, Double> params = behavior.getParams();
+        if(params == null) {
+            return "";
+        }
+
         // 不存在则设置为最大值
-        double targetSpeed = behavior.getParams().getOrDefault("target speed", INT16_MAX/K * 1.0);
-        double acceleration = behavior.getParams().getOrDefault("acceleration", 0.0);
-        double duration = behavior.getParams().getOrDefault("duration", INT16_MAX/K * 1.0);
+        Double targetSpeed = params.getOrDefault("target speed", INT16_MAX/K * 1.0);
+        targetSpeed = (targetSpeed == null? INT16_MAX/K * 1.0 : targetSpeed);
+        Double acceleration = params.getOrDefault("acceleration", 0.0);
+        acceleration = (acceleration == null? 0.0 : acceleration);
+        Double duration = params.getOrDefault("duration", INT16_MAX/K * 1.0);
+        duration = (duration == null? INT16_MAX/K * 1.0 : duration);
 
         if(behavior.getName().equals(BehaviorType.ACCELERATE.getValue())) {
             // *acceleration, *target speed, duration
@@ -467,6 +484,11 @@ public class XMLWriter {
         source = container.getSource();
         timeStep = container.getTimeStep();
         weather = container.getWeather();
+
+        carNameIndexMap = new HashMap<>();
+        for (int i = 0; i < cars.length; i++) {
+            carNameIndexMap.put(cars[i].getName(), i);
+        }
     }
 
     // 从这里开始

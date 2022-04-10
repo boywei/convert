@@ -1,0 +1,615 @@
+{
+  "behaviors": [
+    {
+      "id": 0,
+      "name": "Keep",
+      "params": {
+        "duration": "2"
+      },
+      "position": {
+        "x": 198.0,
+        "y": 1.0
+      },
+      "treeTextPosition": {
+        "x": 232.0,
+        "y": 1.0
+      }
+    },
+    {
+      "id": 1,
+      "name": "ChangeLeft",
+      "params": {
+        "acceleration": "",
+        "target speed": ""
+      },
+      "position": {
+        "x": 194.0,
+        "y": 70.0
+      },
+      "treeTextPosition": {
+        "x": 228.0,
+        "y": 70.0
+      }
+    },
+    {
+      "id": 2,
+      "name": "Accelerate",
+      "params": {
+        "acceleration": "2",
+        "target speed": "12",
+        "duration": "8"
+      },
+      "position": {
+        "x": 190.0,
+        "y": 132.0
+      },
+      "treeTextPosition": {
+        "x": 126.98095703125,
+        "y": 98.0
+      }
+    },
+    {
+      "id": 6,
+      "name": "Keep",
+      "params": {
+        "duration": "5"
+      },
+      "position": {
+        "x": 114.0,
+        "y": 182.0
+      },
+      "treeTextPosition": {
+        "x": 148.0,
+        "y": 182.0
+      }
+    },
+    {
+      "id": 3,
+      "name": "ChangeRight",
+      "params": {
+        "acceleration": "",
+        "target speed": ""
+      },
+      "position": {
+        "x": 274.0,
+        "y": 186.0
+      },
+      "treeTextPosition": {
+        "x": 308.0,
+        "y": 186.0
+      }
+    },
+    {
+      "id": 7,
+      "name": "ChangeRight",
+      "params": {
+        "acceleration": "",
+        "target speed": ""
+      },
+      "position": {
+        "x": 112.0,
+        "y": 256.0
+      },
+      "treeTextPosition": {
+        "x": 146.0,
+        "y": 256.0
+      }
+    },
+    {
+      "id": 4,
+      "name": "Decelerate",
+      "params": {
+        "acceleration": "2",
+        "target speed": "8",
+        "duration": "6"
+      },
+      "position": {
+        "x": 275.0,
+        "y": 247.0
+      },
+      "treeTextPosition": {
+        "x": 309.0,
+        "y": 247.0
+      }
+    },
+    {
+      "id": 5,
+      "name": "Keep",
+      "params": {
+        "duration": ""
+      },
+      "position": {
+        "x": 275.0,
+        "y": 319.0
+      },
+      "treeTextPosition": {
+        "x": 309.0,
+        "y": 319.0
+      }
+    },
+    {
+      "id": 9,
+      "name": "Decelerate",
+      "params": {
+        "acceleration": "2",
+        "target speed": "8",
+        "duration": "6"
+      },
+      "position": {
+        "x": 61.0,
+        "y": 380.0
+      },
+      "treeTextPosition": {
+        "x": 95.0,
+        "y": 380.0
+      }
+    },
+    {
+      "id": 8,
+      "name": "Keep",
+      "params": {
+        "duration": ""
+      },
+      "position": {
+        "x": 160.0,
+        "y": 383.0
+      },
+      "treeTextPosition": {
+        "x": 194.0,
+        "y": 383.0
+      }
+    },
+    {
+      "id": 22,
+      "name": "Keep",
+      "params": {
+        "duration": ""
+      },
+      "position": {
+        "x": 49.0,
+        "y": 444.0
+      },
+      "treeTextPosition": {
+        "x": 83.0,
+        "y": 444.0
+      }
+    }
+  ],
+  "branchPoints": [
+    {
+      "id": 11,
+      "position": {
+        "x": 118.0,
+        "y": 327.0
+      }
+    }
+  ],
+  "commonTransitions": [
+    {
+      "id": 12,
+      "linkPoints": [
+        {
+          "x": 208.07401840777044,
+          "y": 27.97318246596
+        },
+        {
+          "x": 205.92598159222956,
+          "y": 65.02681753403999
+        }
+      ],
+      "sourceId": 0,
+      "targetId": 1,
+      "treeTextPosition": {
+        "x": 214.0,
+        "y": 17.0
+      }
+    },
+    {
+      "id": 13,
+      "linkPoints": [
+        {
+          "x": 203.96988355203254,
+          "y": 96.96680494349533
+        },
+        {
+          "x": 202.03011644796743,
+          "y": 127.03319505650467
+        }
+      ],
+      "sourceId": 1,
+      "targetId": 2,
+      "treeTextPosition": {
+        "x": 210.0,
+        "y": 86.0
+      }
+    },
+    {
+      "id": 16,
+      "linkPoints": [
+        {
+          "x": 122.49231925064362,
+          "y": 282.99194360472586
+        },
+        {
+          "x": 121.25384037467819,
+          "y": 322.00402819763707
+        }
+      ],
+      "sourceId": 7,
+      "targetId": 11,
+      "treeTextPosition": {
+        "x": 128.0,
+        "y": 272.0
+      }
+    },
+    {
+      "id": 20,
+      "linkPoints": [
+        {
+          "x": 285.2622598438288,
+          "y": 212.99785047355783
+        },
+        {
+          "x": 285.7377401561712,
+          "y": 242.00214952644217
+        }
+      ],
+      "sourceId": 3,
+      "targetId": 4,
+      "treeTextPosition": {
+        "x": 290.0,
+        "y": 202.0
+      }
+    },
+    {
+      "id": 21,
+      "linkPoints": [
+        {
+          "x": 286.0,
+          "y": 274.0
+        },
+        {
+          "x": 286.0,
+          "y": 314.0
+        }
+      ],
+      "sourceId": 4,
+      "targetId": 5,
+      "treeTextPosition": {
+        "x": 291.0,
+        "y": 263.0
+      }
+    },
+    {
+      "id": 23,
+      "linkPoints": [
+        {
+          "x": 69.05138343919704,
+          "y": 406.72595499094916
+        },
+        {
+          "x": 62.948616560802975,
+          "y": 439.27404500905084
+        }
+      ],
+      "sourceId": 9,
+      "targetId": 22,
+      "treeTextPosition": {
+        "x": 77.0,
+        "y": 396.0
+      }
+    },
+    {
+      "id": 24,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 0,
+      "targetId": 0,
+      "treeTextPosition": {
+        "x": 214.0,
+        "y": 17.0
+      }
+    },
+    {
+      "id": 25,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 1,
+      "targetId": 1,
+      "treeTextPosition": {
+        "x": 210.0,
+        "y": 86.0
+      }
+    },
+    {
+      "id": 26,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 2,
+      "targetId": 2,
+      "treeTextPosition": {
+        "x": 206.0,
+        "y": 148.0
+      }
+    },
+    {
+      "id": 27,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 6,
+      "targetId": 6,
+      "treeTextPosition": {
+        "x": 130.0,
+        "y": 198.0
+      }
+    },
+    {
+      "id": 28,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 3,
+      "targetId": 3,
+      "treeTextPosition": {
+        "x": 290.0,
+        "y": 202.0
+      }
+    },
+    {
+      "id": 29,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 7,
+      "targetId": 7,
+      "treeTextPosition": {
+        "x": 128.0,
+        "y": 272.0
+      }
+    },
+    {
+      "id": 30,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 4,
+      "targetId": 4,
+      "treeTextPosition": {
+        "x": 291.0,
+        "y": 263.0
+      }
+    },
+    {
+      "id": 31,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 5,
+      "targetId": 5,
+      "treeTextPosition": {
+        "x": 291.0,
+        "y": 335.0
+      }
+    },
+    {
+      "id": 32,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 9,
+      "targetId": 9,
+      "treeTextPosition": {
+        "x": 77.0,
+        "y": 396.0
+      }
+    },
+    {
+      "id": 33,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 8,
+      "targetId": 8,
+      "treeTextPosition": {
+        "x": 176.0,
+        "y": 399.0
+      }
+    },
+    {
+      "id": 34,
+      "linkPoints": [
+        {
+          "x": null,
+          "y": null
+        },
+        {
+          "x": null,
+          "y": null
+        }
+      ],
+      "sourceId": 22,
+      "targetId": 22,
+      "treeTextPosition": {
+        "x": 65.0,
+        "y": 460.0
+      }
+    },
+    {
+      "guard": "distance(car1,car2)>=20",
+      "id": 15,
+      "linkPoints": [
+        {
+          "x": 124.56772541843335,
+          "y": 208.99415951796567
+        },
+        {
+          "x": 123.43227458156665,
+          "y": 251.00584048203433
+        }
+      ],
+      "sourceId": 6,
+      "targetId": 7,
+      "treeTextPosition": {
+        "x": 129.0,
+        "y": 235.0
+      }
+    },
+    {
+      "guard": "distance(car1,car2)>=20",
+      "id": 19,
+      "linkPoints": [
+        {
+          "x": 214.45885560602485,
+          "y": 151.65212146101598
+        },
+        {
+          "x": 271.5411443939752,
+          "y": 188.34787853898402
+        }
+      ],
+      "sourceId": 2,
+      "targetId": 3,
+      "treeTextPosition": {
+        "x": 248.0,
+        "y": 175.0
+      }
+    },
+    {
+      "guard": "distance(car1,car2)<=30",
+      "id": 14,
+      "linkPoints": [
+        {
+          "x": 187.63332668409694,
+          "y": 151.79386402362042
+        },
+        {
+          "x": 138.36667331590303,
+          "y": 184.20613597637958
+        }
+      ],
+      "sourceId": 2,
+      "targetId": 6,
+      "treeTextPosition": {
+        "x": 168.0,
+        "y": 173.0
+      }
+    }
+  ],
+  "probabilityTransitions": [
+    {
+      "id": 17,
+      "linkPoints": [
+        {
+          "x": 115.98998063660812,
+          "y": 336.23696288095726
+        },
+        {
+          "x": 82.02003872678377,
+          "y": 378.5260742380855
+        }
+      ],
+      "sourceId": 11,
+      "targetId": 9,
+      "treeTextPosition": {
+        "x": 104.00500968169595,
+        "y": 362.3815185595214
+      },
+      "weight": "3"
+    },
+    {
+      "id": 18,
+      "linkPoints": [
+        {
+          "x": 125.92515233577853,
+          "y": 336.3041949897965
+        },
+        {
+          "x": 161.14969532844296,
+          "y": 381.391610020407
+        }
+      ],
+      "sourceId": 11,
+      "targetId": 8,
+      "treeTextPosition": {
+        "x": 148.53742383211073,
+        "y": 363.84790250510173
+      },
+      "weight": "7"
+    }
+  ],
+  "rootId": 0
+}

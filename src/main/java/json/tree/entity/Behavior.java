@@ -1,5 +1,6 @@
 package json.tree.entity;
 
+import java.util.List;
 import java.util.Map;
 
 public class Behavior {
@@ -12,6 +13,33 @@ public class Behavior {
     private int level;
     private int group;
     private int number;
+    private List<CommonTransition> nextTransitions;
+    private List<Behavior> nextBehaviors;
+    private List<BranchPoint> nextBranchPoints;
+
+    public List<CommonTransition> getNextTransitions() {
+        return nextTransitions;
+    }
+
+    public void setNextTransitions(List<CommonTransition> nextTransitions) {
+        this.nextTransitions = nextTransitions;
+    }
+
+    public List<Behavior> getNextBehaviors() {
+        return nextBehaviors;
+    }
+
+    public void setNextBehaviors(List<Behavior> nextBehaviors) {
+        this.nextBehaviors = nextBehaviors;
+    }
+
+    public List<BranchPoint> getNextBranchPoints() {
+        return nextBranchPoints;
+    }
+
+    public void setNextBranchPoints(List<BranchPoint> nextBranchPoints) {
+        this.nextBranchPoints = nextBranchPoints;
+    }
 
     public Behavior(int id, String name, Map<String, Double> params, Position position, Position treeTextPosition) {
         this.id = id;

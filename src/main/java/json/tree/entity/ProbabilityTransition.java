@@ -12,6 +12,25 @@ public class ProbabilityTransition {
     private int group;
     private int number;
 
+    private BranchPoint sourceBranchPoint;
+    private Behavior targetBehavior;
+
+    public BranchPoint getSourceBranchPoint() {
+        return sourceBranchPoint;
+    }
+
+    public void setSourceBranchPoint(BranchPoint sourceBranchPoint) {
+        this.sourceBranchPoint = sourceBranchPoint;
+    }
+
+    public Behavior getTargetBehavior() {
+        return targetBehavior;
+    }
+
+    public void setTargetBehavior(Behavior targetBehavior) {
+        this.targetBehavior = targetBehavior;
+    }
+
     public ProbabilityTransition(int id, Position[] linkPoints, int sourceId, int targetId, Position treeTextPosition, String weight) {
         this.id = id;
         this.linkPoints = linkPoints;

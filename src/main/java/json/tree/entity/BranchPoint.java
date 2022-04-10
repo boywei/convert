@@ -1,5 +1,7 @@
 package json.tree.entity;
 
+import java.util.List;
+
 public class BranchPoint {
     private int id;
     private Position position;
@@ -7,6 +9,24 @@ public class BranchPoint {
     private int level;
     private int group;
     private int number;
+    private List<ProbabilityTransition> nextTransitions;
+    private List<Behavior> nextBehaviors;
+
+    public List<ProbabilityTransition> getNextTransitions() {
+        return nextTransitions;
+    }
+
+    public void setNextTransitions(List<ProbabilityTransition> nextTransitions) {
+        this.nextTransitions = nextTransitions;
+    }
+
+    public List<Behavior> getNextBehaviors() {
+        return nextBehaviors;
+    }
+
+    public void setNextBehaviors(List<Behavior> nextBehaviors) {
+        this.nextBehaviors = nextBehaviors;
+    }
 
     public BranchPoint(int id, Position position) {
         this.id = id;

@@ -125,7 +125,7 @@ public class BufferWriter {
             buffer.append("}");
             // +laneSections
 
-            buffer.append("}\n");
+            buffer.append("}" + (road.getIndex()==roads.size()-1?"":",") + "\n");
             // 结束road
         }
 
@@ -164,9 +164,9 @@ public class BufferWriter {
             buffer.append("}");
             // +lanes
 
-            buffer.append("," + laneSection.getLength());
+            buffer.append("," + f(laneSection.getLength()));
 
-            buffer.append("}\n");
+            buffer.append("}" + (laneSection.getIndex()==laneSections.size()-1?"":",") + "\n");
             // +laneSection结束
         }
 
@@ -191,7 +191,7 @@ public class BufferWriter {
             buffer.append(lane.getSuccessorIndex() + ",");
             buffer.append(lane.getLaneChange());
 
-            buffer.append("}\n");
+            buffer.append("}" + (lane.getIndex()==lanes.size()-1?"":",") + "\n");
             // +lane结束
         }
 
@@ -200,6 +200,10 @@ public class BufferWriter {
     }
 
     private static void addJunction(StringBuffer buffer) {
+        if(junctions.size() == 0) {
+            buffer.append("Junction junctions[2];\n");
+            return;
+        }
         buffer.append("Junction junctions[" + junctions.size() + "] = {");
         for (Junction junction : junctions) {
             // 开始junction
@@ -226,7 +230,7 @@ public class BufferWriter {
             buffer.append("}");
             // +connections
 
-            buffer.append("}\n");
+            buffer.append("}" + (junction.getIndex()==junctions.size()-1?"":",") + "\n");
             // 结束junction
         }
 
@@ -235,6 +239,10 @@ public class BufferWriter {
     }
 
     private static void addConnection(StringBuffer buffer) {
+        if(connections.size() == 0) {
+            buffer.append("Connection connections[2];\n");
+            return;
+        }
         buffer.append("Connection connections[" + connections.size() + "] = {");
         for (Connection connection : connections) {
             // 开始connection
@@ -264,7 +272,7 @@ public class BufferWriter {
             buffer.append("}");
             // +laneLinks
 
-            buffer.append("}\n");
+            buffer.append("}" + (connection.getIndex()==connections.size()-1?"":",") + "\n");
             // 结束connection
         }
 
@@ -273,6 +281,10 @@ public class BufferWriter {
     }
 
     private static void addLaneLink(StringBuffer buffer) {
+        if(laneLinks.size() == 0) {
+            buffer.append("LaneLink laneLinks[2];\n");
+            return;
+        }
         buffer.append("LaneLink laneLinks[" + laneLinks.size() + "] = {");
         for (LaneLink laneLink : laneLinks) {
             // +laneLink开始
@@ -282,7 +294,7 @@ public class BufferWriter {
             buffer.append(laneLink.getFrom() + ",");
             buffer.append(laneLink.getTo());
 
-            buffer.append("}\n");
+            buffer.append("}" + (laneLink.getIndex()==laneLinks.size()-1?"":",") + "\n");
             // +laneLink结束
         }
 

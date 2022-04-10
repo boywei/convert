@@ -7,10 +7,10 @@ public class TreeDataContainer {
     private Car[] cars;
     private String map;
     private String source;
-    private int timeStep;
+    private double timeStep;
     private String weather;
 
-    public TreeDataContainer(Car[] cars, String map, String source, int timeStep, String weather) {
+    public TreeDataContainer(Car[] cars, String map, String source, double timeStep, String weather) {
         this.cars = cars;
         this.map = map;
         this.source = source;
@@ -42,11 +42,11 @@ public class TreeDataContainer {
         this.source = source;
     }
 
-    public int getTimeStep() {
+    public double getTimeStep() {
         return timeStep;
     }
 
-    public void setTimeStep(int timeStep) {
+    public void setTimeStep(double timeStep) {
         this.timeStep = timeStep;
     }
 

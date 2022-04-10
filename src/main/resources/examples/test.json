@@ -121,7 +121,7 @@
 				}
 			}],
 			"commonTransitions": [{
-				"guards": ["distanceToEnd() < 20", "distanceToEnd() > 10"],
+				"guards": ["distanceToEnd(car1) < 20", "distanceToEnd(car1) > 10"],
 				"id": 5,
 				"linkPoints": [{
 					"x": 285.9673060914619,
@@ -137,7 +137,7 @@
 					"y": 77.66327800750737
 				}
 			}, {
-				"guards": ["canChangeLeft()"],
+				"guards": ["canChangeLeft(car1)"],
 				"id": 6,
 				"linkPoints": [{
 					"x": 218.22692273416467,
@@ -185,7 +185,7 @@
 					"y": 415.4
 				}
 			}, {
-				"guards": ["isJunction()"],
+				"guards": ["isJunction(car1)"],
 				"id": 12,
 				"linkPoints": [{
 					"x": 304.9799323369354,
