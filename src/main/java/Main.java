@@ -6,7 +6,7 @@ import json.tree.TreeDataContainer;
 public class Main {
 
     public final static String JSON_PATH = "src/main/resources/ADSML/overtake/overtake.json";
-    public final static String XML_PATH = "src/main/resources/models/overtake.xml";
+    public final static String XML_PATH = "src/main/resources/models/overtake1.xml";
 //    public final static String JSON_PATH = "src/main/resources/examples/test.json";
 //    public final static String XML_PATH = "src/main/resources/models/test.xml";
 

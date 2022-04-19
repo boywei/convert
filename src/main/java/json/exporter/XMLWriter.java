@@ -111,8 +111,8 @@ public class XMLWriter {
             buffer.append(f(cars[i].getMaxSpeed()) + ", ");
 
             buffer.append(cars[i].getRoadId() + ", ");
-            buffer.append(cars[i].getLaneId() + ", ");
             buffer.append(cars[i].getLaneSectionId() + ", ");
+            buffer.append(cars[i].getLaneId() + ", ");
             buffer.append(cars[i].getRoadIndex() + ", ");
             buffer.append(cars[i].getLaneSectionIndex() + ", ");
             buffer.append(cars[i].getLaneIndex() + ", ");
@@ -258,8 +258,8 @@ public class XMLWriter {
                     "level == i &amp;&amp; group == j &amp;&amp; !lock" +
                     addGuards(commonTransition.getGuards(), index) + "</label>\n");
 
-            // sync 普通迁移不需要信号，自循环才需要
-            // buffer.append("<label kind=\"synchronisation\">update?</label>");
+            // sync 普通迁移也需要信号，否则在验证时可能会无法迁出
+             buffer.append("\t\t\t<label kind=\"synchronisation\">update?</label>\n");
 
             // update/assignment 先更新边的坐标，再更新其他信息
             buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>\n");
@@ -277,6 +277,9 @@ public class XMLWriter {
                     probabilityTransition.getLevel() + "," + probabilityTransition.getLevel() + "], j:int[" +
                     probabilityTransition.getGroup() + "," + probabilityTransition.getGroup() + "], k:int[" +
                     probabilityTransition.getNumber() + "," + probabilityTransition.getNumber() + "]</label>\n");
+
+            // sync 普通迁移也需要信号，否则在验证时可能会无法迁出
+//            buffer.append("\t\t\t<label kind=\"synchronisation\">update?</label>\n");
 
             // update/assignment 先更新边的坐标，再更新其他信息
             buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+k, number=k</label>\n");

@@ -161,12 +161,15 @@ const int INT16_MAX =  32767;
 // RSS
 const int ret = 1; // 司机反应时间
 const int maxAcc = 6; // 最大加速度
-const int minBra = 5; // 最大刹车加速度
-const int minCor = 5; // 最大刹车加速度?
+const int minBra = 2; // 最小刹车加速度
+const int maxBra = 6; // 最大刹车加速度
+const int minCor = 5; // 最小刹车加速度？
+const int minLatBra = 2; // 横向换道最小刹车加速度
+const int minLatAcc = 1;
+const int maxLatAcc = 2;
 
 // 函数中不能声明结构体，在这里临时声明
 Lane tempLane;
 Connection tempConnection;
-
 
 
