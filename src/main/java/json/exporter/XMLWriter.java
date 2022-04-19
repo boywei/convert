@@ -16,11 +16,12 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class XMLWriter {
 
-    private static Car[] cars;
+    private static List<Car> cars;
     private static String map;
     private static String source;
     private static double timeStep;
@@ -48,7 +49,7 @@ public class XMLWriter {
 
         addDeclaration(buffer);
         addTimer(buffer);
-        for(int i = 0; i < cars.length; i++) {
+        for(int i = 0; i < cars.size(); i++) {
             addTemplate(buffer, i);
         }
         addSystem(buffer);
@@ -95,28 +96,28 @@ public class XMLWriter {
 
     // 1.3 添加车辆声明
     private static void addCar(StringBuffer buffer) {
-        int countOfCar = cars.length;
+        int countOfCar = cars.size();
         buffer.append("//id, width, length, heading, speed, acceleration, maxSpeed, ..., offset\n");
         buffer.append("Car car[" + countOfCar + "] = {");
         for(int i = 0; i < countOfCar; i++) {
 //            System.out.println(cars[i].toString());
             buffer.append("{");
             buffer.append(i + ", ");
-            buffer.append(f(cars[i].getWidth()) + ", ");
-            buffer.append(f(cars[i].getLength()) + ", ");
+            buffer.append(f(cars.get(i).getWidth()) + ", ");
+            buffer.append(f(cars.get(i).getLength()) + ", ");
 
-            buffer.append(cars[i].isHeading() + ", ");
-            buffer.append(f(cars[i].getInitSpeed()) + ", ");
+            buffer.append(cars.get(i).isHeading() + ", ");
+            buffer.append(f(cars.get(i).getInitSpeed()) + ", ");
             buffer.append(0 + ", ");
-            buffer.append(f(cars[i].getMaxSpeed()) + ", ");
+            buffer.append(f(cars.get(i).getMaxSpeed()) + ", ");
 
-            buffer.append(cars[i].getRoadId() + ", ");
-            buffer.append(cars[i].getLaneId() + ", ");
-            buffer.append(cars[i].getLaneSectionId() + ", ");
-            buffer.append(cars[i].getRoadIndex() + ", ");
-            buffer.append(cars[i].getLaneSectionIndex() + ", ");
-            buffer.append(cars[i].getLaneIndex() + ", ");
-            buffer.append(f(cars[i].getOffset()));
+            buffer.append(cars.get(i).getRoadId() + ", ");
+            buffer.append(cars.get(i).getLaneSectionId() + ", ");
+            buffer.append(cars.get(i).getLaneId() + ", ");
+            buffer.append(cars.get(i).getRoadIndex() + ", ");
+            buffer.append(cars.get(i).getLaneSectionIndex() + ", ");
+            buffer.append(cars.get(i).getLaneIndex() + ", ");
+            buffer.append(f(cars.get(i).getOffset()));
             buffer.append("}");
 
             if(i != countOfCar-1) {
@@ -163,7 +164,7 @@ public class XMLWriter {
 
     // 2.1 template名称，即车辆名称
     private static void addName(StringBuffer buffer, int index) {
-        String name = cars[index].getName();
+        String name = cars.get(index).getName();
 
         buffer.append("\t\t<name>");
         buffer.append(name);
@@ -192,7 +193,7 @@ public class XMLWriter {
                 "\t\t\t<committed/>\n" +
                 "\t\t</location>\n");
 
-        Behavior[] behaviors = cars[index].getmTree().getBehaviors();
+        List<Behavior> behaviors = cars.get(index).getmTree().getBehaviors();
         Map<Integer, Boolean> exist = new HashMap<>();
         for (Behavior behavior : behaviors) {
             if(!exist.containsKey(behavior.getId())) {
@@ -213,7 +214,7 @@ public class XMLWriter {
 
     // 2.4 转换点branch point
     private static void addBranchPoints(StringBuffer buffer, int index) {
-        BranchPoint[] branchPoints = cars[index].getmTree().getBranchPoints();
+        List<BranchPoint> branchPoints = cars.get(index).getmTree().getBranchPoints();
         for (BranchPoint branchPoint : branchPoints) {
             String id = "id" + branchPoint.getId();
             double x = branchPoint.getPosition().getX(), y = branchPoint.getPosition().getY();
@@ -230,14 +231,14 @@ public class XMLWriter {
 
     // 2.6 连线
     private static void addTransitions(StringBuffer buffer, int index) {
-        CommonTransition[] commonTransitions = cars[index].getmTree().getCommonTransitions();
-        ProbabilityTransition[] probabilityTransitions = cars[index].getmTree().getProbabilityTransitions();
+        List<CommonTransition> commonTransitions = cars.get(index).getmTree().getCommonTransitions();
+        List<ProbabilityTransition> probabilityTransitions = cars.get(index).getmTree().getProbabilityTransitions();
 
         // Start到行为树的根结点
         buffer.append("\t\t<transition>\n" +
                 "\t\t\t<source ref=\"id0\"/>\n" +
                 "\t\t\t<target ref=\"id1\"/>\n" +
-                "\t\t\t<label kind=\"select\">offset:int[" + f(cars[index].getMinOffset()) + "," + f(cars[index].getMaxOffset()) + "]</label>\n" +
+                "\t\t\t<label kind=\"select\">offset:int[" + f(cars.get(index).getMinOffset()) + "," + f(cars.get(index).getMaxOffset()) + "]</label>\n" +
                 "\t\t\t<label kind=\"assignment\">initCar(car[" + index + "], offset)</label>\n" +
                 "\t\t</transition>\n");
 
@@ -258,8 +259,8 @@ public class XMLWriter {
                     "level == i &amp;&amp; group == j &amp;&amp; !lock" +
                     addGuards(commonTransition.getGuards(), index) + "</label>\n");
 
-            // sync 普通迁移不需要信号，自循环才需要
-            // buffer.append("<label kind=\"synchronisation\">update?</label>");
+            // sync 普通迁移也需要信号，否则在验证时可能会无法迁出
+             buffer.append("\t\t\t<label kind=\"synchronisation\">update?</label>\n");
 
             // update/assignment 先更新边的坐标，再更新其他信息
             buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>\n");
@@ -278,6 +279,9 @@ public class XMLWriter {
                     probabilityTransition.getGroup() + "," + probabilityTransition.getGroup() + "], k:int[" +
                     probabilityTransition.getNumber() + "," + probabilityTransition.getNumber() + "]</label>\n");
 
+            // sync 普通迁移也需要信号，否则在验证时可能会无法迁出
+//            buffer.append("\t\t\t<label kind=\"synchronisation\">update?</label>\n");
+
             // update/assignment 先更新边的坐标，再更新其他信息
             buffer.append("\t\t\t<label kind=\"assignment\">level = level+1, group = (group-1)*N+k, number=k</label>\n");
 
@@ -291,7 +295,7 @@ public class XMLWriter {
     /*
         guard条件命名参照GuardType
      */
-    private static String addGuards(String[] guards, int index) {
+    private static String addGuards(List<String> guards, int index) {
         StringBuffer buffer = new StringBuffer();
         if(guards == null) {
             return "";
@@ -326,7 +330,7 @@ public class XMLWriter {
         changeRight: 同上
      */
     private static void addSelfTransitions(StringBuffer buffer, int index) {
-        Behavior[] behaviors = cars[index].getmTree().getBehaviors();
+        List<Behavior> behaviors = cars.get(index).getmTree().getBehaviors();
         for(Behavior behavior : behaviors) {
             resolveBehavior(buffer, behavior, index);
         }
@@ -486,8 +490,8 @@ public class XMLWriter {
         weather = container.getWeather();
 
         carNameIndexMap = new HashMap<>();
-        for (int i = 0; i < cars.length; i++) {
-            carNameIndexMap.put(cars[i].getName(), i);
+        for (int i = 0; i < cars.size(); i++) {
+            carNameIndexMap.put(cars.get(i).getName(), i);
         }
     }
 

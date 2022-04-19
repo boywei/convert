@@ -1,8 +1,10 @@
 package json.tree.entity;
 
+import java.util.List;
+
 public class ProbabilityTransition {
     private int id;
-    private Position[] linkPoints;
+    private List<Position> linkPoints;
     private int sourceId;
     private int targetId;
     private Position treeTextPosition;
@@ -31,7 +33,7 @@ public class ProbabilityTransition {
         this.targetBehavior = targetBehavior;
     }
 
-    public ProbabilityTransition(int id, Position[] linkPoints, int sourceId, int targetId, Position treeTextPosition, String weight) {
+    public ProbabilityTransition(int id, List<Position> linkPoints, int sourceId, int targetId, Position treeTextPosition, String weight) {
         this.id = id;
         this.linkPoints = linkPoints;
         this.sourceId = sourceId;
@@ -48,11 +50,11 @@ public class ProbabilityTransition {
         this.id = id;
     }
 
-    public Position[] getLinkPoints() {
+    public List<Position> getLinkPoints() {
         return linkPoints;
     }
 
-    public void setLinkPoints(Position[] linkPoints) {
+    public void setLinkPoints(List<Position> linkPoints) {
         this.linkPoints = linkPoints;
     }
 

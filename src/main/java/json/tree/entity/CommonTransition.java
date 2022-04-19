@@ -1,9 +1,11 @@
 package json.tree.entity;
 
+import java.util.List;
+
 public class CommonTransition {
-    private String[] guards;
+    private List<String> guards;
     private int id;
-    private Position[] linkPoints;
+    private List<Position> linkPoints;
     private int sourceId;
     private int targetId;
     private Position treeTextPosition;
@@ -40,7 +42,7 @@ public class CommonTransition {
         this.targetBranchPoint = targetBranchPoint;
     }
 
-    public CommonTransition(String[] guards, int id, Position[] linkPoints, int sourceId, int targetId, Position treeTextPosition) {
+    public CommonTransition(List<String> guards, int id, List<Position> linkPoints, int sourceId, int targetId, Position treeTextPosition) {
         this.guards = guards;
         this.id = id;
         this.linkPoints = linkPoints;
@@ -49,11 +51,11 @@ public class CommonTransition {
         this.treeTextPosition = treeTextPosition;
     }
 
-    public String[] getGuards() {
+    public List<String> getGuards() {
         return guards;
     }
 
-    public void setGuards(String[] guards) {
+    public void setGuards(List<String> guards) {
         this.guards = guards;
     }
 
@@ -65,11 +67,11 @@ public class CommonTransition {
         this.id = id;
     }
 
-    public Position[] getLinkPoints() {
+    public List<Position> getLinkPoints() {
         return linkPoints;
     }
 
-    public void setLinkPoints(Position[] linkPoints) {
+    public void setLinkPoints(List<Position> linkPoints) {
         this.linkPoints = linkPoints;
     }
 

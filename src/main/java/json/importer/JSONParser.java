@@ -1,12 +1,13 @@
 package json.importer;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import json.tree.entity.*;
 import json.tree.TreeDataContainer;
+import json.tree.entity.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JSONParser {
 
@@ -16,6 +17,21 @@ public class JSONParser {
     private static List<CommonTransition> commonTransitionList;
     private static List<ProbabilityTransition> probabilityTransitionList;
     private static List<BranchPoint> branchPointList;
+
+    // 从locationParams初始化car的道路信息 TODO: 道路索引初始化
+    private static void initLocationParams(Car car) {
+        Map<String, Double> locationParams = car.getLocationParams();
+        car.setRoadId((int) Math.round(locationParams.get("road id")));
+        car.setLaneId((int) Math.round(locationParams.get("lane id")));
+        car.setMinOffset(locationParams.get("min longitudinal offset"));
+        car.setMaxOffset(locationParams.get("max longitudinal offset"));
+
+        System.out.println(car.getName() + "道路信息初始化完成："
+                + "road id: " + car.getRoadId()
+                + ", lane id: " + car.getLaneId()
+                + ", min offset: " + car.getMinOffset()
+                + ", max offset: " + car.getMaxOffset());
+    }
 
     // 将所有id去重，并重新分配
     private static void modifyId(Car car) {
@@ -61,10 +77,10 @@ public class JSONParser {
 
     private static void initEdge2(Car car) {
         MTree mTree = car.getmTree();
-        Behavior[] behaviors = mTree.getBehaviors();
-        CommonTransition[] commonTransitions = mTree.getCommonTransitions();
-        ProbabilityTransition[] probabilityTransitions = mTree.getProbabilityTransitions();
-        BranchPoint[] branchPoints = mTree.getBranchPoints();
+        List<Behavior> behaviors = mTree.getBehaviors();
+        List<CommonTransition> commonTransitions = mTree.getCommonTransitions();
+        List<ProbabilityTransition> probabilityTransitions = mTree.getProbabilityTransitions();
+        List<BranchPoint> branchPoints = mTree.getBranchPoints();
 
         behaviorList = new ArrayList<>();
         commonTransitionList = new ArrayList<>();
@@ -147,10 +163,10 @@ public class JSONParser {
         }
 
         // 3. 加入到全局变量中
-        mTree.setProbabilityTransitions(probabilityTransitionList.toArray(new ProbabilityTransition[0]));
-        mTree.setBranchPoints(branchPointList.toArray(new BranchPoint[0]));
-        mTree.setCommonTransitions(commonTransitionList.toArray(new CommonTransition[0]));
-        mTree.setBehaviors(behaviorList.toArray(new Behavior[0]));
+        mTree.setProbabilityTransitions(probabilityTransitionList);
+        mTree.setBranchPoints(branchPointList);
+        mTree.setCommonTransitions(commonTransitionList);
+        mTree.setBehaviors(behaviorList);
     }
 
     // 递归初始化
@@ -216,15 +232,15 @@ public class JSONParser {
 
     // 初始化各边和各自环对应的三元组
     private static void initEdge(Car car) {
-        Behavior[] behaviors = car.getmTree().getBehaviors();
-        CommonTransition[] commonTransitions = car.getmTree().getCommonTransitions();
-        ProbabilityTransition[] probabilityTransitions = car.getmTree().getProbabilityTransitions();
-        BranchPoint[] branchPoints = car.getmTree().getBranchPoints();
+        List<Behavior> behaviors = car.getmTree().getBehaviors();
+        List<CommonTransition> commonTransitions = car.getmTree().getCommonTransitions();
+        List<ProbabilityTransition> probabilityTransitions = car.getmTree().getProbabilityTransitions();
+        List<BranchPoint> branchPoints = car.getmTree().getBranchPoints();
 
-        behaviors[0].setLevel(1);
-        behaviors[0].setGroup(1);
-        behaviors[0].setNumber(0);
-        buildTree(behaviors[0], behaviors, commonTransitions, probabilityTransitions, branchPoints);
+        behaviors.get(0).setLevel(1);
+        behaviors.get(0).setGroup(1);
+        behaviors.get(0).setNumber(0);
+        buildTree(behaviors.get(0), behaviors, commonTransitions, probabilityTransitions, branchPoints);
 
         MTree mTree = car.getmTree();
         mTree.setBehaviors(behaviors);
@@ -233,8 +249,8 @@ public class JSONParser {
     }
 
     // 递归初始化
-    private static void buildTree(Behavior sourceBehavior, Behavior[] behaviors, CommonTransition[] commonTransitions,
-                                  ProbabilityTransition[] probabilityTransitions, BranchPoint[] branchPoints) {
+    private static void buildTree(Behavior sourceBehavior, List<Behavior> behaviors, List<CommonTransition> commonTransitions,
+                                  List<ProbabilityTransition> probabilityTransitions, List<BranchPoint> branchPoints) {
         int number = 1;
         // 找出以该behavior为source的边
         for(CommonTransition commonTransition : commonTransitions) {
@@ -291,54 +307,31 @@ public class JSONParser {
         }
     }
 
-    public static TreeDataContainer parse(String input) {
+    public static TreeDataContainer parse(String input, String treePathPrefix) {
         System.out.println("Parsing input...");
 
-        Car[] cars = null;
-        String map = "";
-        String source = "";
-        double timeStep = 0.0;
-        String weather = "";
 
-        JSONObject jsonObject = JSON.parseObject(input);
+        TreeDataContainer container = JSONObject.parseObject(input, TreeDataContainer.class);
 
-        Set<Map.Entry<String, Object>> set = jsonObject.entrySet();
-
-        for(Map.Entry<String, Object> entry : set) {
-            switch (entry.getKey()) {
-                case "cars":
-                    JSONArray ja = jsonObject.getJSONArray(entry.getKey());
-                    int countOfCar = ja.size();
-                    cars = new Car[countOfCar];
-                    for (int i = 0; i < countOfCar; i++) {
-                        Car car = JSONObject.parseObject(ja.get(i).toString(), Car.class);
-                        cars[i] = car;
-                    }
-                    break;
-                case "map":
-                    map = entry.getValue().toString();
-                    break;
-                case "source":
-                    source = entry.getValue().toString();
-                    break;
-                case "timeStep":
-                    timeStep = Double.parseDouble(entry.getValue().toString());
-                    break;
-                case "weather":
-                    weather = entry.getValue().toString();
-                    break;
-            }
-        }
-
-        for(Car car : cars) {
+        List<Car> cars = new ArrayList<>();
+        for(Car car : container.getCars()) {
+            // 从路径中获取行为树
+            String treeStr = JSONInputReader.readFromFile(treePathPrefix + car.getTreePath());
+            MTree tree = JSONObject.parseObject(treeStr, MTree.class);
+            car.setmTree(tree);
+            // 初始化location
+            initLocationParams(car);
             // 初始化（level, group, number）
             initEdge2(car);
             // 需要对id进行去重并更改，将同名节点归为同一id，否则会有重名节点
             modifyId(car);
+
+            cars.add(car);
         }
+        container.setCars(cars);
 
         System.out.println("Finishing parsing...");
-        return new TreeDataContainer(cars, map, source, timeStep, weather);
+        return container;
     }
 
 }

@@ -165,13 +165,16 @@ const int INT16_MAX =  32767;
 // RSS
 const int ret = 1; // 司机反应时间
 const int maxAcc = 6; // 最大加速度
-const int minBra = 5; // 最大刹车加速度
-const int minCor = 5; // 最大刹车加速度?
+const int minBra = 2; // 最小刹车加速度
+const int maxBra = 6; // 最大刹车加速度
+const int minCor = 5; // 最小刹车加速度？
+const int minLatBra = 2; // 横向换道最小刹车加速度
+const int minLatAcc = 1;
+const int maxLatAcc = 2;
 
 // 函数中不能声明结构体，在这里临时声明
 Lane tempLane;
 Connection tempConnection;
-
 
 
 const int TIME_STEP = 1;
@@ -187,7 +190,8 @@ Junction junctions[2];
 Connection connections[2];
 LaneLink laneLinks[2];
 //id, width, length, heading, speed, acceleration, maxSpeed, ..., offset
-Car car[2] = {{0, 15, 25, true, 80, 0, 400, 0, -1, 0, 0, 0, 0, 0},{1, 15, 25, true, 80, 0, 400, 0, 0, 0, 0, 0, 0, 0}};
+Car car[2] = {{0, 15, 25, true, 80, 0, 400, 0, 0, -1, 0, 0, 0, 0},{1, 15, 25, true, 80, 0, 400, 0, 0, -1, 0, 0, 0, 0}};
+
 /************************************* 常用函数 *************************************/
 
 /**
@@ -203,12 +207,73 @@ int distance(Car car1, Car car2){
     }
 }
 
+int max(int a, int b) {
+    return (a &gt; b ? a : b);
+}
+
+int safeDistance(Car car1, Car car2){
+    int v1 = car1.speed, v2 = car2.speed;
+    return v1*ret+maxAcc*ret*ret*1/2 +(v1+ret*maxAcc)*(v1+ret*maxAcc)/(2*minBra) - v2*v2/(2*maxBra);
+}
+
+/**
+    同向行驶安全距离规约
+**/
+bool isSafeSameDirection(Car car1, Car car2){
+    if(car1.laneIndex == car2.laneIndex &amp;&amp; car1.heading == car2.heading){
+        return distance(car1, car2) &lt; safeDistance(car1, car2);
+    }
+    return true;
+}
+
+
+int oppsiteSafeDistance(Car car1, Car car2){
+    int v1p = car1.speed+maxAcc*ret, v2p = abs(car2.speed)+maxAcc*ret;
+    int v1 = car1.speed, v2 = car2.speed;
+    return (v1+v1p)*ret/2 + v1p*v1p/(2*minCor) + (abs(v2)+v2p)*ret/2 + v2p*v2p/(2*minBra);
+}
+
+/**
+    相对方向行驶安全距离规约
+**/
+bool isSafeOppositeDirection(Car car1, Car car2){
+    if(car1.laneIndex == car2.laneIndex &amp;&amp; car1.heading == car2.heading){
+        return max(oppsiteSafeDistance(car1,car2),0) &gt; distance(car1, car2);
+    }
+    return true;
+}
+
+int changeLaneSafeDistance(Car car1, Car car2){
+    int v1 = car1.speed, v2 = car2.speed;
+    int v1p = v1+minLatAcc*ret, v2p = v2+maxLatAcc*ret;
+    return (v1+v1p)*ret/2 + v1p*v1p/(2*minLatBra) - ((v2+v2p)*ret/2 - v2p*v2p/(2*minLatBra));
+}
+
+/**
+    横向换道安全距离规约
+**/
+bool isSafeChangeLane(Car car1, Car car2){
+    if(car1.laneIndex == car2.laneIndex &amp;&amp; car1.heading == car2.heading){
+        return max(changeLaneSafeDistance(car1,car2),0) &gt; distance(car1, car2);
+    }
+    return true;
+}
+
+/**
+    道路最大限速规约
+**/
+bool isLessThanMaxSpeed(Car car){
+    return car.speed &lt; roads[car.roadIndex].maxSpeed;
+}
+
+
 /**
    	初始化汽车，加入随机性
 **/
 void initCar(Car&amp; car, int offset){
     car.offset = offset;
 }
+
 /**
     汽车到路尽头的距离
 **/
@@ -287,7 +352,10 @@ int sucLaneIndex(Lane lane){
 int leftLaneIndex(Lane lane){
     int i;
 	for(i=0; i&lt;10; i++) {
-        int index = laneSections[roads[lane.roadIndex].laneSections[lane.laneSectionIndex]].lanes[i];
+        int index = laneSections[lane.laneSectionIndex].lanes[i];
+        if(index == -1){
+            return -1;
+        }
         tempLane = lanes[index];
         if(tempLane.laneId - lane.laneId == 1 || (tempLane.laneId - lane.laneId == 2 &amp;&amp; lane.laneId == -1)) {
             return index;
@@ -303,7 +371,10 @@ int leftLaneIndex(Lane lane){
 int rightLaneIndex(Lane lane){
     int i;
     for(i=0; i&lt;10; i++) {
-        int index = laneSections[roads[lane.roadIndex].laneSections[lane.laneSectionIndex]].lanes[i];
+        int index = laneSections[lane.laneSectionIndex].lanes[i];
+        if(index == -1){
+            return -1;
+        }
         tempLane = lanes[index];
         if(tempLane.laneId - lane.laneId == -1 || (tempLane.laneId - lane.laneId == -2 &amp;&amp; lane.laneId == 1)) {
             return index;
@@ -381,7 +452,7 @@ int sucLaneSectionIndex(LaneSection laneSection){
 	modifyRoadLane 	运动一段时间后可能改变了road和lane信息, 这时根据偏移修改
 **/
 int accelerate_s(int v, int a, int t) {
-    return v*t/10 +   a * t * t/2 / (FACTOR * FACTOR);
+    return v*t/FACTOR +   a * t * t/2 / (FACTOR * FACTOR);
 }
 
 int accelerate_v(int v, int a, int t) {
@@ -687,6 +758,7 @@ bool lock = true;
 			<target ref="id2"/>
 			<label kind="select">i: int[1,1], j:int[1,1], k:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
@@ -694,6 +766,7 @@ bool lock = true;
 			<target ref="id3"/>
 			<label kind="select">i: int[2,2], j:int[1,1], k:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
@@ -701,6 +774,7 @@ bool lock = true;
 			<target ref="id1"/>
 			<label kind="select">i: int[3,3], j:int[1,1], k:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
@@ -708,6 +782,7 @@ bool lock = true;
 			<target ref="id4"/>
 			<label kind="select">i: int[4,4], j:int[1,1], k:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
@@ -715,6 +790,7 @@ bool lock = true;
 			<target ref="id6"/>
 			<label kind="select">i: int[5,5], j:int[1,1], k:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
@@ -722,6 +798,7 @@ bool lock = true;
 			<target ref="id1"/>
 			<label kind="select">i: int[7,7], j:int[1,1], k:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
@@ -729,6 +806,7 @@ bool lock = true;
 			<target ref="id4"/>
 			<label kind="select">i: int[3,3], j:int[1,1], k:int[2,2]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
@@ -736,6 +814,7 @@ bool lock = true;
 			<target ref="id5"/>
 			<label kind="select">i: int[4,4], j:int[2,2], k:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
@@ -743,6 +822,7 @@ bool lock = true;
 			<target ref="id1"/>
 			<label kind="select">i: int[5,5], j:int[4,4], k:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
 		<transition>
@@ -899,7 +979,7 @@ bool lock = true;
 		<transition>
 			<source ref="id0"/>
 			<target ref="id1"/>
-			<label kind="select">offset:int[0,0]</label>
+			<label kind="select">offset:int[400,600]</label>
 			<label kind="assignment">initCar(car[1], offset)</label>
 		</transition>
 		<transition>

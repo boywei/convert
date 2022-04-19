@@ -1,14 +1,16 @@
 package json.tree.entity;
 
+import java.util.List;
+
 public class MTree {
 
-    private Behavior[] behaviors;
-    private BranchPoint[] branchPoints;
-    private CommonTransition[] commonTransitions;
-    private ProbabilityTransition[] probabilityTransitions;
+    private List<Behavior> behaviors;
+    private List<BranchPoint> branchPoints;
+    private List<CommonTransition> commonTransitions;
+    private List<ProbabilityTransition> probabilityTransitions;
     private int rootId;
 
-    public MTree(Behavior[] behaviors, BranchPoint[] branchPoints, CommonTransition[] commonTransitions, ProbabilityTransition[] probabilityTransitions, int rootId) {
+    public MTree(List<Behavior> behaviors, List<BranchPoint> branchPoints, List<CommonTransition> commonTransitions, List<ProbabilityTransition> probabilityTransitions, int rootId) {
         this.behaviors = behaviors;
         this.branchPoints = branchPoints;
         this.commonTransitions = commonTransitions;
@@ -16,35 +18,35 @@ public class MTree {
         this.rootId = rootId;
     }
 
-    public Behavior[] getBehaviors() {
+    public List<Behavior> getBehaviors() {
         return behaviors;
     }
 
-    public void setBehaviors(Behavior[] behaviors) {
+    public void setBehaviors(List<Behavior> behaviors) {
         this.behaviors = behaviors;
     }
 
-    public BranchPoint[] getBranchPoints() {
+    public List<BranchPoint> getBranchPoints() {
         return branchPoints;
     }
 
-    public void setBranchPoints(BranchPoint[] branchPoints) {
+    public void setBranchPoints(List<BranchPoint> branchPoints) {
         this.branchPoints = branchPoints;
     }
 
-    public CommonTransition[] getCommonTransitions() {
+    public List<CommonTransition> getCommonTransitions() {
         return commonTransitions;
     }
 
-    public void setCommonTransitions(CommonTransition[] commonTransitions) {
+    public void setCommonTransitions(List<CommonTransition> commonTransitions) {
         this.commonTransitions = commonTransitions;
     }
 
-    public ProbabilityTransition[] getProbabilityTransitions() {
+    public List<ProbabilityTransition> getProbabilityTransitions() {
         return probabilityTransitions;
     }
 
-    public void setProbabilityTransitions(ProbabilityTransition[] probabilityTransitions) {
+    public void setProbabilityTransitions(List<ProbabilityTransition> probabilityTransitions) {
         this.probabilityTransitions = probabilityTransitions;
     }
 

@@ -1,20 +1,24 @@
 package json.tree.entity;
 
+import java.util.Map;
+
 // 解析时变量顺序必须和json一致！
 // 什么玩意！构造函数也得和json对应？
 public class Car {
     private boolean heading;
     private double initSpeed;
-    private int laneId;
     private MTree mTree;
     private double maxSpeed;
     private String model;
     private String name;
+    private double roadDeviation;
+    private String treePath;
+    private Map<String, Double> locationParams;
+
+    private int laneId;
     private double minOffset;
     private double maxOffset;
-    private double roadDeviation;
     private int roadId;
-    private String treePath;
 
     private double offset;
     private int laneSectionId;
@@ -23,6 +27,22 @@ public class Car {
     private int roadIndex;
     private double width = 1.5;
     private double length = 2.5;
+
+    public Map<String, Double> getLocationParams() {
+        return locationParams;
+    }
+
+    public void setLocationParams(Map<String, Double> locationParams) {
+        this.locationParams = locationParams;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
 
     public double getMaxSpeed() {
         return maxSpeed;

@@ -2,27 +2,30 @@ package json.tree;
 
 import json.tree.entity.Car;
 
+import java.util.List;
+
 public class TreeDataContainer {
     // 这里对应json的各个部分
-    private Car[] cars;
+    private List<Car> cars;
     private String map;
     private String source;
     private double timeStep;
     private String weather;
+    private List<String> requirements;
 
-    public TreeDataContainer(Car[] cars, String map, String source, double timeStep, String weather) {
-        this.cars = cars;
-        this.map = map;
-        this.source = source;
-        this.timeStep = timeStep;
-        this.weather = weather;
+    public List<String> getRequirements() {
+        return requirements;
     }
 
-    public Car[] getCars() {
+    public void setRequirements(List<String> requirements) {
+        this.requirements = requirements;
+    }
+
+    public List<Car> getCars() {
         return cars;
     }
 
-    public void setCars(Car[] cars) {
+    public void setCars(List<Car> cars) {
         this.cars = cars;
     }
 
