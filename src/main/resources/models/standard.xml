@@ -201,6 +201,10 @@ int distance(Car car1, Car car2){
     }
 }
 
+int lateralDistance(Car car1, Car car2) {
+    return INT16_MAX;
+}
+
 int max(int a, int b) {
     return (a &gt; b ? a : b);
 }
@@ -215,7 +219,7 @@ int safeDistance(Car car1, Car car2){
 **/
 bool isSafeSameDirection(Car car1, Car car2){
     if(car1.laneIndex == car2.laneIndex &amp;&amp; car1.heading == car2.heading){
-        return distance(car1, car2) &lt; safeDistance(car1, car2);
+        return distance(car1, car2) &gt; safeDistance(car1, car2);
     }
     return true;
 }
@@ -232,7 +236,7 @@ int oppsiteSafeDistance(Car car1, Car car2){
 **/
 bool isSafeOppositeDirection(Car car1, Car car2){
     if(car1.laneIndex == car2.laneIndex &amp;&amp; car1.heading == car2.heading){
-        return max(oppsiteSafeDistance(car1,car2),0) &gt; distance(car1, car2);
+        return max(oppsiteSafeDistance(car1,car2),0) &lt; distance(car1, car2);
     }
     return true;
 }
@@ -248,7 +252,7 @@ int changeLaneSafeDistance(Car car1, Car car2){
 **/
 bool isSafeChangeLane(Car car1, Car car2){
     if(car1.laneIndex == car2.laneIndex &amp;&amp; car1.heading == car2.heading){
-        return max(changeLaneSafeDistance(car1,car2),0) &gt; distance(car1, car2);
+        return max(changeLaneSafeDistance(car1,car2),0) &lt; distance(car1, car2);
     }
     return true;
 }
@@ -350,7 +354,7 @@ int leftLaneIndex(Lane lane){
             return -1;
         }
         tempLane = lanes[index];
-        if(tempLane.laneId - lane.laneId == 1 || (tempLane.laneId - lane.laneId == 2 &amp;&amp; lane.laneId == -1)) {
+        if((tempLane.laneId != 0 &amp;&amp; tempLane.laneId - lane.laneId == 1) || (tempLane.laneId == 1 &amp;&amp; lane.laneId == -1)) {
             return index;
         }
     }
@@ -369,7 +373,7 @@ int rightLaneIndex(Lane lane){
             return -1;
         }
         tempLane = lanes[index];
-        if(tempLane.laneId - lane.laneId == -1 || (tempLane.laneId - lane.laneId == -2 &amp;&amp; lane.laneId == 1)) {
+        if((tempLane.laneId != 0 &amp;&amp; tempLane.laneId - lane.laneId == -1) || (tempLane.laneId == -1 &amp;&amp; lane.laneId == 1)) {
             return index;
         }
     }
@@ -584,6 +588,7 @@ void changeLeft(Car&amp; car){
     car.offset += (car.heading? movement : -movement);
     if(lanes[car.laneIndex].laneChange == 1 || lanes[car.laneIndex].laneChange == 3) {
      	car.laneIndex = leftLaneIndex(lanes[car.laneIndex]);
+        car.laneId = lanes[car.laneIndex].laneId;
     }
     modifyRoadLane(car);
 }
@@ -599,6 +604,7 @@ void changeRight(Car&amp; car){
     car.offset += (car.heading? movement : -movement);
     if(lanes[car.laneIndex].laneChange == 2 || lanes[car.laneIndex].laneChange == 3) {
      	car.laneIndex = leftLaneIndex(lanes[car.laneIndex]);
+        car.laneId = lanes[car.laneIndex].laneId;
     }
     modifyRoadLane(car);
 }

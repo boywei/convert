@@ -7,7 +7,7 @@ public class Main {
 
     private final static String ADSML_PATH = "src/main/resources/ADSML/overtake/";
     private final static String JSON_PATH = ADSML_PATH + "overtake.json";
-    private final static String XML_PATH = "src/main/resources/models/overtake.xml";
+    private final static String XML_PATH = "src/main/resources/models/overtake1.xml";
 
     public static void main(String[] args) {
 

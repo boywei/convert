@@ -22,8 +22,8 @@ public class Lane {
     private int laneSectionIndex;
     private int laneId;
     private int type;
-    private int predecessorIndex; //
-    private int successorIndex; //
+    private int predecessorIndex = -1; //
+    private int successorIndex = -1; //
     private int laneChange;
 
     private int laneSectionId;

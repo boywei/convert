@@ -9,7 +9,7 @@ public class Behavior {
     private Map<String, Double> params;
     private Position position;
     private Position treeTextPosition;
-
+    // 以下变量无法通过解析直接获取，需要通过计算获得
     private int level;
     private int group;
     private int number;

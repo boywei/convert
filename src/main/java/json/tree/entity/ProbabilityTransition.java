@@ -9,11 +9,10 @@ public class ProbabilityTransition {
     private int targetId;
     private Position treeTextPosition;
     private String weight;
-
+    // 以下变量通过计算获取
     private int level;
     private int group;
     private int number;
-
     private BranchPoint sourceBranchPoint;
     private Behavior targetBehavior;
 

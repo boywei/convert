@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * @author wei
- * @description guard条件的规范名称
+ * @description guard条件的规范名称，TODO 添加博哥的GUARD规范
  * @date 2022-04-05 21:56
  */
 public class GuardType {

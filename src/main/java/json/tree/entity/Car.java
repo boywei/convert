@@ -2,19 +2,18 @@ package json.tree.entity;
 
 import java.util.Map;
 
-// 解析时变量顺序必须和json一致！
-// 什么玩意！构造函数也得和json对应？
 public class Car {
     private boolean heading;
     private double initSpeed;
-    private MTree mTree;
     private double maxSpeed;
     private String model;
     private String name;
     private double roadDeviation;
     private String treePath;
     private Map<String, Double> locationParams;
-
+    // 通过treePath的对应文件获取
+    private MTree mTree;
+    // 以下变量不能直接获取，需要初始化后通过Map获取
     private int laneId;
     private double minOffset;
     private double maxOffset;
