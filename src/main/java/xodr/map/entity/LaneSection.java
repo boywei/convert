@@ -1,5 +1,7 @@
 package xodr.map.entity;
 
+import lombok.Data;
+
 import java.util.List;
 
 /**
@@ -14,7 +16,9 @@ import java.util.List;
  length                   LaneSection长度
  **/
 
+@Data
 public class LaneSection {
+
     private int elementType;
     private int roadIndex;
     private int roadId;
@@ -26,90 +30,4 @@ public class LaneSection {
     private List<Lane> lanes;
     private int index;
 
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public int getElementType() {
-        return elementType;
-    }
-
-    public void setElementType(int elementType) {
-        this.elementType = elementType;
-    }
-
-    public int getRoadIndex() {
-        return roadIndex;
-    }
-
-    public void setRoadIndex(int roadIndex) {
-        this.roadIndex = roadIndex;
-    }
-
-    public int getRoadId() {
-        return roadId;
-    }
-
-    public void setRoadId(int roadId) {
-        this.roadId = roadId;
-    }
-
-    public int getLaneSectionId() {
-        return laneSectionId;
-    }
-
-    public void setLaneSectionId(int laneSectionId) {
-        this.laneSectionId = laneSectionId;
-    }
-
-    public double getStartPosition() {
-        return startPosition;
-    }
-
-    public void setStartPosition(double startPosition) {
-        this.startPosition = startPosition;
-    }
-
-    public List<Integer> getLanesIndex() {
-        return lanesIndex;
-    }
-
-    public void setLanesIndex(List<Integer> lanesIndex) {
-        this.lanesIndex = lanesIndex;
-    }
-
-    public List<Lane> getLanes() {
-        return lanes;
-    }
-
-    public void setLanes(List<Lane> lanes) {
-        this.lanes = lanes;
-    }
-
-    public double getLength() {
-        return length;
-    }
-
-    public void setLength(double length) {
-        this.length = length;
-    }
-
-    @Override
-    public String toString() {
-        return "LaneSection{" +
-                "elementType=" + elementType +
-                ", roadIndex=" + roadIndex +
-                ", roadId=" + roadId +
-                ", laneSectionId=" + laneSectionId +
-                ", startPosition=" + startPosition +
-                ", lanesIndex=" + lanesIndex +
-                ", length=" + length +
-                ", lanes=" + lanes +
-                ", index=" + index +
-                '}';
-    }
 }

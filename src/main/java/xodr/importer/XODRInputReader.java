@@ -1,14 +1,16 @@
 package xodr.importer;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 
+@Slf4j
 public class XODRInputReader {
 
     public static String readFromFile(String xodrPath) {
-        System.out.println("Reading OpenDRIVE file: " + xodrPath + "...");
+        log.info("OpenDRIVE地图文件路径：{}", xodrPath);
 
         String xodrStr = null;
         try {
@@ -17,7 +19,6 @@ public class XODRInputReader {
             e.printStackTrace();
         }
 
-        System.out.println("Finish reading OpenDRIVE... ");
         return xodrStr;
     }
 

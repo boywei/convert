@@ -1,5 +1,7 @@
 package xodr.map.entity;
 
+import lombok.Data;
+
 /**
  Lane结构体
 
@@ -15,7 +17,9 @@ package xodr.map.entity;
 
  **/
 
+@Data
 public class Lane {
+
     private int elementType;
     private int roadId; // 表示相对位置
     private int roadIndex;
@@ -34,153 +38,4 @@ public class Lane {
     private int successorLaneId;
     private int successorId;
 
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getPredecessorLaneId() {
-        return predecessorLaneId;
-    }
-
-    public void setPredecessorLaneId(int predecessorLaneId) {
-        this.predecessorLaneId = predecessorLaneId;
-    }
-
-    public int getSuccessorLaneId() {
-        return successorLaneId;
-    }
-
-    public void setSuccessorLaneId(int successorLaneId) {
-        this.successorLaneId = successorLaneId;
-    }
-
-    public int getLaneSectionId() {
-        return laneSectionId;
-    }
-
-    public void setLaneSectionId(int laneSectionId) {
-        this.laneSectionId = laneSectionId;
-    }
-
-    public int getPredecessorId() {
-        return predecessorId;
-    }
-
-    public void setPredecessorId(int predecessorId) {
-        this.predecessorId = predecessorId;
-    }
-
-    public int getSuccessorId() {
-        return successorId;
-    }
-
-    public void setSuccessorId(int successorId) {
-        this.successorId = successorId;
-    }
-
-    public int getElementType() {
-        return elementType;
-    }
-
-    public void setElementType(int elementType) {
-        this.elementType = elementType;
-    }
-
-    public int getRoadId() {
-        return roadId;
-    }
-
-    public void setRoadId(int roadId) {
-        this.roadId = roadId;
-    }
-
-    public int getRoadIndex() {
-        return roadIndex;
-    }
-
-    public void setRoadIndex(int roadIndex) {
-        this.roadIndex = roadIndex;
-    }
-
-    public int getLaneSectionIndex() {
-        return laneSectionIndex;
-    }
-
-    public void setLaneSectionIndex(int laneSectionIndex) {
-        this.laneSectionIndex = laneSectionIndex;
-    }
-
-    public int getLaneId() {
-        return laneId;
-    }
-
-    public void setLaneId(int laneId) {
-        this.laneId = laneId;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public int getPredecessorIndex() {
-        return predecessorIndex;
-    }
-
-    public void setPredecessorIndex(int predecessorIndex) {
-        this.predecessorIndex = predecessorIndex;
-    }
-
-    public int getSuccessorIndex() {
-        return successorIndex;
-    }
-
-    public void setSuccessorIndex(int successorIndex) {
-        this.successorIndex = successorIndex;
-    }
-
-    public int getLaneChange() {
-        return laneChange;
-    }
-
-    public void setLaneChange(int laneChange) {
-        this.laneChange = laneChange;
-    }
-
-    @Override
-    public String toString() {
-        return "Lane{" +
-                "elementType=" + elementType +
-                ", roadId=" + roadId +
-                ", roadIndex=" + roadIndex +
-                ", laneSectionIndex=" + laneSectionIndex +
-                ", laneId=" + laneId +
-                ", type=" + type +
-                ", predecessorIndex=" + predecessorIndex +
-                ", successorIndex=" + successorIndex +
-                ", laneChange=" + laneChange +
-                ", laneSectionId=" + laneSectionId +
-                ", id=" + id +
-                ", index=" + index +
-                ", predecessorLaneId=" + predecessorLaneId +
-                ", predecessorId=" + predecessorId +
-                ", successorLaneId=" + successorLaneId +
-                ", successorId=" + successorId +
-                '}';
-    }
 }

@@ -4,6 +4,7 @@ import json.tree.BehaviorType;
 import json.tree.GuardType;
 import json.tree.TreeDataContainer;
 import json.tree.entity.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import xodr.exporter.BufferWriter;
 import xodr.importer.XODRInputReader;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class XMLWriter {
 
     private static List<Car> cars;
@@ -98,7 +100,7 @@ public class XMLWriter {
     private static void addCar(StringBuffer buffer) {
         int countOfCar = cars.size();
         buffer.append("//id, width, length, heading, speed, acceleration, maxSpeed, ..., offset\n");
-        buffer.append("Car car[" + countOfCar + "] = {");
+        buffer.append("Car cars[" + countOfCar + "] = {");
         for(int i = 0; i < countOfCar; i++) {
 //            System.out.println(cars[i].toString());
             buffer.append("{");
@@ -193,7 +195,7 @@ public class XMLWriter {
                 "\t\t\t<committed/>\n" +
                 "\t\t</location>\n");
 
-        List<Behavior> behaviors = cars.get(index).getmTree().getBehaviors();
+        List<Behavior> behaviors = cars.get(index).getMTree().getBehaviors();
         Map<Integer, Boolean> exist = new HashMap<>();
         for (Behavior behavior : behaviors) {
             if(!exist.containsKey(behavior.getId())) {
@@ -214,7 +216,7 @@ public class XMLWriter {
 
     // 2.4 转换点branch point
     private static void addBranchPoints(StringBuffer buffer, int index) {
-        List<BranchPoint> branchPoints = cars.get(index).getmTree().getBranchPoints();
+        List<BranchPoint> branchPoints = cars.get(index).getMTree().getBranchPoints();
         for (BranchPoint branchPoint : branchPoints) {
             String id = "id" + branchPoint.getId();
             double x = branchPoint.getPosition().getX(), y = branchPoint.getPosition().getY();
@@ -231,15 +233,15 @@ public class XMLWriter {
 
     // 2.6 连线
     private static void addTransitions(StringBuffer buffer, int index) {
-        List<CommonTransition> commonTransitions = cars.get(index).getmTree().getCommonTransitions();
-        List<ProbabilityTransition> probabilityTransitions = cars.get(index).getmTree().getProbabilityTransitions();
+        List<CommonTransition> commonTransitions = cars.get(index).getMTree().getCommonTransitions();
+        List<ProbabilityTransition> probabilityTransitions = cars.get(index).getMTree().getProbabilityTransitions();
 
         // Start到行为树的根结点
         buffer.append("\t\t<transition>\n" +
                 "\t\t\t<source ref=\"id0\"/>\n" +
                 "\t\t\t<target ref=\"id1\"/>\n" +
                 "\t\t\t<label kind=\"select\">offset:int[" + f(cars.get(index).getMinOffset()) + "," + f(cars.get(index).getMaxOffset()) + "]</label>\n" +
-                "\t\t\t<label kind=\"assignment\">initCar(car[" + index + "], offset)</label>\n" +
+                "\t\t\t<label kind=\"assignment\">initCar(cars[" + index + "], offset)</label>\n" +
                 "\t\t</transition>\n");
 
         for (CommonTransition commonTransition : commonTransitions) {
@@ -305,10 +307,10 @@ public class XMLWriter {
                 if(guard.equals(guardType)) {
                     String s = guard;
                     for(String name : carNameIndexMap.keySet()) {
-                        s = guard.replaceAll(name, "car[" + carNameIndexMap.get(name) + "]");
+                        s = guard.replaceAll(name, "cars[" + carNameIndexMap.get(name) + "]");
                     }
                     buffer.append(" &amp;&amp; " + s.
-//                            replaceAll("\\(\\)", "(car[" + index + "])").
+//                            replaceAll("\\(\\)", "(cars[" + index + "])").
                             replaceAll("&", "&amp;").
                             replaceAll(">", "&gt;").
                             replaceAll("<", "&lt;")
@@ -330,7 +332,7 @@ public class XMLWriter {
         changeRight: 同上
      */
     private static void addSelfTransitions(StringBuffer buffer, int index) {
-        List<Behavior> behaviors = cars.get(index).getmTree().getBehaviors();
+        List<Behavior> behaviors = cars.get(index).getMTree().getBehaviors();
         for(Behavior behavior : behaviors) {
             resolveBehavior(buffer, behavior, index);
         }
@@ -385,50 +387,50 @@ public class XMLWriter {
 
         if(behavior.getName().equals(BehaviorType.ACCELERATE.getValue())) {
             // *acceleration, *target speed, duration
-            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
-            buffer.append(", speedUp(car[" + index + "]," + f(targetSpeed) + ")");
-            buffer.append(", lock = (t&lt;" + f(duration) + " &amp;&amp; car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", cars["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", speedUp(cars[" + index + "]," + f(targetSpeed) + ")");
+            buffer.append(", lock = (t&lt;" + f(duration) + " &amp;&amp; cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
 
         } else if(behavior.getName().equals(BehaviorType.DECELERATE.getValue())) {
             // *acceleration, *target speed, duration
-            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
-            buffer.append(", speedDown(car[" + index + "]," + f(targetSpeed) + ")");
-            buffer.append(", lock = (t&lt;" + f(duration) + " &amp;&amp; car[" + index + "].speed&gt;" + f(targetSpeed) + ")");
+            buffer.append(", cars["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", speedDown(cars[" + index + "]," + f(targetSpeed) + ")");
+            buffer.append(", lock = (t&lt;" + f(duration) + " &amp;&amp; cars[" + index + "].speed&gt;" + f(targetSpeed) + ")");
 
         } else if(behavior.getName().equals(BehaviorType.KEEP.getValue())) {
             // duration
-            // , keep(car[0])
+            // , keep(cars[0])
             //, lock=(t<5)
-            buffer.append(", keep(car[" + index + "])");
+            buffer.append(", keep(cars[" + index + "])");
             buffer.append(", lock = (t&lt;" + f(duration) + ")");
         } else if(behavior.getName().equals(BehaviorType.TURN_LEFT.getValue())) {
             // *acceleration, *target speed
-            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
-            buffer.append(", turnLeft(car[" + index + "])");
-//            buffer.append(", lock = (car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", cars["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", turnLeft(cars[" + index + "])");
+//            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.TURN_RIGHT.getValue())) {
             // *acceleration, *target speed
-            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
-            buffer.append(", turnRight(car[" + index + "])");
-//            buffer.append(", lock = (car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", cars["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", turnRight(cars[" + index + "])");
+//            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.CHANGE_LEFT.getValue())) {
             // acceleration, target speed
-            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
-            buffer.append(", changeLeft(car[" + index + "])");
-//            buffer.append(", lock = (car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", cars["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", changeLeft(cars[" + index + "])");
+//            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.CHANGE_RIGHT.getValue())) {
             // acceleration, target speed
-            buffer.append(", car["+ index + "].acceleration = " + f(acceleration));
-            buffer.append(", changeRight(car[" + index + "])");
-//            buffer.append(", lock = (car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", cars["+ index + "].acceleration = " + f(acceleration));
+            buffer.append(", changeRight(cars[" + index + "])");
+//            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.IDLE.getValue())) {
             // duration
-            buffer.append(", car[" + index + "].speed = 0)");
-//            buffer.append(", lock = (car[" + index + "].speed&lt;" + f(targetSpeed) + ")");
+            buffer.append(", cars[" + index + "].speed = 0)");
+//            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = (t&lt;" + f(duration) + ")");
         } else if(behavior.getName().equals(BehaviorType.LANE_OFFSET.getValue())) {
             // *offset, acceleration, target speed, duration
@@ -497,7 +499,7 @@ public class XMLWriter {
 
     // 从这里开始
     public static void write(TreeDataContainer container, String XMLpath) {
-        System.out.println("Writing XML to file: " + XMLpath + "...");
+        log.info("开始输出到文件：{}", XMLpath);
 
         init(container);
         try {
@@ -523,7 +525,7 @@ public class XMLWriter {
             e.printStackTrace();
         }
 
-        System.out.println("Finishing Writing...");
+        log.info("输出结束，Uppaal SMC的XML格式的随机混成自动机已转化完成！");
     }
 
 }

@@ -1,10 +1,12 @@
 package xodr.exporter;
 
+import lombok.extern.slf4j.Slf4j;
 import xodr.map.MapDataContainer;
 import xodr.map.entity.*;
 
 import java.util.List;
 
+@Slf4j
 public class BufferWriter {
 
     private static List<Road> roads;
@@ -22,8 +24,8 @@ public class BufferWriter {
     private static final int K = 10; // 放大倍数
 
     public static void write(MapDataContainer container, StringBuffer buffer) {
-        System.out.println("Writing map's declaration to file...");
-
+        log.info("开始写入地图声明...");
+        
         init(container);
 
         addRoad(buffer);
@@ -33,7 +35,7 @@ public class BufferWriter {
         addConnection(buffer);
         addLaneLink(buffer);
 
-        System.out.println("Finishing Writing...");
+        log.info("地图声明写入已完成！");
     }
     
     private static void init(MapDataContainer container) {
@@ -43,58 +45,13 @@ public class BufferWriter {
         lanes = container.getLanes();
         connections = container.getConnections();
         laneLinks = container.getLaneLinks();
-/*
-        初始化index
-        int countOfConnection = 0, countOfLane = 0, countOfLaneLink = 0, countOfLaneSection = 0;
-
-        for(Road road : roads) {
-            List<Integer> laneSectionsIndex = new ArrayList<>();
-            for(LaneSection laneSection : road.getLaneSections()) {
-                // 1. laneSections
-                laneSections.add(laneSection);
-                // 2. laneSectionsIndex
-                laneSectionsIndex.add(countOfLaneSection++);
-                // 3. lanes
-                List<Integer> lanesIndex = new ArrayList<>();
-                for(Lane lane : laneSection.getLanes()) {
-                    // 1. lanes
-                    lanes.add(lane);
-                    // 2. lanesIndex
-                    lanesIndex.add(countOfLane++);
-                }
-                laneSection.setLanesIndex(lanesIndex);
-            }
-            road.setLaneSectionsIndex(laneSectionsIndex);
-        }
-
-        for(Junction junction : junctions) {
-            List<Integer> connectionsIndex = new ArrayList<>();
-            for(Connection connection : junction.getConnections()) {
-                // 1. connections
-                connections.add(connection);
-                // 2. connectionsIndex
-                connectionsIndex.add(countOfConnection++);
-                // 3. laneLinks
-                List<Integer> laneLinksIndex = new ArrayList<>();
-                for(LaneLink laneLink : connection.getLaneLinks()) {
-                    // 1. laneLinks
-                    laneLinks.add(laneLink);
-                    // 2. laneLinksIndex
-                    laneLinksIndex.add(countOfLaneLink++);
-                }
-                connection.setLaneLinksIndex(laneLinksIndex);
-            }
-            junction.setConnectionsIndex(connectionsIndex);
-        }
-*/
-
     }
 
     private static void addRoad(StringBuffer buffer) {
         buffer.append("Road roads[" + roads.size() + "] = {");
         for (Road road : roads) {
             // 开始road
-            System.out.println(road.toString());
+            log.info(road.toString());
             buffer.append("{");
 
             buffer.append(road.getElementType() + ",");
@@ -138,7 +95,7 @@ public class BufferWriter {
         buffer.append("LaneSection laneSections[" + laneSections.size() + "] = {");
         for (LaneSection laneSection : laneSections) {
             // +laneSection开始
-            System.out.println(laneSection.toString());
+            log.info(laneSection.toString());
             buffer.append("{");
 
             buffer.append(laneSection.getElementType() + ",");
@@ -178,7 +135,7 @@ public class BufferWriter {
         buffer.append("Lane lanes[" + lanes.size() + "] = {");
         for (Lane lane : lanes) {
             // +lane开始
-            System.out.println(lane.toString());
+            log.info(lane.toString());
             buffer.append("{");
 
             buffer.append(lane.getElementType() + ",");
@@ -207,7 +164,7 @@ public class BufferWriter {
         buffer.append("Junction junctions[" + junctions.size() + "] = {");
         for (Junction junction : junctions) {
             // 开始junction
-            System.out.println(junction.toString());
+            log.info(junction.toString());
             buffer.append("{");
 
             buffer.append(junction.getElementType() + ",");
@@ -246,7 +203,7 @@ public class BufferWriter {
         buffer.append("Connection connections[" + connections.size() + "] = {");
         for (Connection connection : connections) {
             // 开始connection
-            System.out.println(connection.toString());
+            log.info(connection.toString());
             buffer.append("{");
 
             buffer.append(connection.getDirection() + ",");
@@ -288,7 +245,7 @@ public class BufferWriter {
         buffer.append("LaneLink laneLinks[" + laneLinks.size() + "] = {");
         for (LaneLink laneLink : laneLinks) {
             // +laneLink开始
-            System.out.println(laneLink.toString());
+            log.info(laneLink.toString());
             buffer.append("{");
 
             buffer.append(laneLink.getFrom() + ",");

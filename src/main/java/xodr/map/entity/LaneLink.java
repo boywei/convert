@@ -1,5 +1,7 @@
 package xodr.map.entity;
 
+import lombok.Data;
+
 /**
  LaneLink结构体
 
@@ -7,42 +9,12 @@ package xodr.map.entity;
  to                      表示当前LaneLink连接的 驶出lane的下标索引
  laneLinks               表示当前连接Road的Lane 连接 驶入Road的Lane的信息
  **/
+@Data
 public class LaneLink {
+
     private int from;
     private int to;
 
     private int index;
 
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public int getFrom() {
-        return from;
-    }
-
-    public void setFrom(int from) {
-        this.from = from;
-    }
-
-    public int getTo() {
-        return to;
-    }
-
-    public void setTo(int to) {
-        this.to = to;
-    }
-
-    @Override
-    public String toString() {
-        return "LaneLink{" +
-                "from=" + from +
-                ", to=" + to +
-                ", index=" + index +
-                '}';
-    }
 }

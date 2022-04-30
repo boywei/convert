@@ -5,11 +5,15 @@ import json.tree.TreeDataContainer;
 
 public class Main {
 
-    private final static String ADSML_PATH = "src/main/resources/ADSML/overtake/";
-    private final static String JSON_PATH = ADSML_PATH + "overtake.json";
-    private final static String XML_PATH = "src/main/resources/models/overtake1.xml";
+    // "src/main/resources/ADSML/Example/" "example.model" "src/main/resources/models/Example.xml"
+//    private final static String ADSML_PATH = "src/main/resources/ADSML/Example/";
+//    private final static String JSON_PATH = ADSML_PATH + "example.model";
+//    private final static String XML_PATH = "src/main/resources/models/Example.xml";
 
     public static void main(String[] args) {
+        final String ADSML_PATH = args[0];
+        final String JSON_PATH = ADSML_PATH + args[1];
+        final String XML_PATH = args[2];
 
         try{
             // 1. 读取

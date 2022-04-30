@@ -1,12 +1,12 @@
 package xodr.importer;
 
+import lombok.extern.slf4j.Slf4j;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import util.Uppaal;
-import xodr.exporter.BufferWriter;
 import xodr.map.ElementType;
 import xodr.map.MapDataContainer;
 import xodr.map.entity.*;
@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class XODRParser {
 
     // 映射：id -> index
@@ -49,20 +50,8 @@ public class XODRParser {
         put("none", 4);
     }};
 
-    public static void main(String[] args) {
-        StringBuffer buffer = new StringBuffer();
-        String map = "src/main/resources/maps/test.xodr";
-        // 1. 读取
-        String input = XODRInputReader.readFromFile(map);
-        // 2. 解析
-        MapDataContainer container = XODRParser.parse(input);
-        // 3. 写入buffer
-        BufferWriter.write(container, buffer);
-        System.out.println(buffer.toString());
-    }
-
     public static MapDataContainer parse(String input) {
-        System.out.println("Parsing input...");
+        log.info("开始解析地图...");
         List<Road> roads = new ArrayList<>();
         List<Junction> junctions = new ArrayList<>();
         List<LaneSection> laneSections = new ArrayList<>();
@@ -102,12 +91,12 @@ public class XODRParser {
             // 3. 初始化index; 初始化connection的direction
             initIndex(roads, laneSections, lanes, junctions, connections, laneLinks);
 
-            System.out.println("Finishing parsing...");
+            log.info("解析地图完成！");
             return new MapDataContainer(roads, junctions, laneSections, lanes, connections, laneLinks);
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
-            System.out.println("Error parsing OpenDRIVE file");
+            log.error("解析OpenDRIVE文件时发生错误！");
             return null;
         }
 
@@ -115,6 +104,7 @@ public class XODRParser {
 
     // 1 road
     private static void parseRoad(NodeList roadList, List<Road> roads, List<LaneSection> laneSections, List<Lane> lanes) {
+        log.info("开始解析road: road个数为{}", roadList.getLength());
         try {
             for(int i = 0; i < roadList.getLength(); i++){
                 Element roadElement = (Element) roadList.item(i);
@@ -139,8 +129,8 @@ public class XODRParser {
                 //    int successorElementType;
                 int predecessorId = -1;
                 int successorId = -1;
-                ElementType predecessorElementType;
-                ElementType successorElementType;
+                ElementType predecessorElementType = ElementType.NONE;
+                ElementType successorElementType = ElementType.NONE;
 
                 NodeList linkList = roadElement.getElementsByTagName("link");
                 Element myLinkList =  (Element) linkList.item(0);
@@ -149,29 +139,33 @@ public class XODRParser {
                 if(predecessorList != null) {
                     Element predecessor = (Element) predecessorList.item(0);
                     if(predecessor != null) {
-                        predecessorId = Integer.parseInt(predecessor.getAttribute("elementId"));
-                        predecessorElementType = predecessor.getAttribute("elementType")
-                                .equalsIgnoreCase("junction") ? ElementType.JUNCTION : ElementType.ROAD;
-                        road.setPredecessorElementType(predecessorElementType.getValue());
+                        String elementId = predecessor.getAttribute("elementId");
+                        String elementType = predecessor.getAttribute("elementType");
+                        if(elementId != null && elementType != null && elementId.length() != 0 && elementType.length() != 0) {
+                            predecessorId = Integer.parseInt(elementId);
+                            predecessorElementType = elementType.equalsIgnoreCase("junction")
+                                    ? ElementType.JUNCTION : ElementType.ROAD;
+                            road.setPredecessorElementType(predecessorElementType.getValue());
+                        }
                     }
-                } else {
-                    road.setPredecessorElementType(-1);
                 }
+                road.setPredecessorElementType(predecessorElementType.getValue());
+                road.setPredecessorId(predecessorId);
 
                 NodeList successorList = myLinkList.getElementsByTagName("successor");
                 if(successorList != null) {
                     Element successor = (Element) successorList.item(0);
                     if(successor != null) {
-                        successorId = Integer.parseInt(successor.getAttribute("elementId"));
-                        successorElementType = successor.getAttribute("elementType")
-                                .equalsIgnoreCase("junction") ? ElementType.JUNCTION : ElementType.ROAD;
-                        road.setSuccessorElementType(successorElementType.getValue());
+                        String elementId = successor.getAttribute("elementId");
+                        String elementType = successor.getAttribute("elementType");
+                        if(elementId != null && elementType != null && elementId.length() != 0 && elementType.length() != 0) {
+                            successorId = Integer.parseInt(elementId);
+                            successorElementType = elementType.equalsIgnoreCase("junction")
+                                    ? ElementType.JUNCTION : ElementType.ROAD;
+                        }
                     }
-                } else {
-                    road.setSuccessorElementType(-1);
                 }
-
-                road.setPredecessorId(predecessorId);
+                road.setSuccessorElementType(successorElementType.getValue());
                 road.setSuccessorId(successorId);
 
                 //    int maxSpeed;
@@ -441,7 +435,7 @@ public class XODRParser {
 
     private static void initLane(List<Lane> lanes) {
         // TODO: lane: predecessorIndex, successorIndex
-        System.out.println("Have not finished");
+        log.warn("TODO：Lane索引初始化尚未完成");
     }
 
     private static void initConnection(List<Connection> connections, List<Junction> junctions, List<Road> roads) {

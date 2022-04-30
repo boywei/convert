@@ -1,5 +1,7 @@
 package xodr.map.entity;
 
+import lombok.Data;
+
 import java.util.List;
 
 /**
@@ -11,7 +13,9 @@ import java.util.List;
 
  **/
 
+@Data
 public class Junction {
+
     private int elementType;
     private int junctionId;
     private List<Integer> connectionsIndex;
@@ -19,54 +23,4 @@ public class Junction {
     private List<Connection> connections;
     private int index;
 
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-    public int getElementType() {
-        return elementType;
-    }
-
-    public void setElementType(int elementType) {
-        this.elementType = elementType;
-    }
-
-    public int getJunctionId() {
-        return junctionId;
-    }
-
-    public void setJunctionId(int junctionId) {
-        this.junctionId = junctionId;
-    }
-
-    public List<Integer> getConnectionsIndex() {
-        return connectionsIndex;
-    }
-
-    public void setConnectionsIndex(List<Integer> connectionsIndex) {
-        this.connectionsIndex = connectionsIndex;
-    }
-
-    public List<Connection> getConnections() {
-        return connections;
-    }
-
-    public void setConnections(List<Connection> connections) {
-        this.connections = connections;
-    }
-
-    @Override
-    public String toString() {
-        return "Junction{" +
-                "elementType=" + elementType +
-                ", junctionId=" + junctionId +
-                ", connectionsIndex=" + connectionsIndex +
-                ", connections=" + connections +
-                ", index=" + index +
-                '}';
-    }
 }
