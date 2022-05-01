@@ -26,7 +26,8 @@ public class LaneSection {
     private double startPosition;
     private List<Integer> lanesIndex;
 
-    private double length;
+    @Deprecated
+    private double length; // 不需要用这个，直接用startPosition更方便
     private List<Lane> lanes;
     private int index;
 

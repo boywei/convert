@@ -6,6 +6,8 @@ import xodr.map.entity.*;
 
 import java.util.List;
 
+import static util.UppaalUtil.*;
+
 @Slf4j
 public class BufferWriter {
 
@@ -16,12 +18,6 @@ public class BufferWriter {
     private static List<Lane> lanes;
     private static List<Connection> connections;
     private static List<LaneLink> laneLinks;
-    
-    private static final int ROAD_LANESECTION = 10; // 一个road含有laneSection的数量
-    private static final int LANESECTION_LANE = 10; // 一个laneSection含有lane的数量
-    private static final int JUNCTION_CONNECTION = 10; // 一个junction含有connection的数量
-    private static final int CONNECTION_LANELINK = 10; // 一个connection含有laneLink的数量
-    private static final int K = 10; // 放大倍数
 
     public static void write(MapDataContainer container, StringBuffer buffer) {
         log.info("开始写入地图声明...");
@@ -48,7 +44,7 @@ public class BufferWriter {
     }
 
     private static void addRoad(StringBuffer buffer) {
-        buffer.append("Road roads[" + roads.size() + "] = {");
+        buffer.append("Road roads[" + roads.size() + "] = {\n");
         for (Road road : roads) {
             // 开始road
             log.info(road.toString());
@@ -92,7 +88,7 @@ public class BufferWriter {
     }
 
     private static void addLaneSection(StringBuffer buffer) {
-        buffer.append("LaneSection laneSections[" + laneSections.size() + "] = {");
+        buffer.append("LaneSection laneSections[" + laneSections.size() + "] = {\n");
         for (LaneSection laneSection : laneSections) {
             // +laneSection开始
             log.info(laneSection.toString());
@@ -132,7 +128,7 @@ public class BufferWriter {
     }
 
     private static void addLane(StringBuffer buffer) {
-        buffer.append("Lane lanes[" + lanes.size() + "] = {");
+        buffer.append("Lane lanes[" + lanes.size() + "] = {\n");
         for (Lane lane : lanes) {
             // +lane开始
             log.info(lane.toString());
@@ -161,7 +157,7 @@ public class BufferWriter {
             buffer.append("Junction junctions[2];\n");
             return;
         }
-        buffer.append("Junction junctions[" + junctions.size() + "] = {");
+        buffer.append("Junction junctions[" + junctions.size() + "] = {\n");
         for (Junction junction : junctions) {
             // 开始junction
             log.info(junction.toString());
@@ -200,7 +196,7 @@ public class BufferWriter {
             buffer.append("Connection connections[2];\n");
             return;
         }
-        buffer.append("Connection connections[" + connections.size() + "] = {");
+        buffer.append("Connection connections[" + connections.size() + "] = {\n");
         for (Connection connection : connections) {
             // 开始connection
             log.info(connection.toString());
@@ -242,7 +238,7 @@ public class BufferWriter {
             buffer.append("LaneLink laneLinks[2];\n");
             return;
         }
-        buffer.append("LaneLink laneLinks[" + laneLinks.size() + "] = {");
+        buffer.append("LaneLink laneLinks[" + laneLinks.size() + "] = {\n");
         for (LaneLink laneLink : laneLinks) {
             // +laneLink开始
             log.info(laneLink.toString());
@@ -259,7 +255,4 @@ public class BufferWriter {
         // LaneLinks结束
     }
 
-    private static int f(double x) {
-        return (int) Math.round(x * K);
-    }
 }

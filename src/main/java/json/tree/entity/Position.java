@@ -1,8 +1,11 @@
 package json.tree.entity;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class Position {
 
     private double x;

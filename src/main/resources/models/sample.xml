@@ -39,7 +39,7 @@
 		<transition>
 			<source ref="id5"/>
 			<target ref="id9"/>
-			<label kind="select" x="131" y="208">342</label>
+			<label kind="select" x="127" y="229">342</label>
 		</transition>
 		<transition>
 			<source ref="id5"/>

@@ -10,7 +10,20 @@ import java.io.IOException;
 public class JSONInputReader {
 
     public static String readFromFile(String JSONPath) {
-        log.info("开始解析JSON文件：{}...", JSONPath);
+
+        if(JSONPath.endsWith(".tree")) {
+            int start = 0;
+            if(JSONPath.contains("/")) { // Mac, Linux
+                start = JSONPath.lastIndexOf('/');
+            } else if (JSONPath.contains("\\")) { // Windows
+                start = JSONPath.lastIndexOf("\\");
+            }
+            log.info("开始解析{}的动态行为模型(JSON)...",
+                    JSONPath.substring(start+1, JSONPath.lastIndexOf('.')));
+        } else {
+            log.info("开始解析JSON文件：{}...", JSONPath);
+        }
+
 
         String jsonStr = null;
         try {

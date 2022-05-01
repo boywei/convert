@@ -1,13 +1,16 @@
 package json.tree.entity;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class CommonTransition {
 
-    private List<String> guards;
+    private List<String> guard;
     private int id;
     private List<Position> linkPoints;
     private int sourceId;

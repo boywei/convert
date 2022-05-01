@@ -6,7 +6,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import util.Uppaal;
+import util.UppaalUtil;
 import xodr.map.ElementType;
 import xodr.map.MapDataContainer;
 import xodr.map.entity.*;
@@ -38,9 +38,9 @@ public class XODRParser {
     private static int connectionIndex;
     private static int laneLinkIndex;
 
-    // id: 分配的；roadId和junctionId本身自带
+    // id: 分配的标识符，在这里id和index一致了；roadId和junctionId自身就有，不用分配；connection和laneLink用不着
     private static int laneSectionId;
-    private static int laneId;
+    private static int laneSingleId;
 
     // laneChange: type -> uppaal number
     private static final Map<String, Integer> laneChangeType = new HashMap<String, Integer>() {{
@@ -65,7 +65,7 @@ public class XODRParser {
         junctionMap = new HashMap<>();
 
         laneSectionId = 0;
-        laneId = 0;
+        laneSingleId = 0;
 
         roadIndex = 0;
         laneSectionIndex = 0;
@@ -104,7 +104,6 @@ public class XODRParser {
 
     // 1 road
     private static void parseRoad(NodeList roadList, List<Road> roads, List<LaneSection> laneSections, List<Lane> lanes) {
-        log.info("开始解析road: road个数为{}", roadList.getLength());
         try {
             for(int i = 0; i < roadList.getLength(); i++){
                 Element roadElement = (Element) roadList.item(i);
@@ -134,8 +133,12 @@ public class XODRParser {
 
                 NodeList linkList = roadElement.getElementsByTagName("link");
                 Element myLinkList =  (Element) linkList.item(0);
+                NodeList predecessorList = null, successorList = null;
+                if (myLinkList != null) {
+                    predecessorList = myLinkList.getElementsByTagName("predecessor");
+                    successorList = myLinkList.getElementsByTagName("successor");
+                }
 
-                NodeList predecessorList = myLinkList.getElementsByTagName("predecessor");
                 if(predecessorList != null) {
                     Element predecessor = (Element) predecessorList.item(0);
                     if(predecessor != null) {
@@ -152,7 +155,6 @@ public class XODRParser {
                 road.setPredecessorElementType(predecessorElementType.getValue());
                 road.setPredecessorId(predecessorId);
 
-                NodeList successorList = myLinkList.getElementsByTagName("successor");
                 if(successorList != null) {
                     Element successor = (Element) successorList.item(0);
                     if(successor != null) {
@@ -181,7 +183,7 @@ public class XODRParser {
                         }
                     }
                 } else {
-                    road.setMaxSpeed(Uppaal.INT16_MAX / Uppaal.K);
+                    road.setMaxSpeed(UppaalUtil.INT16_MAX * 1.0 / UppaalUtil.K);
                 }
 
                 // laneSections
@@ -223,7 +225,7 @@ public class XODRParser {
                 laneSection.setStartPosition(s);
 
 //                private double length;
-                double length = 0; //上一个的长度：本车道段起始位置减去上一个的起始位置。
+                double length = 0; // 本车道段起始位置减去上一个的起始位置
                 laneSection.setLength(length);
 
                 // lanes
@@ -261,10 +263,10 @@ public class XODRParser {
 //                private int laneId;
                 lane.setLaneId(Integer.parseInt(laneElement.getAttribute("id")));
 
-                lane.setId(laneId); //上面的setLaneId中是相对位置，这里是标识符
+                lane.setSingleId(laneSingleId); //上面的setLaneId中是相对位置，这里是标识符
                 lane.setIndex(laneIndex);
                 lanesIndex.add(laneIndex);
-                laneMap.put(laneId++, laneIndex++);
+                laneMap.put(laneSingleId++, laneIndex++);
 
 //                private int type;
                 String type = laneElement.getAttribute("type");
@@ -273,6 +275,7 @@ public class XODRParser {
                 } else {
                     lane.setType(0);
                 }
+
 //                private int predecessorIndex;
 //                private int predecessorLaneId; // 与laneId同类，表示相对位置
 //                private int predecessorId; // 标识符
@@ -284,9 +287,8 @@ public class XODRParser {
                         predecessorLaneId = predecessorElement.getAttribute("id");
                         lane.setPredecessorLaneId(Integer.parseInt(predecessorLaneId));
                     }
-                } else {
-                    lane.setPredecessorLaneId(0); // 不存在
                 }
+
 //                private int successorIndex; 
 //                private int successorLaneId;
 //                private int successorId;
@@ -298,14 +300,22 @@ public class XODRParser {
                         successorLaneId = successorElement.getAttribute("id");
                         lane.setSuccessorLaneId(Integer.parseInt(successorLaneId));
                     }
-                } else {
-                    lane.setSuccessorLaneId(0); // 不存在
                 }
+
 //                private int laneChange;
                 NodeList roadMarkList = laneElement.getElementsByTagName("roadMark");
                 Element roadMarkElement = (Element) roadMarkList.item(0);
                 String laneChange = roadMarkElement.getAttribute("laneChange");
                 lane.setLaneChange(laneChangeType.getOrDefault(laneChange, 0));
+
+                // width
+                NodeList widthList = laneElement.getElementsByTagName("width");
+                Element widthElement = (Element) widthList.item(0);
+                String width = "0.0";
+                if(widthElement != null) { // 不是所有的lane都有width，比如center（中心线）没有
+                    width = widthElement.getAttribute("a");
+                }
+                lane.setWidth(Double.parseDouble(width));
 
                 laneSectionLanes.add(lane);
                 lanes.add(lane);
@@ -404,7 +414,7 @@ public class XODRParser {
         // road: 需要初始化junctionIndex, predecessorIndex, successorIndex
         initRoad(roads);
         // lane: 需要初始化predecessorIndex, successorIndex
-        initLane(lanes);
+        initLane(lanes, laneSections, roads);
         // connection: 需要初始化incomingRoadIndex, connectionRoadIndex; direction
         initConnection(connections, junctions, roads);
     }
@@ -433,9 +443,109 @@ public class XODRParser {
         }
     }
 
-    private static void initLane(List<Lane> lanes) {
-        // TODO: lane: predecessorIndex, successorIndex
-        log.warn("TODO：Lane索引初始化尚未完成");
+    private static void initLane(List<Lane> lanes, List<LaneSection> laneSections, List<Road> roads) {
+        log.warn("Lane的前驱后继索引初始化尚未完成：跨road部分");
+        for(Lane lane : lanes) {
+            Road currentRoad = roads.get(lane.getRoadIndex());
+            LaneSection currentLaneSection = laneSections.get(lane.getLaneSectionIndex());
+
+            if(lane.getPredecessorLaneId() != 0) {
+                /*
+                    前驱：
+                    1 当前laneSection不是当前road的第一个车道段，那么
+                    - 当前laneSection的index-1，即前一个laneSection，找到对应的predecessorLaneId即可
+                    2 当前laneSection是当前road的第一个车道段，那么
+                    - 找到当前road的前驱road，根据两条road的连接方式判断predecessorLaneId属于前驱road的第一个还是最后一个车道段
+                */
+                LaneSection preLaneSection;
+                if(currentLaneSection.getStartPosition() != 0.0) { // 不是第一个车道段
+                    preLaneSection = laneSections.get(currentLaneSection.getIndex() - 1);
+                } else { //是第一个车道段
+                    Road preRoad = roads.get(roadMap.get(currentRoad.getPredecessorId())); // 如果是Junction？
+                    int connectType = 0; // TODO: 两个road的连接方式，影响着前一个laneSection是preRoad的第一个还是最后一个
+                    if(connectType == 0) { // 第一个
+                        preLaneSection = preRoad.getLaneSections().get(0);
+                    } else { // 最后一个
+                        int length = preRoad.getLaneSections().size();
+                        preLaneSection = preRoad.getLaneSections().get(length-1);
+                    }
+                }
+                updatePreLaneIndex(currentLaneSection, preLaneSection, lane);
+            }
+
+            if(lane.getSuccessorLaneId() != 0) {
+                /*
+                    后继：
+                    1 当前laneSection不是当前road的最后一个车道段，那么
+                    - 当前laneSection的index+1，即后一个laneSection，找到对应的successorLaneId即可
+                    2 当前laneSection是当前road的最后一个车道段，那么
+                    - 找到当前road的后继road，根据两条road的连接方式判断successorLaneId属于后继road的第一个还是最后一个车道段
+                 */
+                LaneSection sucLaneSection;
+                int lastIndex = currentRoad.getLaneSections().size() - 1;
+                LaneSection lastLaneSection = currentRoad.getLaneSections().get(lastIndex);
+
+                if(currentLaneSection.getStartPosition() != lastLaneSection.getStartPosition()) { // 不是最后一个车道段
+                    sucLaneSection = laneSections.get(currentLaneSection.getIndex() + 1);
+                } else { //是最后一个车道段
+                    Road sucRoad = roads.get(roadMap.get(currentRoad.getSuccessorId()));
+                    int connectType = 0; // TODO: 两个road的连接方式，影响着前一个laneSection是preRoad的第一个还是最后一个
+                    if(connectType == 0) { // 第一个
+                        sucLaneSection = sucRoad.getLaneSections().get(0);
+                    } else { // 最后一个
+                        int length = sucRoad.getLaneSections().size();
+                        sucLaneSection = sucRoad.getLaneSections().get(length-1);
+                    }
+                }
+                updateSucLaneIndex(currentLaneSection, sucLaneSection, lane);
+            }
+
+        }
+    }
+
+    // 抽取出来的一个方法，通过前驱laneSection更新lane的前驱
+    private static void updatePreLaneIndex(LaneSection currentLaneSection, LaneSection preLaneSection, Lane lane) {
+        // 更新lane
+        for(Lane preLane : preLaneSection.getLanes()) {
+            if(preLane.getLaneId() == lane.getPredecessorLaneId()) {
+                lane.setPredecessorSingleId(preLane.getSingleId());
+                lane.setPredecessorIndex(preLane.getIndex());
+                break;
+            }
+        }
+
+        // 记得更新局部的lane，即当前所属的laneSection中的lane也应该改变
+        List<Lane> currentLanes = currentLaneSection.getLanes();
+        for(Lane curLane : currentLanes) {
+            if(curLane.getLaneId() == lane.getLaneId()) {
+                curLane.setPredecessorSingleId(lane.getSingleId());
+                curLane.setPredecessorIndex(lane.getPredecessorIndex());
+                break;
+            }
+        }
+        currentLaneSection.setLanes(currentLanes);
+    }
+
+    // 抽取出来的一个方法，通过前驱laneSection更新lane的后继
+    private static void updateSucLaneIndex(LaneSection currentLaneSection, LaneSection sucLaneSection, Lane lane) {
+        for(Lane preLane : sucLaneSection.getLanes()) {
+            if(preLane.getLaneId() == lane.getPredecessorLaneId()) {
+                lane.setSuccessorSingleId(preLane.getSingleId());
+                lane.setSuccessorIndex(preLane.getIndex());
+                break;
+            }
+        }
+
+        // 记得更新局部的lane，即当前所属的laneSection中的lane也应该改变
+        List<Lane> currentLanes = currentLaneSection.getLanes();
+        for(Lane curLane : currentLanes) {
+            if(curLane.getLaneId() == lane.getLaneId()) {
+                curLane.setSuccessorSingleId(lane.getSingleId());
+                curLane.setSuccessorIndex(lane.getSuccessorIndex());
+                break;
+            }
+        }
+        currentLaneSection.setLanes(currentLanes);
     }
 
     private static void initConnection(List<Connection> connections, List<Junction> junctions, List<Road> roads) {
@@ -468,5 +578,4 @@ public class XODRParser {
         }
     }
 
-    
 }

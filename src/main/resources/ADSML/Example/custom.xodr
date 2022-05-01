@@ -39,23 +39,23 @@
                 </center>
                 <right>
                     <lane id="-1" type="driving" level="false">
-                        <link>
-                            <predecessor id="-1"/>
-                            <successor id="-1"/>
-                        </link>
+<!--                        <link>-->
+<!--                            <predecessor id="-1"/>-->
+<!--                            <successor id="-1"/>-->
+<!--                        </link>-->
                         <width sOffset="0.0000000000000000e+0" a="3.5000000000000000e+0" b="0.0000000000000000e+0" c="0.0000000000000000e+0" d="0.0000000000000000e+0"/>
-                        <roadMark sOffset="0.0000000000000000e+0" type="broken" material="standard" color="white" width="1.2500000000000000e-1" laneChange="both"/>
+                        <roadMark sOffset="0.0000000000000000e+0" type="broken" material="standard" color="white" width="1.2500000000000000e-1" laneChange="decrease"/>
                         <userData>
                             <vectorLane sOffset="0.0000000000000000e+0" laneId="{2bd5e4cf-c55d-49ab-9714-b5ed26612074}" travelDir="forward"/>
                         </userData>
                     </lane>
                     <lane id="-2" type="driving" level="false">
-                        <link>
-                            <predecessor id="-2"/>
-                            <successor id="-2"/>
-                        </link>
+<!--                        <link>-->
+<!--                            <predecessor id="-2"/>-->
+<!--                            <successor id="-2"/>-->
+<!--                        </link>-->
                         <width sOffset="0.0000000000000000e+0" a="3.5000000000000000e+0" b="0.0000000000000000e+0" c="0.0000000000000000e+0" d="0.0000000000000000e+0"/>
-                        <roadMark sOffset="0.0000000000000000e+0" type="solid" material="standard" color="white" width="1.2500000000000000e-1" laneChange="none"/>
+                        <roadMark sOffset="0.0000000000000000e+0" type="solid" material="standard" color="white" width="1.2500000000000000e-1" laneChange="increase"/>
                         <userData>
                             <vectorLane sOffset="0.0000000000000000e+0" laneId="{8964962f-5d2a-4fed-b73e-0c9faf0c8de4}" travelDir="forward"/>
                         </userData>

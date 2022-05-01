@@ -178,19 +178,27 @@ Connection tempConnection;
 
 
 const int TIME_STEP = 1;
-Road roads[1] = {{1,0,-1,-1,8000,-1,-1,-1,-1,400,{0,-1,-1,-1,-1,-1,-1,-1,-1,-1}}
+Road roads[1] = {
+{1,0,-1,-1,8000,-1,-1,-1,-1,400,{0,-1,-1,-1,-1,-1,-1,-1,-1,-1}}
 };
-LaneSection laneSections[1] = {{2,0,0,0,0,{0,1,2,-1,-1,-1,-1,-1,-1,-1},0}
+LaneSection laneSections[1] = {
+{2,0,0,0,0,{0,1,2,-1,-1,-1,-1,-1,-1,-1},0}
 };
-Lane lanes[3] = {{3,0,0,0,0,0,-1,-1,4},
-{3,0,0,0,-1,1,-1,-1,3},
-{3,0,0,0,-2,1,-1,-1,4}
+Lane lanes[3] = {
+{3,0,0,0,0,0,-1,-1,4},
+{3,0,0,0,-1,1,-1,-1,2},
+{3,0,0,0,-2,1,-1,-1,1}
 };
 Junction junctions[2];
 Connection connections[2];
 LaneLink laneLinks[2];
 //id, width, length, heading, speed, acceleration, maxSpeed, ..., offset
-Car cars[4] = {{0, 15, 25, true, 100, 0, 200, 0, 0, -2, 0, 0, 0, 0},{1, 15, 25, true, 100, 0, 100, 0, 0, -2, 0, 0, 0, 0},{2, 15, 25, true, 100, 0, 100, 0, 0, -2, 0, 0, 0, 0},{3, 15, 25, true, 100, 0, 200, 0, 0, -2, 0, 0, 0, 0}};
+Car cars[4] = {
+{0, 15, 25, true, 100, 0, 200, 0, 0, -2, 0, 0, 2, 0},
+{1, 15, 25, true, 100, 0, 100, 0, 0, -1, 0, 0, 1, 0},
+{2, 15, 25, true, 100, 0, 100, 0, 0, -2, 0, 0, 2, 0},
+{3, 15, 25, true, 100, 0, 200, 0, 0, -1, 0, 0, 1, 0}
+};
 
 /************************************* 常用函数 *************************************/
 
@@ -681,7 +689,7 @@ bool isInSameLane(Car car1, Car car2) {
     *2：其他车辆在当前车的前方, car1可能会撞上car2
 **/
 bool isInLeftLane(Car car1, Car car2) {
-    int left, leftSuc, leftPre;
+    int left;
     left = leftLaneIndex(lanes[car1.laneIndex]);
     if(left == -1) {
         return false;
@@ -693,26 +701,30 @@ bool isInLeftLane(Car car1, Car car2) {
         } else {
             return false;
         }
+    } else {
+        return false;
     }
-    leftSuc = lanes[left].successorIndex;
-    leftPre = lanes[left].predecessorIndex;
-    //rightSuc = lanes[
-    if(leftSuc != -1) {
-        return true;
-    } else if(leftPre != -1) {
-        return true;
-    }
-
-    return false;
 }
 
 /**
-    1：在当前车的左边lane或者在其右边前继lane
+    1：在当前车的右边lane或者在其右边前继lane
 **/
 bool isInRightLane(Car car1, Car car2) {
-    return car1.laneIndex == car2.laneIndex
-            || (!car1.heading &amp;&amp; lanes[car1.laneIndex].predecessorIndex == car2.laneIndex)
-            || (car1.heading &amp;&amp; lanes[car1.laneIndex].successorIndex == car2.laneIndex);
+    int right;
+    right = rightLaneIndex(lanes[car1.laneIndex]);
+    if(right == -1) {
+        return false;
+    } else if(right == car2.laneIndex) { // in left
+        if(car1.heading &amp;&amp; car1.offset &lt;= car2.offset) { // car1与道路同向, car2在car1在前方
+            return true;
+        } else if(!car1.heading &amp;&amp; car1.offset &gt;= car2.offset) { // car1与道路反向, car2在car1前方
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -723,9 +735,9 @@ bool isInRightLane(Car car1, Car car2) {
 bool withinDisToObjsInRoad(Car car1, Car car2, int distance) {
     if(car1.roadId != car2.roadId) {  // 不在同一Road
         return false;
-    } else if(car1.heading &amp;&amp; car2.offset - car1.offset &gt;= distance) { // car1和road同向, 那car2.offset应该在car1.offset到road.length之间
+    } else if(car1.heading &amp;&amp; car2.offset - car1.offset &lt;= distance) { // car1和road同向, 那car2.offset应该在car1.offset到road.length之间
         return true;
-    } else if(!car1.heading &amp;&amp; car1.offset - car2.offset &gt;= distance) { // car1和road反向, 那car2.offset应该在0到car1.offset之间
+    } else if(!car1.heading &amp;&amp; car1.offset - car2.offset &lt;= distance) { // car1和road反向, 那car2.offset应该在0到car1.offset之间
         return true;
     }
     return false;
@@ -766,6 +778,13 @@ bool hasObjWithinDisInLane(Car car, int distance) {
     4：没有左边lane则返回false
 **/
 bool hasObjWithinDisInLeftLane(Car car, int distance) {
+    int i = 0;
+    int count = car.length;
+    for(i = 0; i &lt; count; i++) {
+        if(isInLeftLane(car, cars[i]) &amp;&amp; abs(car.offset-cars[i].offset) &lt;= distance) {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -777,8 +796,16 @@ bool hasObjWithinDisInLeftLane(Car car, int distance) {
     4：没有右边lane则返回false
 **/
 bool hasObjWithinDisInRightLane(Car car, int distance) {
+    int i = 0;
+    int count = car.length;
+    for(i = 0; i &lt; count; i++) {
+        if(isInRightLane(car, cars[i]) &amp;&amp; abs(car.offset-cars[i].offset) &lt;= distance) {
+            return true;
+        }
+    }
     return false;
 }
+
 
 	</declaration>
     <template>
@@ -867,13 +894,13 @@ bool lock = true;
 			<source ref="id0"/>
 			<target ref="id1"/>
 			<label kind="select">offset:int[600,1000]</label>
-			<label kind="assignment">initCar(cars[0], offset)</label>
+			<label kind="assignment">initCar(cars[0], offset), modifyRoadLane(cars[0])</label>
 		</transition>
 		<transition>
 			<source ref="id1"/>
 			<target ref="id2"/>
 			<label kind="select">i: int[1,1], j:int[1,1], k:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock &amp;&amp; withinDisToObjsInLane(cars[0], cars[2], 80)</label>
 			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
@@ -889,7 +916,7 @@ bool lock = true;
 			<source ref="id1"/>
 			<target ref="id3"/>
 			<label kind="select">i: int[3,3], j:int[1,1], k:int[1,1]</label>
-			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock</label>
+			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; !lock &amp;&amp; withinDisToObjsInLane(cars[0], cars[3], 80)</label>
 			<label kind="synchronisation">update?</label>
 			<label kind="assignment">level = level+1, group = (group-1)*N+k, number=k, lock=true, t=0</label>
 		</transition>
@@ -907,7 +934,7 @@ bool lock = true;
 			<label kind="select">i: int[1,1], j:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
 			<label kind="synchronisation">update?</label>
-			<label kind="assignment">t=t+TIME_STEP, cars[0].acceleration = 10, speedUp(cars[0],200), lock = (t&lt;32760 &amp;&amp; cars[0].speed&lt;200)</label>
+			<label kind="assignment">t=t+TIME_STEP, cars[0].acceleration = 10, speedUp(cars[0],200), lock = (t&lt;32767 &amp;&amp; cars[0].speed&lt;200)</label>
 		</transition>
 		<transition>
 			<source ref="id2"/>
@@ -923,7 +950,7 @@ bool lock = true;
 			<label kind="select">i: int[3,3], j:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
 			<label kind="synchronisation">update?</label>
-			<label kind="assignment">t=t+TIME_STEP, cars[0].acceleration = 10, speedUp(cars[0],200), lock = (t&lt;32760 &amp;&amp; cars[0].speed&lt;200)</label>
+			<label kind="assignment">t=t+TIME_STEP, cars[0].acceleration = 10, speedUp(cars[0],200), lock = (t&lt;32767 &amp;&amp; cars[0].speed&lt;200)</label>
 		</transition>
 		<transition>
 			<source ref="id3"/>
@@ -939,7 +966,7 @@ bool lock = true;
 			<label kind="select">i: int[5,5], j:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
 			<label kind="synchronisation">update?</label>
-			<label kind="assignment">t=t+TIME_STEP, cars[0].acceleration = 10, speedDown(cars[0],100), lock = (t&lt;32760 &amp;&amp; cars[0].speed&gt;100)</label>
+			<label kind="assignment">t=t+TIME_STEP, cars[0].acceleration = 10, speedDown(cars[0],100), lock = (t&lt;32767 &amp;&amp; cars[0].speed&gt;100)</label>
 		</transition>
 	</template>
 	<template>
@@ -994,7 +1021,7 @@ bool lock = true;
 			<source ref="id0"/>
 			<target ref="id1"/>
 			<label kind="select">offset:int[200,800]</label>
-			<label kind="assignment">initCar(cars[1], offset)</label>
+			<label kind="assignment">initCar(cars[1], offset), modifyRoadLane(cars[1])</label>
 		</transition>
 		<transition>
 			<source ref="id1"/>
@@ -1002,7 +1029,7 @@ bool lock = true;
 			<label kind="select">i: int[1,1], j:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
 			<label kind="synchronisation">update?</label>
-			<label kind="assignment">t=t+TIME_STEP, keep(cars[1]), lock = (t&lt;32760)</label>
+			<label kind="assignment">t=t+TIME_STEP, keep(cars[1]), lock = (t&lt;32767)</label>
 		</transition>
 	</template>
 	<template>
@@ -1057,7 +1084,7 @@ bool lock = true;
 			<source ref="id0"/>
 			<target ref="id1"/>
 			<label kind="select">offset:int[1100,1500]</label>
-			<label kind="assignment">initCar(cars[2], offset)</label>
+			<label kind="assignment">initCar(cars[2], offset), modifyRoadLane(cars[2])</label>
 		</transition>
 		<transition>
 			<source ref="id1"/>
@@ -1065,7 +1092,7 @@ bool lock = true;
 			<label kind="select">i: int[1,1], j:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
 			<label kind="synchronisation">update?</label>
-			<label kind="assignment">t=t+TIME_STEP, keep(cars[2]), lock = (t&lt;32760)</label>
+			<label kind="assignment">t=t+TIME_STEP, keep(cars[2]), lock = (t&lt;32767)</label>
 		</transition>
 	</template>
 	<template>
@@ -1126,7 +1153,7 @@ bool lock = true;
 			<source ref="id0"/>
 			<target ref="id1"/>
 			<label kind="select">offset:int[1300,2000]</label>
-			<label kind="assignment">initCar(cars[3], offset)</label>
+			<label kind="assignment">initCar(cars[3], offset), modifyRoadLane(cars[3])</label>
 		</transition>
 		<transition>
 			<source ref="id1"/>
@@ -1182,7 +1209,7 @@ bool lock = true;
 			<label kind="select">i: int[4,4], j:int[1,1]</label>
 			<label kind="guard">level == i &amp;&amp; group == j &amp;&amp; lock</label>
 			<label kind="synchronisation">update?</label>
-			<label kind="assignment">t=t+TIME_STEP, keep(cars[3]), lock = (t&lt;32760)</label>
+			<label kind="assignment">t=t+TIME_STEP, keep(cars[3]), lock = (t&lt;32767)</label>
 		</transition>
 	</template>
 	<system>

@@ -17,8 +17,7 @@
     - map：路网结构对应的Java类
     - importer：地图读取、解析并转化为Java对象
     - exporter：解析后数据写入
-- deprecated：没用，单纯不舍得删
-- Main：主类，项目启动口
+- Convert：主类，项目启动口
 
 ### 资源文件 src/main/resources
 

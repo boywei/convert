@@ -10,6 +10,9 @@ import xodr.exporter.BufferWriter;
 import xodr.importer.XODRInputReader;
 import xodr.importer.XODRParser;
 import xodr.map.MapDataContainer;
+import xodr.map.entity.Lane;
+import xodr.map.entity.LaneSection;
+import xodr.map.entity.Road;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,27 +22,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static util.UppaalUtil.*;
 
 @Slf4j
 public class XMLWriter {
 
     private static List<Car> cars;
     private static String map;
-    private static String source;
     private static double timeStep;
-    private static String weather;
 
-    // 已定义好的数据结构路径、函数路径、边的变量路径
-    private static final String DEFINED_PATH = "src/main/resources/uppaal/defined.txt";
-    private static final String FUNCTION_PATH = "src/main/resources/uppaal/function.txt";
-    private static final String TRANSITION_PATH = "src/main/resources/uppaal/transition.txt";
-    private static final String TIMER_PATH = "src/main/resources/uppaal/timer.xml";
-
-    public static final int K = 10;
-    public static final int INT16_MAX = 32767;
-    public static final int INT16_MIN = -32768;
-
-    public static Map<String, Integer> carNameIndexMap;
+    // car映射: name -> Index
+    private static Map<String, Integer> carNameIndexMap;
 
     // （一）对应XML声明头
     private static final String XML_HEAD = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
@@ -94,13 +90,119 @@ public class XMLWriter {
         MapDataContainer container = XODRParser.parse(input);
         // 3. 写入buffer
         BufferWriter.write(container, buffer);
+        // 4. 根据地图的解析结果对车辆的道路信息索引进行更新
+        initCarFromMap(container);
+    }
+
+    // 1.2.4 根据地图信息更新车辆的索引；另外，通过偏移重新计算laneId
+    private static void initCarFromMap(MapDataContainer container) {
+        if(container == null) {
+            log.warn("地图解析发生错误，返回了null对象！");
+            return;
+        }
+
+        log.info("开始解析车辆(包括地图带来的索引更新)...");
+        List<Road> roads = container.getRoads();
+        List<LaneSection> laneSections = container.getLaneSections();
+        List<Lane> lanes = container.getLanes();
+
+        // 地图映射：id -> Road/LaneSection/Lane
+        Map<Integer, Road> roadMap = new HashMap<>();
+        Map<Integer, LaneSection> laneSectionMap = new HashMap<>();
+        Map<Integer, Lane> laneMap = new HashMap<>();
+
+        // 初始化映射: id -> index，便于查找
+        for(Road road : roads) {
+            roadMap.put(road.getRoadId(), road);
+        }
+        for(LaneSection laneSection : laneSections) {
+            laneSectionMap.put(laneSection.getLaneSectionId(), laneSection);
+        }
+        for(Lane lane : lanes) {
+            laneMap.put(lane.getSingleId(), lane);
+        }
+
+        for(Car car : cars) {
+            // 1、解析laneSectionId和laneSingleId
+            int laneSectionId = 0;
+
+            Road road;
+            if(roadMap.containsKey(car.getRoadId())) {
+                road = roadMap.get(car.getRoadId());
+                car.setRoadIndex(roadMap.get(car.getRoadId()).getIndex());
+            } else {
+                log.error("{}车的道路信息roadId({})不存在！", car.getName(), car.getRoadId());
+                break;
+            }
+
+            // 这里会有点问题，因为偏移是不确定的，导致初始laneSectionId无法确定，因此这里用了最小偏移来替代；在uppaal中需要再判定一次
+            for(LaneSection laneSection : road.getLaneSections()) {
+                if(car.getMinOffset() >= laneSection.getStartPosition()) { // 偏移在该段起始位置后和下一个起始位置之前即为相应的laneSection
+                    laneSectionId = laneSection.getLaneSectionId();
+                    car.setLaneSectionId(laneSectionId);
+                    car.setLaneSectionIndex(laneSectionMap.get(laneSectionId).getIndex());
+                } else {
+                    break;
+                }
+            }
+
+            // 同样也可能因为不确定性导致初始化出现一些问题
+            LaneSection laneSection = laneSectionMap.get(laneSectionId);
+            List<Lane> currentLanes = laneSection.getLanes();
+            for(Lane lane : currentLanes) { // 这里还需要根据偏移更新laneId
+                if(lane.getLaneId() == car.getLaneId()) {
+                    int singleId = lane.getSingleId();
+                    car.setLaneSingleId(singleId);
+                    car.setLaneIndex(laneMap.get(singleId).getIndex());
+                    break;
+                }
+            }
+
+            // 1 计算laneId相对中心线偏移
+            double totalLateralOffset = 0.0;
+            int laneId = car.getLaneId();
+            int direction = -laneId / Math.abs(laneId); // 索引增加的方向：-1为左，1为右（因为解析时先解析左再解析右）
+            int centerLaneIndex = 0;
+            for(Lane lane : currentLanes) { //找到中心线车道的索引
+                if(lane.getLaneId() == 0) {
+                    centerLaneIndex = lane.getIndex();
+                }
+            }
+            for(int i = centerLaneIndex; i < lanes.size() && i < LANESECTION_LANE; i += direction) { // lane的singleId和index相同，往两边叠加
+                if(i != laneId) {
+                    totalLateralOffset += currentLanes.get(i).getWidth();
+                } else {
+                    totalLateralOffset += currentLanes.get(i).getWidth() / 2; // 如果对应的lane，则实际偏移取中心线位置的
+                    break;
+                }
+            }
+            // 2 计算lane通过Related Position计算后的偏移
+            double lateralOffset = totalLateralOffset + car.getMinLateralOffset();
+            // 3 根据偏移比较，计算相应的lane
+            double tempOffset = 0.0;
+            for(int i = 0; i < lanes.size() && i < LANESECTION_LANE; i += direction) {
+                if(lateralOffset >= tempOffset) {
+                    int singleId = currentLanes.get(i).getSingleId();
+                    car.setLaneId(currentLanes.get(i).getLaneId());
+                    car.setLaneSingleId(singleId);
+                    car.setLaneIndex(laneMap.get(singleId).getIndex());
+                }
+                tempOffset += currentLanes.get(i).getWidth();
+            }
+
+            log.info("{}车的道路信息为: Road(id={}, index={}), LaneSection(id={}, index={}), Lane(id={}, index={})",
+                    car.getName(), car.getRoadId(), car.getRoadIndex(), car.getLaneSectionId(),
+                    car.getLaneSectionIndex(), car.getLaneId(), car.getLaneIndex());
+        }
+
+        log.info("车辆解析完成！");
     }
 
     // 1.3 添加车辆声明
     private static void addCar(StringBuffer buffer) {
         int countOfCar = cars.size();
         buffer.append("//id, width, length, heading, speed, acceleration, maxSpeed, ..., offset\n");
-        buffer.append("Car cars[" + countOfCar + "] = {");
+        buffer.append("Car cars[" + countOfCar + "] = {\n");
         for(int i = 0; i < countOfCar; i++) {
 //            System.out.println(cars[i].toString());
             buffer.append("{");
@@ -122,9 +224,7 @@ public class XMLWriter {
             buffer.append(f(cars.get(i).getOffset()));
             buffer.append("}");
 
-            if(i != countOfCar-1) {
-                buffer.append(",");
-            }
+            buffer.append(i != countOfCar-1? ",\n" : "\n");
         }
         buffer.append("};\n");
     }
@@ -154,7 +254,7 @@ public class XMLWriter {
         buffer.append("\t<template>\n");
 
         addName(buffer, index);
-        addLocalDeclaration(buffer, index);
+        addLocalDeclaration(buffer);
         addLocations(buffer, index);
         addBranchPoints(buffer, index);
         addInit(buffer);
@@ -174,7 +274,7 @@ public class XMLWriter {
     }
 
     // 2.2 局部变量的声明: 包含三元组算法和自循环加锁算法的变量
-    private static void addLocalDeclaration(StringBuffer buffer, int index) {
+    private static void addLocalDeclaration(StringBuffer buffer) {
         buffer.append("\t\t<declaration>\n");
 
         try {
@@ -241,7 +341,7 @@ public class XMLWriter {
                 "\t\t\t<source ref=\"id0\"/>\n" +
                 "\t\t\t<target ref=\"id1\"/>\n" +
                 "\t\t\t<label kind=\"select\">offset:int[" + f(cars.get(index).getMinOffset()) + "," + f(cars.get(index).getMaxOffset()) + "]</label>\n" +
-                "\t\t\t<label kind=\"assignment\">initCar(cars[" + index + "], offset)</label>\n" +
+                "\t\t\t<label kind=\"assignment\">initCar(cars[" + index + "], offset), modifyRoadLane(cars[" + index + "])</label>\n" +
                 "\t\t</transition>\n");
 
         for (CommonTransition commonTransition : commonTransitions) {
@@ -259,7 +359,7 @@ public class XMLWriter {
             // guard 这里需先比对边是否衔接（坐标对应），再比较其他条件
             buffer.append("\t\t\t<label kind=\"guard\">" +
                     "level == i &amp;&amp; group == j &amp;&amp; !lock" +
-                    addGuards(commonTransition.getGuards(), index) + "</label>\n");
+                    addGuard(commonTransition.getGuard(), index) + "</label>\n");
 
             // sync 普通迁移也需要信号，否则在验证时可能会无法迁出
              buffer.append("\t\t\t<label kind=\"synchronisation\">update?</label>\n");
@@ -297,26 +397,41 @@ public class XMLWriter {
     /*
         guard条件命名参照GuardType
      */
-    private static String addGuards(List<String> guards, int index) {
+    private static String addGuard(List<String> guards, int index) {
         StringBuffer buffer = new StringBuffer();
         if(guards == null) {
             return "";
         }
+
         for(String guard : guards) {
+            boolean isMatch = false;
             for(String guardType : GuardType.allGuards) {
-                if(guard.equals(guardType)) {
+                if(guard.matches(guardType)) {
+                    isMatch = true;
                     String s = guard;
                     for(String name : carNameIndexMap.keySet()) {
-                        s = guard.replaceAll(name, "cars[" + carNameIndexMap.get(name) + "]");
+                        s = s.replaceAll(name, "cars[" + carNameIndexMap.get(name) + "]");
                     }
-                    buffer.append(" &amp;&amp; " + s.
-//                            replaceAll("\\(\\)", "(cars[" + index + "])").
-                            replaceAll("&", "&amp;").
+
+                    // guard参数中的数字放大十倍（这里很乱，需要改一下）
+                    Pattern numberPattern = Pattern.compile("[+-]?\\d+.?\\d*\\)"); //最后加一个右括号，只匹配最后一个distance的数字
+                    Matcher m = numberPattern.matcher(s);
+                    if(m.find()) {
+                        String result = m.group();
+                        String number = result.substring(0, result.length()-1);
+                        s = s.replaceAll(result.replaceAll("\\)", "\\\\)"), f(Double.parseDouble(number)) + ")");
+                    }
+
+                    s = s.replaceAll("&", "&amp;").
                             replaceAll(">", "&gt;").
-                            replaceAll("<", "&lt;")
-                    );
+                            replaceAll("<", "&lt;");
+                    buffer.append(" &amp;&amp; " + s);
+                    log.info("Guard解析成功：原guard：{}, 转化后guard：{}", guard, s);
                     break;
                 }
+            }
+            if (!isMatch) {
+                log.error("Guard条件不合法：{}", guard);
             }
         }
         return buffer.toString();
@@ -368,7 +483,7 @@ public class XMLWriter {
 
     }
 
-    // 2.7.2 TODO: 未完成但后续条件满足时跳出？需不需要加锁; 左右转问题
+    // 2.7.2 update部分，根据行为类型更改
     private static String operate(Behavior behavior, int index) {
         StringBuffer buffer = new StringBuffer();
 
@@ -378,12 +493,12 @@ public class XMLWriter {
         }
 
         // 不存在则设置为最大值
-        Double targetSpeed = params.getOrDefault("target speed", INT16_MAX/K * 1.0);
-        targetSpeed = (targetSpeed == null? INT16_MAX/K * 1.0 : targetSpeed);
+        Double targetSpeed = params.getOrDefault("target speed", INT16_MAX*1.0/K);
+        targetSpeed = (targetSpeed == null? INT16_MAX*1.0/K : targetSpeed);
         Double acceleration = params.getOrDefault("acceleration", 0.0);
         acceleration = (acceleration == null? 0.0 : acceleration);
-        Double duration = params.getOrDefault("duration", INT16_MAX/K * 1.0);
-        duration = (duration == null? INT16_MAX/K * 1.0 : duration);
+        Double duration = params.getOrDefault("duration", INT16_MAX*1.0/K);
+        duration = (duration == null? INT16_MAX*1.0/K : duration);
 
         if(behavior.getName().equals(BehaviorType.ACCELERATE.getValue())) {
             // *acceleration, *target speed, duration
@@ -478,18 +593,11 @@ public class XMLWriter {
         buffer.append("\t\t</query>\n");
     }
 
-    // 用于计算放大后的数字，因为uppaal中double计算验证会出问题
-    private static int f(double x) {
-        return (int) Math.round(x * K);
-    }
-
     // 初始化，便于使用
     private static void init(TreeDataContainer container) {
         cars = container.getCars();
         map = container.getMap();
-        source = container.getSource();
         timeStep = container.getTimeStep();
-        weather = container.getWeather();
 
         carNameIndexMap = new HashMap<>();
         for (int i = 0; i < cars.size(); i++) {

@@ -488,7 +488,7 @@ bool isInSameLane(Car car1, Car car2) {
     *2：其他车辆在当前车的前方, car1可能会撞上car2
 **/
 bool isInLeftLane(Car car1, Car car2) {
-    int left, leftSuc, leftPre;
+    int left;
     left = leftLaneIndex(lanes[car1.laneIndex]);
     if(left == -1) {
         return false;
@@ -500,26 +500,30 @@ bool isInLeftLane(Car car1, Car car2) {
         } else {
             return false;
         }
+    } else {
+        return false;
     }
-    leftSuc = lanes[left].successorIndex;
-    leftPre = lanes[left].predecessorIndex;
-    //rightSuc = lanes[
-    if(leftSuc != -1) {
-        return true;
-    } else if(leftPre != -1) {
-        return true;
-    }
-
-    return false;
 }
 
 /**
-    1：在当前车的左边lane或者在其右边前继lane
+    1：在当前车的右边lane或者在其右边前继lane
 **/
 bool isInRightLane(Car car1, Car car2) {
-    return car1.laneIndex == car2.laneIndex
-            || (!car1.heading &amp;&amp; lanes[car1.laneIndex].predecessorIndex == car2.laneIndex)
-            || (car1.heading &amp;&amp; lanes[car1.laneIndex].successorIndex == car2.laneIndex);
+    int right;
+    right = rightLaneIndex(lanes[car1.laneIndex]);
+    if(right == -1) {
+        return false;
+    } else if(right == car2.laneIndex) { // in left
+        if(car1.heading &amp;&amp; car1.offset &lt;= car2.offset) { // car1与道路同向, car2在car1在前方
+            return true;
+        } else if(!car1.heading &amp;&amp; car1.offset &gt;= car2.offset) { // car1与道路反向, car2在car1前方
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -530,9 +534,9 @@ bool isInRightLane(Car car1, Car car2) {
 bool withinDisToObjsInRoad(Car car1, Car car2, int distance) {
     if(car1.roadId != car2.roadId) {  // 不在同一Road
         return false;
-    } else if(car1.heading &amp;&amp; car2.offset - car1.offset &gt;= distance) { // car1和road同向, 那car2.offset应该在car1.offset到road.length之间
+    } else if(car1.heading &amp;&amp; car2.offset - car1.offset &lt;= distance) { // car1和road同向, 那car2.offset应该在car1.offset到road.length之间
         return true;
-    } else if(!car1.heading &amp;&amp; car1.offset - car2.offset &gt;= distance) { // car1和road反向, 那car2.offset应该在0到car1.offset之间
+    } else if(!car1.heading &amp;&amp; car1.offset - car2.offset &lt;= distance) { // car1和road反向, 那car2.offset应该在0到car1.offset之间
         return true;
     }
     return false;
@@ -573,6 +577,13 @@ bool hasObjWithinDisInLane(Car car, int distance) {
     4：没有左边lane则返回false
 **/
 bool hasObjWithinDisInLeftLane(Car car, int distance) {
+    int i = 0;
+    int count = car.length;
+    for(i = 0; i &lt; count; i++) {
+        if(isInLeftLane(car, cars[i]) &amp;&amp; abs(car.offset-cars[i].offset) &lt;= distance) {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -584,5 +595,13 @@ bool hasObjWithinDisInLeftLane(Car car, int distance) {
     4：没有右边lane则返回false
 **/
 bool hasObjWithinDisInRightLane(Car car, int distance) {
+    int i = 0;
+    int count = car.length;
+    for(i = 0; i &lt; count; i++) {
+        if(isInRightLane(car, cars[i]) &amp;&amp; abs(car.offset-cars[i].offset) &lt;= distance) {
+            return true;
+        }
+    }
     return false;
 }
+

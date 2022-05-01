@@ -11,10 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static util.ADSMLUtil.*;
+
 @Slf4j
 public class JSONParser {
-
-    private static final int N = 3;
 
     private static List<Behavior> behaviorList;
     private static List<CommonTransition> commonTransitionList;
@@ -47,7 +47,7 @@ public class JSONParser {
         car.setLaneId(laneId);
         car.setActorRef(actorRefName);
 
-        // TODO: 准确定位位置信息和索引
+        // TODO: Global Position定位位置信息和索引
 //        if (type.equals(TreeConstant.LANE_POSITION)) {
 //
 //        } else if (type.equals(TreeConstant.ROAD_POSITION)) {
@@ -59,6 +59,21 @@ public class JSONParser {
 //        } else {
 //            log.error("car的定位类型错误！");
 //        }
+    }
+
+    private static void initFromRelatedCar(Car car) {
+        if(car.getLocationType().equals(TreeConstant.RELATED_POSITION)) {
+            log.info("{}的关联车辆为{}", car.getName(), car.getActorRef());
+            Car relatedCar = nameCarMap.get(car.getActorRef());
+            car.setRoadId(relatedCar.getRoadId());
+            car.setLaneId(relatedCar.getLaneId());
+            car.setMinOffset(relatedCar.getMinOffset() + car.getMinOffset());
+            car.setMaxOffset(relatedCar.getMaxOffset() + car.getMaxOffset());
+            car.setMinLateralOffset(relatedCar.getMinLateralOffset() + car.getMinLateralOffset());
+            car.setMaxLateralOffset(relatedCar.getMaxLateralOffset() + car.getMaxLateralOffset());
+        }
+        log.info("{}车的定位方式为：{}, 道路初步信息（需再计算）：road id: {}, lane id: {}, min offset: {}, max offset: {}",
+                car.getName(), car.getLocationType(), car.getRoadId(), car.getLaneId(), car.getMinOffset(), car.getMaxOffset());
     }
 
     // 将所有id去重，并重新分配
@@ -339,21 +354,6 @@ public class JSONParser {
         }
     }
 
-    private static void initFromRelatedCar(Car car) {
-        if(car.getLocationType().equals(TreeConstant.RELATED_POSITION)) {
-            log.info("{}的关联车辆为{}", car.getName(), car.getActorRef());
-            Car relatedCar = nameCarMap.get(car.getActorRef());
-            car.setRoadId(relatedCar.getRoadId());
-            car.setLaneId(relatedCar.getLaneId());
-            car.setMinOffset(relatedCar.getMinOffset() + car.getMinOffset());
-            car.setMaxOffset(relatedCar.getMaxOffset() + car.getMaxOffset());
-            car.setMinLateralOffset(relatedCar.getMinLateralOffset() + car.getMinLateralOffset());
-            car.setMaxLateralOffset(relatedCar.getMaxLateralOffset() + car.getMaxLateralOffset());
-        }
-        log.info("{}车的定位方式为：{}, 道路信息：road id: {}, lane id: {}, min offset: {}, max offset: {}",
-                car.getName(), car.getLocationType(), car.getRoadId(), car.getLaneId(), car.getMinOffset(), car.getMaxOffset());
-    }
-
     public static TreeDataContainer parse(String input, String treePathPrefix) {
         log.info("开始解析各车辆...");
 
@@ -386,7 +386,7 @@ public class JSONParser {
 
         container.setCars(cars);
 
-        log.info("车辆解析完成...");
+        log.info("车辆解析完成!");
         return container;
     }
 

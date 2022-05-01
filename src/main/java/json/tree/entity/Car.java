@@ -1,10 +1,13 @@
 package json.tree.entity;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 
-@Data
+@Getter
+@Setter
 public class Car {
 
     private boolean heading;
@@ -21,7 +24,7 @@ public class Car {
     private MTree mTree;
     // 以下变量不能直接获取，需要初始化后通过Map获取
     private int roadId;
-    private int laneId;
+    private int laneId; // 表示lane相对位置的id，往左依次递加1，往右依次递减1，中心线为0
     private double minOffset;
     private double maxOffset;
     private double minLateralOffset;
@@ -32,6 +35,7 @@ public class Car {
     // 若通过关联车辆定位
     private String actorRef;
 
+    private int laneSingleId; // lane真正的唯一id标识符，所有lane均不相同
     private double offset;
     private int laneSectionId;
     private int laneIndex;
