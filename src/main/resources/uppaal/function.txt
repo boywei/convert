@@ -416,7 +416,7 @@ void changeRight(Car&amp; car){
     int movement = v * TIME_STEP * k / (FACTOR * FACTOR);
     car.offset += (car.heading? movement : -movement);
     if(lanes[car.laneIndex].laneChange == 2 || lanes[car.laneIndex].laneChange == 3) {
-     	car.laneIndex = leftLaneIndex(lanes[car.laneIndex]);
+     	car.laneIndex = rightLaneIndex(lanes[car.laneIndex]);
         car.laneId = lanes[car.laneIndex].laneId;
     }
     modifyRoadLane(car);
