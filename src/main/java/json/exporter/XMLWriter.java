@@ -568,7 +568,7 @@ public class XMLWriter {
         buffer.append("\t</system>\n");
     }
 
-    // 4 对应queries部分，即性质规约？
+    // 4 对应queries部分，即性质规约
     private static void addQueries(StringBuffer buffer) {
         buffer.append("\t<queries>\n");
 

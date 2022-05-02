@@ -16,11 +16,6 @@ import static util.ADSMLUtil.*;
 @Slf4j
 public class JSONParser {
 
-    private static List<Behavior> behaviorList;
-    private static List<CommonTransition> commonTransitionList;
-    private static List<ProbabilityTransition> probabilityTransitionList;
-    private static List<BranchPoint> branchPointList;
-
     // 映射：name -> car
     private static Map<String, Car> nameCarMap;
 
@@ -125,11 +120,6 @@ public class JSONParser {
         List<ProbabilityTransition> probabilityTransitions = mTree.getProbabilityTransitions();
         List<BranchPoint> branchPoints = mTree.getBranchPoints();
 
-        behaviorList = new ArrayList<>();
-        commonTransitionList = new ArrayList<>();
-        probabilityTransitionList = new ArrayList<>();
-        branchPointList = new ArrayList<>();
-
         // 0. init idMap
         // id -> Behavior
         Map<Integer, Behavior> idBehaviorMap = new HashMap<>();
@@ -152,21 +142,18 @@ public class JSONParser {
                     // next commonTransition
                     commonTransition.setSourceBehavior(behavior);
                     if(idBehaviorMap.containsKey(commonTransition.getTargetId())) { // next behavior
-                        Behavior behavior1 = idBehaviorMap.get(commonTransition.getTargetId());
-                        commonTransition.setTargetBehavior(behavior1);
-                        List<Behavior> behaviorList = behavior.getNextBehaviors();
-                        behaviorList.add(behavior1);
-                        behavior.setNextBehaviors(behaviorList);
+                        Behavior targetBehavior = idBehaviorMap.get(commonTransition.getTargetId());
+                        commonTransition.setTargetBehavior(targetBehavior);
+                        List<Behavior> nextBehaviors = behavior.getNextBehaviors();
+                        nextBehaviors.add(targetBehavior);
                     } else { // next branchPoint
                         BranchPoint branchPoint = idBranchPointMap.get(commonTransition.getTargetId());
                         commonTransition.setTargetBranchPoint(branchPoint);
-                        List<BranchPoint> branchPointList = behavior.getNextBranchPoints();
-                        branchPointList.add(branchPoint);
-                        behavior.setNextBranchPoints(branchPointList);
+                        List<BranchPoint> nextBranchPoints = behavior.getNextBranchPoints();
+                        nextBranchPoints.add(branchPoint);
                     }
-                    List<CommonTransition> commonTransitionList = behavior.getNextTransitions();
-                    commonTransitionList.add(commonTransition);
-                    behavior.setNextTransitions(commonTransitionList);
+                    List<CommonTransition> nextTransitions = behavior.getNextTransitions();
+                    nextTransitions.add(commonTransition);
                 }
             }
         }
@@ -181,35 +168,26 @@ public class JSONParser {
                     if(idBehaviorMap.containsKey(probabilityTransition.getTargetId())) {
                         Behavior behavior = idBehaviorMap.get(probabilityTransition.getTargetId());
                         probabilityTransition.setTargetBehavior(behavior);
-                        List<Behavior> behaviorList = branchPoint.getNextBehaviors();
-                        behaviorList.add(behavior);
-                        branchPoint.setNextBehaviors(behaviorList);
+                        List<Behavior> nextBehaviors = branchPoint.getNextBehaviors();
+                        nextBehaviors.add(behavior);
                     }
-                    List<ProbabilityTransition> probabilityTransitionList = branchPoint.getNextTransitions();
-                    probabilityTransitionList.add(probabilityTransition);
-                    branchPoint.setNextTransitions(probabilityTransitionList);
+                    List<ProbabilityTransition> nextTransitions = branchPoint.getNextTransitions();
+                    nextTransitions.add(probabilityTransition);
                 }
             }
         }
 
-        // 2. build
-        // root
+        // 2. start building tree from root
         for(Behavior behavior : behaviors) {
             if(behavior.getId() == mTree.getRootId()) {
                 behavior.setLevel(1);
                 behavior.setGroup(1);
                 behavior.setNumber(0);
-                behaviorList.add(behavior);
                 initBehavior(behavior);
                 break;
             }
         }
 
-        // 3. 加入到全局变量中
-        mTree.setProbabilityTransitions(probabilityTransitionList);
-        mTree.setBranchPoints(branchPointList);
-        mTree.setCommonTransitions(commonTransitionList);
-        mTree.setBehaviors(behaviorList);
     }
 
     // 递归初始化
@@ -221,7 +199,6 @@ public class JSONParser {
             commonTransition.setLevel(sourceBehavior.getLevel());
             commonTransition.setGroup(sourceBehavior.getGroup());
             commonTransition.setNumber(number);
-            commonTransitionList.add(commonTransition);
             number ++;
             initCommonTransition(commonTransition);
         }
@@ -235,7 +212,6 @@ public class JSONParser {
             behavior.setLevel(commonTransition.getLevel() + 1);
             behavior.setGroup((commonTransition.getGroup() - 1) * N + commonTransition.getNumber());
             behavior.setNumber(0);
-            behaviorList.add(behavior);
             initBehavior(behavior);
         } else if(commonTransition.getTargetBranchPoint() != null) {
             BranchPoint branchPoint = commonTransition.getTargetBranchPoint();
@@ -243,7 +219,6 @@ public class JSONParser {
             branchPoint.setLevel(commonTransition.getLevel() + 1);
             branchPoint.setGroup((commonTransition.getGroup() - 1) * N + commonTransition.getNumber());
             branchPoint.setNumber(0);
-            branchPointList.add(branchPoint);
             initBranchPoint(branchPoint);
         }
     }
@@ -255,7 +230,6 @@ public class JSONParser {
             probabilityTransition.setLevel(branchPoint.getLevel());
             probabilityTransition.setGroup(branchPoint.getGroup());
             probabilityTransition.setNumber(number);
-            probabilityTransitionList.add(probabilityTransition);
             number ++;
             initProbabilityTransition(probabilityTransition);
         }
@@ -268,7 +242,6 @@ public class JSONParser {
             behavior.setLevel(probabilityTransition.getLevel() + 1);
             behavior.setGroup((probabilityTransition.getGroup() - 1) * N + probabilityTransition.getNumber());
             behavior.setNumber(0);
-            behaviorList.add(behavior);
             initBehavior(behavior);
         }
     }
@@ -287,11 +260,6 @@ public class JSONParser {
         behaviors.get(0).setGroup(1);
         behaviors.get(0).setNumber(0);
         buildTree(behaviors.get(0), behaviors, commonTransitions, probabilityTransitions, branchPoints);
-
-        MTree mTree = car.getMTree();
-        mTree.setBehaviors(behaviors);
-        mTree.setCommonTransitions(commonTransitions);
-        mTree.setBranchPoints(branchPoints);
     }
 
     // 递归初始化
