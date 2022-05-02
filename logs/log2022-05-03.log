@@ -1,0 +1,298 @@
+2022-05-03 00:47:42.965 [main] INFO  json.importer.JSONInputReader.readFromFile-24 - 开始解析JSON文件：src/main/resources/ADSML/Example/example.model...
+2022-05-03 00:47:42.985 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:47:42.988 [main] INFO  json.importer.JSONParser.parse-326 - 开始解析各车辆...
+2022-05-03 00:47:43.170 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析Ego的动态行为模型(JSON)...
+2022-05-03 00:47:43.177 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:47:43.262 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析B1的动态行为模型(JSON)...
+2022-05-03 00:47:43.266 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:47:43.268 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F1的动态行为模型(JSON)...
+2022-05-03 00:47:43.284 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:47:43.290 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F2的动态行为模型(JSON)...
+2022-05-03 00:47:43.292 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:47:43.299 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - Ego车的定位方式为：Lane Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 60.0, max offset: 100.0
+2022-05-03 00:47:43.299 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - B1的关联车辆为Ego
+2022-05-03 00:47:43.299 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - B1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 20.0, max offset: 80.0
+2022-05-03 00:47:43.300 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F1的关联车辆为Ego
+2022-05-03 00:47:43.300 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 110.0, max offset: 150.0
+2022-05-03 00:47:43.301 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F2的关联车辆为F1
+2022-05-03 00:47:43.301 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F2车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 130.0, max offset: 200.0
+2022-05-03 00:47:43.302 [main] INFO  json.importer.JSONParser.parse-357 - 车辆解析完成!
+2022-05-03 00:47:43.308 [main] INFO  json.exporter.XMLWriter.write-710 - 开始输出到文件：src/main/resources/models/Example1.xml
+2022-05-03 00:47:43.319 [main] INFO  xodr.importer.XODRInputReader.readFromFile-13 - OpenDRIVE地图文件路径：src/main/resources/ADSML/Example/custom.xodr
+2022-05-03 00:47:43.332 [main] INFO  xodr.importer.XODRParser.parse-54 - 开始解析地图...
+2022-05-03 00:47:43.365 [main] WARN  xodr.importer.XODRParser.initLane-447 - Lane的前驱后继索引初始化尚未完成：跨road部分
+2022-05-03 00:47:43.366 [main] INFO  xodr.importer.XODRParser.parse-94 - 解析地图完成！
+2022-05-03 00:47:43.368 [main] INFO  xodr.exporter.BufferWriter.write-23 - 开始写入地图声明...
+2022-05-03 00:47:43.369 [main] INFO  xodr.exporter.BufferWriter.addRoad-50 - Road(elementType=1, roadId=0, junctionIndex=-1, junctionId=-1, length=800.0, predecessorElementType=-1, predecessorIndex=-1, successorElementType=-1, successorIndex=-1, maxSpeed=40.0, laneSectionsIndex=[0], laneSections=[LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)], successorId=-1, predecessorId=-1, index=0)
+2022-05-03 00:47:43.370 [main] INFO  xodr.exporter.BufferWriter.addLaneSection-94 - LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)
+2022-05-03 00:47:43.370 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0)
+2022-05-03 00:47:43.371 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 00:47:43.371 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 00:47:43.371 [main] INFO  xodr.exporter.BufferWriter.write-34 - 地图声明写入已完成！
+2022-05-03 00:47:43.371 [main] INFO  json.exporter.XMLWriter.initCarFromMap-108 - 开始解析车辆(包括地图带来的索引更新)...
+2022-05-03 00:47:43.372 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - Ego车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 00:47:43.373 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - B1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 00:47:43.373 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 00:47:43.375 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F2车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 00:47:43.376 [main] INFO  json.exporter.XMLWriter.initCarFromMap-202 - 车辆解析完成！
+2022-05-03 00:47:43.395 [main] INFO  json.exporter.XMLWriter.resolveGuard-466 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 00:47:43.402 [main] INFO  json.exporter.XMLWriter.resolveGuard-466 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 00:47:43.417 [main] INFO  json.exporter.XMLWriter.resolveGuard-466 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 00:47:43.420 [main] INFO  json.exporter.XMLWriter.resolveGuard-466 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 00:47:43.428 [main] INFO  json.exporter.XMLWriter.resolveGuard-466 - Guard解析成功：原guard：Ego.intersection || B1.intersection || F1.intersection || F2.intersection, 转化后guard：cars[0].intersection || cars[1].intersection || cars[2].intersection || cars[3].intersection
+2022-05-03 00:47:43.441 [main] INFO  json.exporter.XMLWriter.write-736 - 输出结束，Uppaal SMC的XML格式的随机混成自动机已转化完成！
+2022-05-03 00:51:55.934 [main] INFO  json.importer.JSONInputReader.readFromFile-24 - 开始解析JSON文件：src/main/resources/ADSML/Example/example.model...
+2022-05-03 00:51:55.954 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:51:55.958 [main] INFO  json.importer.JSONParser.parse-326 - 开始解析各车辆...
+2022-05-03 00:51:56.138 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析Ego的动态行为模型(JSON)...
+2022-05-03 00:51:56.141 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:51:56.276 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析B1的动态行为模型(JSON)...
+2022-05-03 00:51:56.279 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:51:56.286 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F1的动态行为模型(JSON)...
+2022-05-03 00:51:56.288 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:51:56.289 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F2的动态行为模型(JSON)...
+2022-05-03 00:51:56.291 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:51:56.295 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - Ego车的定位方式为：Lane Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 60.0, max offset: 100.0
+2022-05-03 00:51:56.299 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - B1的关联车辆为Ego
+2022-05-03 00:51:56.300 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - B1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 20.0, max offset: 80.0
+2022-05-03 00:51:56.302 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F1的关联车辆为Ego
+2022-05-03 00:51:56.303 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 110.0, max offset: 150.0
+2022-05-03 00:51:56.305 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F2的关联车辆为F1
+2022-05-03 00:51:56.305 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F2车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 130.0, max offset: 200.0
+2022-05-03 00:51:56.307 [main] INFO  json.importer.JSONParser.parse-357 - 车辆解析完成!
+2022-05-03 00:51:56.318 [main] INFO  json.exporter.XMLWriter.write-710 - 开始输出到文件：src/main/resources/models/Example1.xml
+2022-05-03 00:51:56.325 [main] INFO  xodr.importer.XODRInputReader.readFromFile-13 - OpenDRIVE地图文件路径：src/main/resources/ADSML/Example/custom.xodr
+2022-05-03 00:51:56.332 [main] INFO  xodr.importer.XODRParser.parse-54 - 开始解析地图...
+2022-05-03 00:51:56.391 [main] WARN  xodr.importer.XODRParser.initLane-447 - Lane的前驱后继索引初始化尚未完成：跨road部分
+2022-05-03 00:51:56.392 [main] INFO  xodr.importer.XODRParser.parse-94 - 解析地图完成！
+2022-05-03 00:51:56.396 [main] INFO  xodr.exporter.BufferWriter.write-23 - 开始写入地图声明...
+2022-05-03 00:51:56.400 [main] INFO  xodr.exporter.BufferWriter.addRoad-50 - Road(elementType=1, roadId=0, junctionIndex=-1, junctionId=-1, length=800.0, predecessorElementType=-1, predecessorIndex=-1, successorElementType=-1, successorIndex=-1, maxSpeed=40.0, laneSectionsIndex=[0], laneSections=[LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)], successorId=-1, predecessorId=-1, index=0)
+2022-05-03 00:51:56.405 [main] INFO  xodr.exporter.BufferWriter.addLaneSection-94 - LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)
+2022-05-03 00:51:56.405 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0)
+2022-05-03 00:51:56.406 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 00:51:56.406 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 00:51:56.406 [main] INFO  xodr.exporter.BufferWriter.write-34 - 地图声明写入已完成！
+2022-05-03 00:51:56.407 [main] INFO  json.exporter.XMLWriter.initCarFromMap-108 - 开始解析车辆(包括地图带来的索引更新)...
+2022-05-03 00:51:56.407 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - Ego车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 00:51:56.407 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - B1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 00:51:56.408 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 00:51:56.408 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F2车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 00:51:56.408 [main] INFO  json.exporter.XMLWriter.initCarFromMap-202 - 车辆解析完成！
+2022-05-03 00:51:56.431 [main] INFO  json.exporter.XMLWriter.resolveGuard-466 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 00:51:56.437 [main] INFO  json.exporter.XMLWriter.resolveGuard-466 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 00:51:56.440 [main] INFO  json.exporter.XMLWriter.resolveGuard-466 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 00:51:56.443 [main] INFO  json.exporter.XMLWriter.resolveGuard-466 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 00:51:56.450 [main] INFO  json.exporter.XMLWriter.resolveGuard-466 - Guard解析成功：原guard：, 转化后guard：
+2022-05-03 00:51:56.456 [main] INFO  json.exporter.XMLWriter.write-736 - 输出结束，Uppaal SMC的XML格式的随机混成自动机已转化完成！
+2022-05-03 00:55:07.615 [main] INFO  json.importer.JSONInputReader.readFromFile-24 - 开始解析JSON文件：src/main/resources/ADSML/Example/example.model...
+2022-05-03 00:55:07.647 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:55:07.652 [main] INFO  json.importer.JSONParser.parse-326 - 开始解析各车辆...
+2022-05-03 00:55:07.989 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析Ego的动态行为模型(JSON)...
+2022-05-03 00:55:07.992 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:55:08.081 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析B1的动态行为模型(JSON)...
+2022-05-03 00:55:08.083 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:55:08.085 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F1的动态行为模型(JSON)...
+2022-05-03 00:55:08.093 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:55:08.094 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F2的动态行为模型(JSON)...
+2022-05-03 00:55:08.096 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:55:08.105 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - Ego车的定位方式为：Lane Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 60.0, max offset: 100.0
+2022-05-03 00:55:08.107 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - B1的关联车辆为Ego
+2022-05-03 00:55:08.107 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - B1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 20.0, max offset: 80.0
+2022-05-03 00:55:08.108 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F1的关联车辆为Ego
+2022-05-03 00:55:08.111 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 110.0, max offset: 150.0
+2022-05-03 00:55:08.112 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F2的关联车辆为F1
+2022-05-03 00:55:08.118 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F2车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 130.0, max offset: 200.0
+2022-05-03 00:55:08.118 [main] INFO  json.importer.JSONParser.parse-357 - 车辆解析完成!
+2022-05-03 00:55:08.128 [main] INFO  json.exporter.XMLWriter.write-714 - 开始输出到文件：src/main/resources/models/Example1.xml
+2022-05-03 00:55:08.133 [main] INFO  xodr.importer.XODRInputReader.readFromFile-13 - OpenDRIVE地图文件路径：src/main/resources/ADSML/Example/custom.xodr
+2022-05-03 00:55:08.141 [main] INFO  xodr.importer.XODRParser.parse-54 - 开始解析地图...
+2022-05-03 00:55:08.172 [main] WARN  xodr.importer.XODRParser.initLane-447 - Lane的前驱后继索引初始化尚未完成：跨road部分
+2022-05-03 00:55:08.172 [main] INFO  xodr.importer.XODRParser.parse-94 - 解析地图完成！
+2022-05-03 00:55:08.175 [main] INFO  xodr.exporter.BufferWriter.write-23 - 开始写入地图声明...
+2022-05-03 00:55:08.176 [main] INFO  xodr.exporter.BufferWriter.addRoad-50 - Road(elementType=1, roadId=0, junctionIndex=-1, junctionId=-1, length=800.0, predecessorElementType=-1, predecessorIndex=-1, successorElementType=-1, successorIndex=-1, maxSpeed=40.0, laneSectionsIndex=[0], laneSections=[LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)], successorId=-1, predecessorId=-1, index=0)
+2022-05-03 00:55:08.177 [main] INFO  xodr.exporter.BufferWriter.addLaneSection-94 - LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)
+2022-05-03 00:55:08.178 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0)
+2022-05-03 00:55:08.179 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 00:55:08.181 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 00:55:08.183 [main] INFO  xodr.exporter.BufferWriter.write-34 - 地图声明写入已完成！
+2022-05-03 00:55:08.185 [main] INFO  json.exporter.XMLWriter.initCarFromMap-108 - 开始解析车辆(包括地图带来的索引更新)...
+2022-05-03 00:55:08.186 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - Ego车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 00:55:08.186 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - B1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 00:55:08.187 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 00:55:08.187 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F2车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 00:55:08.188 [main] INFO  json.exporter.XMLWriter.initCarFromMap-202 - 车辆解析完成！
+2022-05-03 00:55:08.199 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 00:55:08.202 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 00:55:08.205 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 00:55:08.206 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 00:55:08.213 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：, 转化后guard：
+2022-05-03 00:55:08.221 [main] INFO  json.exporter.XMLWriter.write-740 - 输出结束，Uppaal SMC的XML格式的随机混成自动机已转化完成！
+2022-05-03 00:55:40.969 [main] INFO  json.importer.JSONInputReader.readFromFile-24 - 开始解析JSON文件：src/main/resources/ADSML/Example/example.model...
+2022-05-03 00:55:41.008 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:55:41.012 [main] INFO  json.importer.JSONParser.parse-326 - 开始解析各车辆...
+2022-05-03 00:55:41.389 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析Ego的动态行为模型(JSON)...
+2022-05-03 00:55:41.396 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:55:41.449 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析B1的动态行为模型(JSON)...
+2022-05-03 00:55:41.451 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:55:41.452 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F1的动态行为模型(JSON)...
+2022-05-03 00:55:41.453 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:55:41.455 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F2的动态行为模型(JSON)...
+2022-05-03 00:55:41.457 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:55:41.460 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - Ego车的定位方式为：Lane Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 60.0, max offset: 100.0
+2022-05-03 00:55:41.461 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - B1的关联车辆为Ego
+2022-05-03 00:55:41.461 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - B1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 20.0, max offset: 80.0
+2022-05-03 00:55:41.461 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F1的关联车辆为Ego
+2022-05-03 00:55:41.462 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 110.0, max offset: 150.0
+2022-05-03 00:55:41.462 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F2的关联车辆为F1
+2022-05-03 00:55:41.462 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F2车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 130.0, max offset: 200.0
+2022-05-03 00:55:41.462 [main] INFO  json.importer.JSONParser.parse-357 - 车辆解析完成!
+2022-05-03 00:55:41.482 [main] INFO  json.exporter.XMLWriter.write-714 - 开始输出到文件：src/main/resources/models/Example1.xml
+2022-05-03 00:55:41.489 [main] INFO  xodr.importer.XODRInputReader.readFromFile-13 - OpenDRIVE地图文件路径：src/main/resources/ADSML/Example/custom.xodr
+2022-05-03 00:55:41.496 [main] INFO  xodr.importer.XODRParser.parse-54 - 开始解析地图...
+2022-05-03 00:55:41.530 [main] WARN  xodr.importer.XODRParser.initLane-447 - Lane的前驱后继索引初始化尚未完成：跨road部分
+2022-05-03 00:55:41.531 [main] INFO  xodr.importer.XODRParser.parse-94 - 解析地图完成！
+2022-05-03 00:55:41.536 [main] INFO  xodr.exporter.BufferWriter.write-23 - 开始写入地图声明...
+2022-05-03 00:55:41.537 [main] INFO  xodr.exporter.BufferWriter.addRoad-50 - Road(elementType=1, roadId=0, junctionIndex=-1, junctionId=-1, length=800.0, predecessorElementType=-1, predecessorIndex=-1, successorElementType=-1, successorIndex=-1, maxSpeed=40.0, laneSectionsIndex=[0], laneSections=[LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)], successorId=-1, predecessorId=-1, index=0)
+2022-05-03 00:55:41.538 [main] INFO  xodr.exporter.BufferWriter.addLaneSection-94 - LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)
+2022-05-03 00:55:41.539 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0)
+2022-05-03 00:55:41.539 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 00:55:41.540 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 00:55:41.540 [main] INFO  xodr.exporter.BufferWriter.write-34 - 地图声明写入已完成！
+2022-05-03 00:55:41.540 [main] INFO  json.exporter.XMLWriter.initCarFromMap-108 - 开始解析车辆(包括地图带来的索引更新)...
+2022-05-03 00:55:41.541 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - Ego车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 00:55:41.541 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - B1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 00:55:41.542 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 00:55:41.542 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F2车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 00:55:41.542 [main] INFO  json.exporter.XMLWriter.initCarFromMap-202 - 车辆解析完成！
+2022-05-03 00:55:41.565 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 00:55:41.567 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 00:55:41.570 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 00:55:41.571 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 00:55:41.575 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：, 转化后guard：
+2022-05-03 00:56:43.870 [main] INFO  json.exporter.XMLWriter.write-740 - 输出结束，Uppaal SMC的XML格式的随机混成自动机已转化完成！
+2022-05-03 00:56:51.880 [main] INFO  json.importer.JSONInputReader.readFromFile-24 - 开始解析JSON文件：src/main/resources/ADSML/Example/example.model...
+2022-05-03 00:56:51.905 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:56:51.909 [main] INFO  json.importer.JSONParser.parse-326 - 开始解析各车辆...
+2022-05-03 00:56:52.270 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析Ego的动态行为模型(JSON)...
+2022-05-03 00:56:52.274 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:56:52.395 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析B1的动态行为模型(JSON)...
+2022-05-03 00:56:52.400 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:56:52.401 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F1的动态行为模型(JSON)...
+2022-05-03 00:56:52.407 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:56:52.409 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F2的动态行为模型(JSON)...
+2022-05-03 00:56:52.411 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 00:56:52.415 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - Ego车的定位方式为：Lane Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 60.0, max offset: 100.0
+2022-05-03 00:56:52.417 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - B1的关联车辆为Ego
+2022-05-03 00:56:52.418 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - B1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 20.0, max offset: 80.0
+2022-05-03 00:56:52.418 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F1的关联车辆为Ego
+2022-05-03 00:56:52.419 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 110.0, max offset: 150.0
+2022-05-03 00:56:52.419 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F2的关联车辆为F1
+2022-05-03 00:56:52.420 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F2车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 130.0, max offset: 200.0
+2022-05-03 00:56:52.420 [main] INFO  json.importer.JSONParser.parse-357 - 车辆解析完成!
+2022-05-03 00:56:52.423 [main] INFO  json.exporter.XMLWriter.write-714 - 开始输出到文件：src/main/resources/models/Example1.xml
+2022-05-03 00:56:52.431 [main] INFO  xodr.importer.XODRInputReader.readFromFile-13 - OpenDRIVE地图文件路径：src/main/resources/ADSML/Example/custom.xodr
+2022-05-03 00:56:52.436 [main] INFO  xodr.importer.XODRParser.parse-54 - 开始解析地图...
+2022-05-03 00:56:52.463 [main] WARN  xodr.importer.XODRParser.initLane-447 - Lane的前驱后继索引初始化尚未完成：跨road部分
+2022-05-03 00:56:52.465 [main] INFO  xodr.importer.XODRParser.parse-94 - 解析地图完成！
+2022-05-03 00:56:52.468 [main] INFO  xodr.exporter.BufferWriter.write-23 - 开始写入地图声明...
+2022-05-03 00:56:52.469 [main] INFO  xodr.exporter.BufferWriter.addRoad-50 - Road(elementType=1, roadId=0, junctionIndex=-1, junctionId=-1, length=800.0, predecessorElementType=-1, predecessorIndex=-1, successorElementType=-1, successorIndex=-1, maxSpeed=40.0, laneSectionsIndex=[0], laneSections=[LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)], successorId=-1, predecessorId=-1, index=0)
+2022-05-03 00:56:52.469 [main] INFO  xodr.exporter.BufferWriter.addLaneSection-94 - LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)
+2022-05-03 00:56:52.470 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0)
+2022-05-03 00:56:52.470 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 00:56:52.471 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 00:56:52.471 [main] INFO  xodr.exporter.BufferWriter.write-34 - 地图声明写入已完成！
+2022-05-03 00:56:52.471 [main] INFO  json.exporter.XMLWriter.initCarFromMap-108 - 开始解析车辆(包括地图带来的索引更新)...
+2022-05-03 00:56:52.472 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - Ego车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 00:56:52.472 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - B1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 00:56:52.473 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 00:56:52.473 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F2车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 00:56:52.474 [main] INFO  json.exporter.XMLWriter.initCarFromMap-202 - 车辆解析完成！
+2022-05-03 00:56:52.505 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 00:56:52.510 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 00:56:52.519 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 00:56:52.523 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 00:56:52.540 [main] INFO  json.exporter.XMLWriter.write-740 - 输出结束，Uppaal SMC的XML格式的随机混成自动机已转化完成！
+2022-05-03 01:01:22.909 [main] INFO  json.importer.JSONInputReader.readFromFile-24 - 开始解析JSON文件：src/main/resources/ADSML/Example/example.model...
+2022-05-03 01:01:22.931 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 01:01:22.934 [main] INFO  json.importer.JSONParser.parse-326 - 开始解析各车辆...
+2022-05-03 01:01:23.310 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析Ego的动态行为模型(JSON)...
+2022-05-03 01:01:23.313 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 01:01:23.372 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析B1的动态行为模型(JSON)...
+2022-05-03 01:01:23.374 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 01:01:23.375 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F1的动态行为模型(JSON)...
+2022-05-03 01:01:23.377 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 01:01:23.380 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F2的动态行为模型(JSON)...
+2022-05-03 01:01:23.383 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 01:01:23.391 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - Ego车的定位方式为：Lane Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 60.0, max offset: 100.0
+2022-05-03 01:01:23.392 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - B1的关联车辆为Ego
+2022-05-03 01:01:23.393 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - B1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 20.0, max offset: 80.0
+2022-05-03 01:01:23.395 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F1的关联车辆为Ego
+2022-05-03 01:01:23.396 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 110.0, max offset: 150.0
+2022-05-03 01:01:23.396 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F2的关联车辆为F1
+2022-05-03 01:01:23.396 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F2车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 130.0, max offset: 200.0
+2022-05-03 01:01:23.397 [main] INFO  json.importer.JSONParser.parse-357 - 车辆解析完成!
+2022-05-03 01:01:23.403 [main] INFO  json.exporter.XMLWriter.write-714 - 开始输出到文件：src/main/resources/models/Example1.xml
+2022-05-03 01:01:23.409 [main] INFO  xodr.importer.XODRInputReader.readFromFile-13 - OpenDRIVE地图文件路径：src/main/resources/ADSML/Example/custom.xodr
+2022-05-03 01:01:23.415 [main] INFO  xodr.importer.XODRParser.parse-54 - 开始解析地图...
+2022-05-03 01:01:23.452 [main] WARN  xodr.importer.XODRParser.initLane-447 - Lane的前驱后继索引初始化尚未完成：跨road部分
+2022-05-03 01:01:23.453 [main] INFO  xodr.importer.XODRParser.parse-94 - 解析地图完成！
+2022-05-03 01:01:23.456 [main] INFO  xodr.exporter.BufferWriter.write-23 - 开始写入地图声明...
+2022-05-03 01:01:23.458 [main] INFO  xodr.exporter.BufferWriter.addRoad-50 - Road(elementType=1, roadId=0, junctionIndex=-1, junctionId=-1, length=800.0, predecessorElementType=-1, predecessorIndex=-1, successorElementType=-1, successorIndex=-1, maxSpeed=40.0, laneSectionsIndex=[0], laneSections=[LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)], successorId=-1, predecessorId=-1, index=0)
+2022-05-03 01:01:23.458 [main] INFO  xodr.exporter.BufferWriter.addLaneSection-94 - LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)
+2022-05-03 01:01:23.459 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0)
+2022-05-03 01:01:23.459 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 01:01:23.460 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 01:01:23.460 [main] INFO  xodr.exporter.BufferWriter.write-34 - 地图声明写入已完成！
+2022-05-03 01:01:23.460 [main] INFO  json.exporter.XMLWriter.initCarFromMap-108 - 开始解析车辆(包括地图带来的索引更新)...
+2022-05-03 01:01:23.461 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - Ego车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 01:01:23.461 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - B1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 01:01:23.462 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 01:01:23.463 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F2车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 01:01:23.464 [main] INFO  json.exporter.XMLWriter.initCarFromMap-202 - 车辆解析完成！
+2022-05-03 01:01:23.479 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 01:01:23.481 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 01:01:23.486 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 01:01:23.487 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 01:01:23.499 [main] INFO  json.exporter.XMLWriter.write-740 - 输出结束，Uppaal SMC的XML格式的随机混成自动机已转化完成！
+2022-05-03 01:39:49.701 [main] INFO  json.importer.JSONInputReader.readFromFile-24 - 开始解析JSON文件：src/main/resources/ADSML/Example/example.model...
+2022-05-03 01:39:49.722 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 01:39:49.725 [main] INFO  json.importer.JSONParser.parse-326 - 开始解析各车辆...
+2022-05-03 01:39:50.030 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析Ego的动态行为模型(JSON)...
+2022-05-03 01:39:50.035 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 01:39:50.163 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析B1的动态行为模型(JSON)...
+2022-05-03 01:39:50.167 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 01:39:50.169 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F1的动态行为模型(JSON)...
+2022-05-03 01:39:50.173 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 01:39:50.174 [main] INFO  json.importer.JSONInputReader.readFromFile-21 - 开始解析F2的动态行为模型(JSON)...
+2022-05-03 01:39:50.177 [main] INFO  json.importer.JSONInputReader.readFromFile-35 - 完成解析JSON!
+2022-05-03 01:39:50.180 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - Ego车的定位方式为：Lane Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 60.0, max offset: 100.0
+2022-05-03 01:39:50.181 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - B1的关联车辆为Ego
+2022-05-03 01:39:50.182 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - B1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 20.0, max offset: 80.0
+2022-05-03 01:39:50.182 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F1的关联车辆为Ego
+2022-05-03 01:39:50.183 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F1车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 110.0, max offset: 150.0
+2022-05-03 01:39:50.183 [main] INFO  json.importer.JSONParser.initFromRelatedCar-61 - F2的关联车辆为F1
+2022-05-03 01:39:50.184 [main] INFO  json.importer.JSONParser.initFromRelatedCar-70 - F2车的定位方式为：Related Position, 道路初步信息（需再计算）：road id: 0, lane id: -2, min offset: 130.0, max offset: 200.0
+2022-05-03 01:39:50.185 [main] INFO  json.importer.JSONParser.parse-357 - 车辆解析完成!
+2022-05-03 01:39:50.190 [main] INFO  json.exporter.XMLWriter.write-714 - 开始输出到文件：src/main/resources/models/Example1.xml
+2022-05-03 01:39:50.200 [main] INFO  xodr.importer.XODRInputReader.readFromFile-13 - OpenDRIVE地图文件路径：src/main/resources/ADSML/Example/custom.xodr
+2022-05-03 01:39:50.209 [main] INFO  xodr.importer.XODRParser.parse-54 - 开始解析地图...
+2022-05-03 01:39:50.247 [main] WARN  xodr.importer.XODRParser.initLane-447 - Lane的前驱后继索引初始化尚未完成：跨road部分
+2022-05-03 01:39:50.248 [main] INFO  xodr.importer.XODRParser.parse-94 - 解析地图完成！
+2022-05-03 01:39:50.257 [main] INFO  xodr.exporter.BufferWriter.write-23 - 开始写入地图声明...
+2022-05-03 01:39:50.259 [main] INFO  xodr.exporter.BufferWriter.addRoad-50 - Road(elementType=1, roadId=0, junctionIndex=-1, junctionId=-1, length=800.0, predecessorElementType=-1, predecessorIndex=-1, successorElementType=-1, successorIndex=-1, maxSpeed=40.0, laneSectionsIndex=[0], laneSections=[LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)], successorId=-1, predecessorId=-1, index=0)
+2022-05-03 01:39:50.260 [main] INFO  xodr.exporter.BufferWriter.addLaneSection-94 - LaneSection(elementType=2, roadIndex=0, roadId=0, laneSectionId=0, startPosition=0.0, lanesIndex=[0, 1, 2], length=0.0, lanes=[Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5), Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)], index=0)
+2022-05-03 01:39:50.261 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=0, type=0, predecessorIndex=-1, successorIndex=-1, laneChange=4, laneSectionId=0, singleId=0, index=0, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=0.0)
+2022-05-03 01:39:50.261 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-1, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=2, laneSectionId=0, singleId=1, index=1, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 01:39:50.261 [main] INFO  xodr.exporter.BufferWriter.addLane-134 - Lane(elementType=3, roadId=0, roadIndex=0, laneSectionIndex=0, laneId=-2, type=1, predecessorIndex=-1, successorIndex=-1, laneChange=1, laneSectionId=0, singleId=2, index=2, predecessorLaneId=0, predecessorSingleId=-1, successorLaneId=0, successorSingleId=-1, width=3.5)
+2022-05-03 01:39:50.262 [main] INFO  xodr.exporter.BufferWriter.write-34 - 地图声明写入已完成！
+2022-05-03 01:39:50.262 [main] INFO  json.exporter.XMLWriter.initCarFromMap-108 - 开始解析车辆(包括地图带来的索引更新)...
+2022-05-03 01:39:50.263 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - Ego车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 01:39:50.264 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - B1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 01:39:50.264 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F1车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-2, index=2)
+2022-05-03 01:39:50.264 [main] INFO  json.exporter.XMLWriter.initCarFromMap-197 - F2车的道路信息为: Road(id=0, index=0), LaneSection(id=0, index=0), Lane(id=-1, index=1)
+2022-05-03 01:39:50.265 [main] INFO  json.exporter.XMLWriter.initCarFromMap-202 - 车辆解析完成！
+2022-05-03 01:39:50.294 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 01:39:50.298 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 01:39:50.305 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F1, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[2], 80)
+2022-05-03 01:39:50.308 [main] INFO  json.exporter.XMLWriter.resolveGuard-470 - Guard解析成功：原guard：withinDisToObjsInLane(Ego, F2, 8), 转化后guard：withinDisToObjsInLane(cars[0], cars[3], 80)
+2022-05-03 01:39:50.316 [main] INFO  json.exporter.XMLWriter.write-740 - 输出结束，Uppaal SMC的XML格式的随机混成自动机已转化完成！

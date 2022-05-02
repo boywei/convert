@@ -26,8 +26,9 @@ public class UppaalUtil {
     public static final String DEFINED_PATH = "src/main/resources/uppaal/defined.txt";
     public static final String FUNCTION_PATH = "src/main/resources/uppaal/function.txt";
     public static final String TRANSITION_PATH = "src/main/resources/uppaal/transition.txt";
-    public static final String AUTOMATON_PATH = "src/main/resources/uppaal/automaton.txt";
-    
+    public static final String AUTOMATON_PATH = "src/main/resources/uppaal/Timer.txt";
+    public static final String END_TRIGGER_PATH = "src/main/resources/uppaal/EndTrigger.txt";
+
     /*
         地图信息
      */

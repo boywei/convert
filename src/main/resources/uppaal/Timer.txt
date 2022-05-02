@@ -23,26 +23,3 @@
             <nail x="-51" y="-161"/>
         </transition>
     </template>
-    <template>
-    <name>EndTrigger</name>
-    <location id="id2" x="-246" y="-144">
-        <name x="-256" y="-178">Start</name>
-        <label kind="invariant" x="-256" y="-127">safeTurnLeft &amp;&amp;
-safeTurnRight &amp;&amp;
-safeChangeLeft &amp;&amp;
-safeChangeRight &amp;&amp;
-safeAccelerate &amp;&amp;
-safeDecelerate &amp;&amp;
-safeKeep &amp;&amp;
-safeModifyRoadLane</label>
-    </location>
-    <location id="id3" x="25" y="-144">
-        <name x="15" y="-178">End</name>
-    </location>
-    <init ref="id2"/>
-    <transition>
-        <source ref="id2"/>
-        <target ref="id3"/>
-        <label kind="synchronisation" x="-136" y="-161">end!</label>
-    </transition>
-    </template>

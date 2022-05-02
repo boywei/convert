@@ -515,6 +515,7 @@ void modifyRoadLane(Car&amp; car) {
     }
 }
 
+
 /**
 	加速:
 	1. 根据加速度公式v'=v+at计算速度: speed += timestep * acceletion? 同时需要判断是否到达最大车速
