@@ -205,7 +205,8 @@ public class XMLWriter {
     // 1.3 添加车辆声明
     private static void addCar(StringBuffer buffer) {
         int countOfCar = cars.size();
-        buffer.append("//id, width, length, heading, speed, acceleration, maxSpeed, ..., offset\n");
+        buffer.append("\n//id, width, length, heading, speed, acceleration, maxSpeed, ..., offset\n");
+        buffer.append("int countOfCars = " + countOfCar + ";\n");
         buffer.append("Car cars[" + countOfCar + "] = {\n");
         for(int i = 0; i < countOfCar; i++) {
 //            System.out.println(cars[i].toString());
@@ -317,7 +318,7 @@ public class XMLWriter {
                 "\t\t\t<committed/>\n" +
                 "\t\t</location>\n");
         // 再加一个结束状态
-        endId = carNameIndexMap.size() + 1; // 最后一个节点名id + 1
+        endId = carNameIndexMap.size() + cars.get(index).getMTree().getBranchPoints().size() + 1; // 最后一个节点名id + 1
         buffer.append("\t\t<location id=\"id" + endId + "\">\n" +
                 "\t\t\t<name>End</name>\n" +
                 "\t\t</location>\n");
@@ -589,14 +590,16 @@ public class XMLWriter {
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.CHANGE_LEFT.getValue())) {
             // acceleration, target speed
+            targetSpeed = (targetSpeed == INT16_MAX*1.0/K? -1.0/K : targetSpeed);
             buffer.append(", cars[" + index + "].acceleration = " + f(acceleration));
-            buffer.append(", changeLeft(cars[" + index + "])");
+            buffer.append(", changeLeft(cars[" + index + "], " + f(targetSpeed) + ")");
 //            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.CHANGE_RIGHT.getValue())) {
             // acceleration, target speed
+            targetSpeed = (targetSpeed == INT16_MAX*1.0/K? -1.0/K : targetSpeed);
             buffer.append(", cars[" + index + "].acceleration = " + f(acceleration));
-            buffer.append(", changeRight(cars[" + index + "])");
+            buffer.append(", changeRight(cars[" + index + "], " + f(targetSpeed) + ")");
 //            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.IDLE.getValue())) {
