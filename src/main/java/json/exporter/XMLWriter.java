@@ -164,7 +164,7 @@ public class XMLWriter {
 
             // 1 计算laneId相对中心线偏移
             double totalLateralOffset = 0.0;
-            int laneId = car.getLaneId();
+            int laneId = car.getLaneId() == 0 ? -1 : car.getLaneId();
             int direction = -laneId / Math.abs(laneId); // 索引增加的方向：-1为左，1为右（因为解析时先解析左再解析右）
             int centerLaneIndex = 0;
             for(Lane lane : currentLanes) { //找到中心线车道的索引
@@ -318,7 +318,7 @@ public class XMLWriter {
                 "\t\t\t<committed/>\n" +
                 "\t\t</location>\n");
         // 再加一个结束状态
-        endId = carNameIndexMap.size() + cars.get(index).getMTree().getBranchPoints().size() + 1; // 最后一个节点名id + 1
+        endId = cars.get(index).getMTree().getBehaviors().size() + cars.get(index).getMTree().getBranchPoints().size() + 1; // 最后一个节点名id + 1
         buffer.append("\t\t<location id=\"id" + endId + "\">\n" +
                 "\t\t\t<name>End</name>\n" +
                 "\t\t</location>\n");
