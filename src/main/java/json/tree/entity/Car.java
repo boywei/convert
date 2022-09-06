@@ -32,6 +32,9 @@ public class Car {
     private double x;
     private double y;
 
+    private int currentBehavior = 0; //（新增）状态含义： 0不明确，1匀速，2加速，3减速，4左换道，5右换道，6左转，7右转
+    private int targetSpeed = -1;
+
     // 若通过关联车辆定位
     private String actorRef;
 

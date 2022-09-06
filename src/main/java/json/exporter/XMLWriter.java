@@ -54,6 +54,7 @@ public class XMLWriter {
             addTemplate(buffer, i);
         }
         addEndTrigger(buffer);
+        addController(buffer);
         addSystem(buffer);
         addQueries(buffer);
 
@@ -220,6 +221,9 @@ public class XMLWriter {
             buffer.append(0 + ", ");
             buffer.append(f(cars.get(i).getMaxSpeed()) + ", ");
 
+            buffer.append(cars.get(i).getCurrentBehavior() + ", ");
+            buffer.append(cars.get(i).getTargetSpeed() + ", ");
+
             buffer.append(cars.get(i).getRoadId() + ", ");
             buffer.append(cars.get(i).getLaneSectionId() + ", ");
             buffer.append(cars.get(i).getLaneId() + ", ");
@@ -248,6 +252,16 @@ public class XMLWriter {
     private static void addTimer(StringBuffer buffer) {
         try {
             String definedContent = FileUtils.readFileToString(new File(AUTOMATON_PATH), "UTF-8");
+            buffer.append(definedContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 2.1 Controller，用于同步更新
+    private static void addController(StringBuffer buffer) {
+        try {
+            String definedContent = FileUtils.readFileToString(new File(CONTROLLER_PATH), "UTF-8");
             buffer.append(definedContent);
         } catch (IOException e) {
             e.printStackTrace();
@@ -545,7 +559,7 @@ public class XMLWriter {
         if(behavior.getName().equals(BehaviorType.ACCELERATE.getValue())) {
             // *acceleration, *target speed, duration
             buffer.append(", cars[" + index + "].acceleration = " + f(acceleration));
-            buffer.append(", speedUp(cars[" + index + "]," + f(targetSpeed) + ")");
+            buffer.append(", m_speedUp(cars[" + index + "]," + f(targetSpeed) + ")");
             String lock = nextGuardAndNot(behavior, index);
             if(lock == null) {
                 buffer.append(", lock = (t&lt;" + f(duration) + " &amp;&amp; cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
@@ -556,7 +570,7 @@ public class XMLWriter {
         } else if(behavior.getName().equals(BehaviorType.DECELERATE.getValue())) {
             // *acceleration, *target speed, duration
             buffer.append(", cars[" + index + "].acceleration = " + f(acceleration));
-            buffer.append(", speedDown(cars[" + index + "]," + f(targetSpeed) + ")");
+            buffer.append(", m_speedDown(cars[" + index + "]," + f(targetSpeed) + ")");
             String lock = nextGuardAndNot(behavior, index);
             if(lock == null) {
                 buffer.append(", lock = (t&lt;" + f(duration) + " &amp;&amp; cars[" + index + "].speed&gt;" + f(targetSpeed) + ")");
@@ -568,7 +582,7 @@ public class XMLWriter {
             // duration
             // , keep(cars[0])
             //, lock=(t<5)
-            buffer.append(", keep(cars[" + index + "])");
+            buffer.append(", m_keep(cars[" + index + "])");
             String lock = nextGuardAndNot(behavior, index);
             if(lock == null) {
                 buffer.append(", lock = (t&lt;" + f(duration) + ")");
@@ -579,27 +593,27 @@ public class XMLWriter {
         } else if(behavior.getName().equals(BehaviorType.TURN_LEFT.getValue())) {
             // *acceleration, *target speed
             buffer.append(", cars[" + index + "].acceleration = " + f(acceleration));
-            buffer.append(", turnLeft(cars[" + index + "])");
+            buffer.append(", m_turnLeft(cars[" + index + "])");
 //            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.TURN_RIGHT.getValue())) {
             // *acceleration, *target speed
             buffer.append(", cars[" + index + "].acceleration = " + f(acceleration));
-            buffer.append(", turnRight(cars[" + index + "])");
+            buffer.append(", m_turnRight(cars[" + index + "])");
 //            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.CHANGE_LEFT.getValue())) {
             // acceleration, target speed
             targetSpeed = (targetSpeed == INT16_MAX*1.0/K? -1.0/K : targetSpeed);
             buffer.append(", cars[" + index + "].acceleration = " + f(acceleration));
-            buffer.append(", changeLeft(cars[" + index + "], " + f(targetSpeed) + ")");
+            buffer.append(", m_changeLeft(cars[" + index + "], " + f(targetSpeed) + ")");
 //            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.CHANGE_RIGHT.getValue())) {
             // acceleration, target speed
             targetSpeed = (targetSpeed == INT16_MAX*1.0/K? -1.0/K : targetSpeed);
             buffer.append(", cars[" + index + "].acceleration = " + f(acceleration));
-            buffer.append(", changeRight(cars[" + index + "], " + f(targetSpeed) + ")");
+            buffer.append(", m_changeRight(cars[" + index + "], " + f(targetSpeed) + ")");
 //            buffer.append(", lock = (cars[" + index + "].speed&lt;" + f(targetSpeed) + ")");
             buffer.append(", lock = false");
         } else if(behavior.getName().equals(BehaviorType.IDLE.getValue())) {
@@ -669,7 +683,8 @@ public class XMLWriter {
         for (Car car : cars) {
             buffer.append(", " + car.getName());
         }
-        buffer.append(", EndTrigger;\n");
+        buffer.append(", EndTrigger");
+        buffer.append(", Controller;\n");
 
         buffer.append("\t</system>\n");
     }

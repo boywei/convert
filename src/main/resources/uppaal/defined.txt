@@ -134,6 +134,8 @@ typedef struct {
     int speed;
     int acceleration;
     int maxSpeed;
+    int currentBehavior; //状态含义： 0不明确，1匀速，2加速，3减速，4左换道，5右换道，6左转，7右转
+    int targetSpeed; // -1
 
     //车的车道信息: 所在road, laneSection, lane及在road上的偏移量
     int roadId;
@@ -152,6 +154,7 @@ typedef struct {
 clock time; // 时钟
 broadcast chan update, end;
 
+const int COUNT_BEHAVIORS = 8; //行为类型数量
 const int FACTOR = 10; // 为保留小数而放大的倍数
 const int MIN_DISTANCE_TO_OVERTAKE = 30 * FACTOR; // 超车的最小距离
 const int MIN_DISTANCE_TO_CLOSE = 20 * FACTOR; // 两车最小的距离

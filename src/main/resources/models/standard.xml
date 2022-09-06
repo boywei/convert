@@ -138,6 +138,8 @@ typedef struct {
     int speed;
     int acceleration;
     int maxSpeed;
+    int currentBehavior; //状态含义： 0不明确，1匀速，2加速，3减速，4左换道，5右换道，6左转，7右转
+    int targetSpeed; // -1
 
     //车的车道信息: 所在road, laneSection, lane及在road上的偏移量
     int roadId;
@@ -195,8 +197,9 @@ Connection connections[2];
 LaneLink laneLinks[2];
 
 const int TIME_STEP = 10;
+const int COUNT_BEHAVIORS = 8; //New
 int countOfCars = 1;
-Car cars[1] = {{0, 0, 0, true, 0, 0, 1, 10, 0, 0, 0, 0, 0, 0}};
+Car cars[1] = {{0, 0, 0, true, 0, 0, 1, 10, 0, -1, 0, 0, 0, 0, 0, 0}};
 
 /************************************* 常用函数 *************************************/
 
@@ -678,6 +681,71 @@ void turnRight(Car&amp; car){
         }
     }
 }
+
+void updateAllCarsLoc(){
+    int i = 0, j = 0, c = 0, targetSpeed = -1;
+    for(i=0; i&lt;countOfCars; i++) {
+        c = cars[i].currentBehavior;
+        targetSpeed = cars[i].targetSpeed;
+        // 状态含义： 0不明确，1匀速，2加速，3减速，4左换道，5右换道，6左转，7右转
+        if(c == 0){
+            return;
+        } else if(c == 1){
+           keep(cars[i]);
+        } else if(c == 2){
+            speedUp(cars[i], targetSpeed);
+        } else if(c == 3){
+            speedDown(cars[i], targetSpeed);
+        } else if(c == 4){
+            changeLeft(cars[i],targetSpeed);
+        } else if(c == 5){
+            changeRight(cars[i], targetSpeed);
+        } else if(c == 6){
+            turnLeft(cars[i]);
+        } else if(c == 7){
+            turnRight(cars[i]);
+        }       
+    }
+}
+
+void modifyBehavior(Car&amp; car, int behaviorType, int targetSpeed) { //方式一： modifyBehavior直接修改，行为类型作为参数传递
+    car.currentBehavior = behaviorType;
+    car.targetSpeed = targetSpeed;
+}
+
+void m_keep(Car&amp; car){ //方式二：m_行为名函数，根据行为名修改车辆行为属性
+    car.currentBehavior = 1;
+}
+
+void m_speedUp(Car&amp; car, int targetSpeed){
+    car.currentBehavior = 2;
+    car.targetSpeed = targetSpeed;
+}
+
+void m_speedDown(Car&amp; car, int targetSpeed){
+    car.currentBehavior = 3;
+    car.targetSpeed = targetSpeed;
+}
+
+void m_changeLeft(Car&amp; car, int targetSpeed){
+    car.currentBehavior = 4;
+    car.targetSpeed = targetSpeed;
+}
+
+void m_changeRight(Car&amp; car, int targetSpeed){
+    car.currentBehavior = 5;
+    car.targetSpeed = targetSpeed;
+}
+
+void m_turnLeft(Car&amp; car){
+    car.currentBehavior = 6;
+}
+
+void m_turnRight(Car&amp; car) {
+    car.currentBehavior = 7;
+}
+
+
 
 /************************************* Guard条件规范 *************************************/
 

@@ -1,0 +1,24 @@
+    <template>
+		<name>Controller</name>
+		<location id="id24" x="-382" y="-93">
+			<name x="-392" y="-127">Start</name>
+		</location>
+		<location id="id25" x="-178" y="-93">
+			<name x="-188" y="-127">End</name>
+		</location>
+		<init ref="id24"/>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id24"/>
+			<label kind="synchronisation" x="-425" y="-229">update?</label>
+			<label kind="assignment" x="-459" y="-187">updateAllCarsLoc()</label>
+			<nail x="-484" y="-195"/>
+			<nail x="-484" y="-195"/>
+			<nail x="-280" y="-195"/>
+		</transition>
+		<transition>
+			<source ref="id24"/>
+			<target ref="id25"/>
+			<label kind="synchronisation" x="-314" y="-110">end?</label>
+		</transition>
+	</template>
